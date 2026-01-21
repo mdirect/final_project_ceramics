@@ -1,9 +1,13 @@
+import { Stack, Typography } from "@mui/material";
+
 export default function WePage() {
   return (
-    <main className="page">
-      <h1>WE</h1>
-      <p>Brand concept, values, and directions.</p>
-    </main>
+    <Stack spacing={2}>
+      <Typography variant="h1">WE</Typography>
+      <Typography variant="body2" color="text.secondary">
+        Brand concept, values, and directions.
+      </Typography>
+    </Stack>
   );
 }
 

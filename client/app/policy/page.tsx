@@ -1,3 +1,5 @@
+import { Stack, Typography } from "@mui/material";
+
 const sections = [
   "Delivery",
   "Return Policy",
@@ -8,14 +10,14 @@ const sections = [
 
 export default function PolicyPage() {
   return (
-    <main className="page">
-      <h1>Policy & Delivery Terms</h1>
-      <section className="pageSection">
+    <Stack spacing={2}>
+      <Typography variant="h1">Policy & Delivery Terms</Typography>
+      <Stack spacing={1}>
         {sections.map((title) => (
-          <p key={title}>{title}</p>
+          <Typography key={title}>{title}</Typography>
         ))}
-      </section>
-    </main>
+      </Stack>
+    </Stack>
   );
 }
 

@@ -1,13 +1,17 @@
+import { Box, Typography } from "@mui/material";
+
 type ProductGridProps = {
   title?: string;
 };
 
 export function ProductGrid({ title }: ProductGridProps) {
   return (
-    <section className="pageSection">
-      <h2>{title ?? "Products"}</h2>
-      <p>Grid placeholder for product cards.</p>
-    </section>
+    <Box>
+      <Typography variant="h2">{title ?? "Products"}</Typography>
+      <Typography variant="body2" color="text.secondary">
+        Grid placeholder for product cards.
+      </Typography>
+    </Box>
   );
 }
 

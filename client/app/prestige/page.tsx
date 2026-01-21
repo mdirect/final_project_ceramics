@@ -1,12 +1,15 @@
+import { Stack, Typography } from "@mui/material";
 import { ProductGrid } from "@/src/widgets/product-grid";
 
 export default function PrestigePage() {
   return (
-    <main className="page">
-      <h1>Prestige</h1>
-      <p>Premium selection with limited pieces.</p>
+    <Stack spacing={2}>
+      <Typography variant="h1">Prestige</Typography>
+      <Typography variant="body2" color="text.secondary">
+        Premium selection with limited pieces.
+      </Typography>
       <ProductGrid title="Prestige items" />
-    </main>
+    </Stack>
   );
 }
 

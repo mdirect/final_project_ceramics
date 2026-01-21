@@ -1,16 +1,21 @@
+import { Box, Stack, Typography } from "@mui/material";
 import { shopFilters } from "@/src/shared/config/filters";
 
 export function FilterPanel() {
   return (
-    <section className="pageSection">
-      <h2>Filters</h2>
-      {shopFilters.map((group) => (
-        <div key={group.title} className="pageSection">
-          <strong>{group.title}</strong>
-          <p>{group.options.join(", ")}</p>
-        </div>
-      ))}
-    </section>
+    <Box>
+      <Typography variant="h2">Filters</Typography>
+      <Stack spacing={1} mt={1}>
+        {shopFilters.map((group) => (
+          <Box key={group.title}>
+            <Typography variant="subtitle2">{group.title}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {group.options.join(", ")}
+            </Typography>
+          </Box>
+        ))}
+      </Stack>
+    </Box>
   );
 }
 

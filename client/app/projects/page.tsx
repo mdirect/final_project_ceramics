@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Stack, Typography } from "@mui/material";
 
 const people = [
   { label: "Laura Winter", slug: "laura-winter" },
@@ -8,17 +9,21 @@ const people = [
 
 export default function ProjectsPage() {
   return (
-    <main className="page">
-      <h1>Projects</h1>
-      <p>Personal projects by the WSE team.</p>
-      <section className="pageSection">
+    <Stack spacing={2}>
+      <Typography variant="h1">Projects</Typography>
+      <Typography variant="body2" color="text.secondary">
+        Personal projects by the WSE team.
+      </Typography>
+      <Stack spacing={1}>
         {people.map((person) => (
           <Link key={person.slug} href={`/projects/${person.slug}`}>
-            {person.label}
+            <Typography sx={{ color: "text.primary", textTransform: "uppercase" }}>
+              {person.label}
+            </Typography>
           </Link>
         ))}
-      </section>
-    </main>
+      </Stack>
+    </Stack>
   );
 }
 

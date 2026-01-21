@@ -4,8 +4,6 @@ export type CollectionItem = {
 };
 
 export const collections: CollectionItem[] = [
-  { label: "All jewellery", slug: "all-jewellery" },
-  { label: "All objects", slug: "all-objects" },
   { label: "Hands", slug: "hands" },
   { label: "Bearlings", slug: "bearlings" },
   { label: "Dear Deer", slug: "dear-deer" },

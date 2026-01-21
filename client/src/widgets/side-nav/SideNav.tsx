@@ -2,26 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Stack, Typography } from "@mui/material";
 import { sideNav } from "@/src/shared/config/site-nav";
 
 export function SideNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="sideNav">
+    <Stack spacing={1} alignItems="flex-end">
       {sideNav.map((item) => {
         const isActive = pathname === item.href;
         return (
-          <Link
+          <Typography
             key={item.href}
+            component={Link}
             href={item.href}
-            className={isActive ? "navItem navItemActive" : "navItem"}
+            sx={{
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              opacity: isActive ? 1 : 0.75,
+              fontWeight: isActive ? 600 : 400,
+              color: "text.primary",
+            }}
           >
             {item.label}
-          </Link>
+          </Typography>
         );
       })}
-    </aside>
+    </Stack>
   );
 }
 
