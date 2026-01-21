@@ -1,37 +1,35 @@
-import elbrusConfig from '@elbrus/eslint-config';
-import elbrusPlugin from '@elbrus/eslint-plugin';
-import js from '@eslint/js';
-import json from '@eslint/json';
-import { defineConfig } from 'eslint/config';
+// @ts-check
+import eslint from '@eslint/js';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default defineConfig([
-  { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
+export default tseslint.config(
   {
-    files: ['**/*.{js,mjs,cjs}'],
+    ignores: ['eslint.config.mjs'],
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  eslintPluginPrettierRecommended,
+  {
     languageOptions: {
       globals: {
-        ...globals.browser,
         ...globals.node,
         ...globals.jest,
       },
+      sourceType: 'commonjs',
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
-  { files: ['**/*.{js,mjs,cjs}'], plugins: { js }, extends: ['js/recommended'] },
-  ...elbrusConfig,
   {
-    plugins: {
-      '@elbrus': elbrusPlugin,
-    },
     rules: {
-      '@elbrus/prefer-for-of': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
     },
   },
-  {
-    files: ['**/*.json'],
-    plugins: { json },
-    language: 'json/json',
-    extends: ['json/recommended'],
-  },
-]);
-
+);
