@@ -21,7 +21,7 @@ const gradientByPath: Record<string, string> = {
 
 function resolveGradient(pathname: string) {
   if (pathname.startsWith("/collections/")) {
-    return "linear-gradient(115deg,rgb(148, 70, 90) 10%,rgb(40, 210, 60) 90%)";
+    return "linear-gradient(90deg,rgba(140, 93, 93, 0.69) 19%,rgb(229, 160, 76) 36%,rgb(156, 186, 103) 110%)";
   }
   if (pathname.startsWith("/products/")) {
     return "linear-gradient(135deg,rgb(90, 133, 182) 0%,rgb(182, 99, 99) 100%)";
@@ -98,85 +98,20 @@ export function AppShell({ children }: PropsWithChildren) {
         </Box>
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, auto)",
-            gridAutoRows: "auto",
-            columnGap: "clamp(14px, 3vw, 45px)",
-            rowGap: "clamp(12px, 2.5vw, 25px)",
-            alignItems: "center",
-            opacity: 0.22,
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
             mt: "clamp(20px, 6vh, 80px)",
+            opacity: 0.22,
           }}
         >
           <Box
+            component="img"
+            src="/Group%201%20(2).png"
+            alt=""
             sx={{
-              gridColumn: "1 / 2",
-              gridRow: "1 / 2",
-              width: "clamp(90px, 9vw, 150px)",
-              height: "clamp(90px, 9vw, 150px)",
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "2 / 3",
-              gridRow: "1 / 2",
-              width: "clamp(170px, 14vw, 240px)",
-              height: "clamp(48px, 5vw, 80px)",
-              backgroundColor: "text.primary",
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "3 / 4",
-              gridRow: "1 / 2",
-              width: "clamp(170px, 14vw, 240px)",
-              height: "clamp(48px, 5vw, 80px)",
-              backgroundColor: "text.primary",
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "1 / 2",
-              gridRow: "2 / 3",
-              width: "clamp(90px, 9vw, 150px)",
-              height: "clamp(90px, 9vw, 150px)",
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "2 / 3",
-              gridRow: "2 / 3",
-              width: "clamp(90px, 9vw, 150px)",
-              height: "clamp(90px, 9vw, 150px)",
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-              ml: "clamp(10px, 1.5vw, 30px)"
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "3 / 4",
-              gridRow: "2 / 3",
-              width: "clamp(90px, 9vw, 150px)",
-              height: "clamp(90px, 9vw, 150px)",
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-              ml: "clamp(10px, 1.5vw, 30px)"
-            }}
-          />
-          <Box
-            sx={{
-              gridColumn: "2 / 3",
-              gridRow: "3 / 4",
-              width: "clamp(90px, 9vw, 150px)",
-              height: "clamp(90px, 9vw, 150px)",
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-              ml: "clamp(10px, 1.5vw, 30px)"
+              width: "min(600px, 70vw)",
+              height: "auto",
             }}
           />
         </Box>
