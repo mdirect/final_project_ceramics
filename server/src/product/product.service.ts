@@ -8,32 +8,26 @@ export class ProductService {
   constructor(private readonly dbService: DbService) {}
 
   async create(product: CreateProductDto) {
-    const res = await this.dbService.product.create({
+    return await this.dbService.product.create({
       data: product,
     });
-
-    return res;
   }
 
   async findAll() {
-    const res = await this.dbService.product.findMany();
-    return res;
+    return await this.dbService.product.findMany();
   }
 
   async findOne(id: number) {
-    const res = await this.dbService.product.findUnique({
+    return await this.dbService.product.findUnique({
       where: { id },
     });
-
-    return res;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    const res = await this.dbService.product.update({
+  async update(id: number, product: UpdateProductDto) {
+    return await this.dbService.product.update({
       where: { id },
-      data: updateProductDto,
+      data: product,
     });
-    return res;
   }
 
   async remove(id: number) {
