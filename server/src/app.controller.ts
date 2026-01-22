@@ -10,19 +10,19 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateDTO } from 'src/dto/create.dto';
- g service db
+import { CreateDTO } from './dto/create.dto';
+
 @Controller('app')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('test')
-  getHello(): string {
+  getHello() {
     return this.appService.getHello();
   }
 
   @Get('get/:id')
-  getId(@Param('id', ParseIntPipe) id: number): number {
+  getId(@Param('id', ParseIntPipe) id: number) {
     if (id < 1) {
       throw new BadRequestException('Id must be a positive integer');
     }
@@ -36,8 +36,10 @@ export class AppController {
 
   @UsePipes(new ValidationPipe())
   @Post('post')
-  post(@Body() dto: CreateDTO): CreateDTO {
-    console.log(dto.num + '. ' + dto.name + ': ' + dto.desc);
-    return dto;
+  async post(@Body() dto: CreateDTO) {
+    console.log(dto.image + ' - ' + dto.title + ': ' + dto.description);
+    const res = await this.appService.save(dto);
+
+    return res;
   }
 }
