@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { DbService } from '../db/db.service';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(private readonly dbService: DbService) {}
+
+  async create(product: CreateProductDto) {
+    const res = await this.dbService.product.create({
+      data: product,
+    });
+
+    return res;
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll() {
+    const res = await this.dbService.product.findMany();
+    return res;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    const res = await this.dbService.product.findUnique({
+      where: { id },
+    });
+
+    return res;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const res = await this.dbService.product.update({
+      where: { id },
+      data: updateProductDto,
+    });
+    return res;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    return await this.dbService.product.delete({
+      where: { id },
+    });
   }
 }

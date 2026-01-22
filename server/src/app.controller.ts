@@ -38,8 +38,5 @@ export class AppController {
   @Post('post')
   async post(@Body() dto: CreateDTO) {
     console.log(dto.image + ' - ' + dto.title + ': ' + dto.description);
-    const res = await this.appService.save(dto);
-
-    return res;
   }
 }
