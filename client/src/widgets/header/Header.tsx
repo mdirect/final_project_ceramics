@@ -54,6 +54,7 @@ export function Header() {
                       anchorEl={anchorEl}
                       open={shopOpen}
                       onClose={() => setAnchorEl(null)}
+                      disableScrollLock
                       MenuListProps={{
                         onMouseLeave: () => setAnchorEl(null),
                       }}
