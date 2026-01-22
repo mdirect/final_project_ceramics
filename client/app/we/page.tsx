@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { useState } from "react";
 
 const heroCopy = {
   title: "The Visionaries",
@@ -15,40 +20,44 @@ const heroCopy = {
 
 const team = [
   {
-    name: "Elena V.",
+    name: "Serg",
     role: "Lead Metalsmith",
     image:
       "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
   },
   {
-    name: "Julian K.",
+    name: "Alex",
     role: "Master Ceramist",
     image:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
   },
   {
-    name: "Mara S.",
+    name: "Tati",
     role: "Creative Director",
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
   },
 ];
 
+const producerGallery = [
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1800&q=80",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1800&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1800&q=80",
+];
+
 export default function WePage() {
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const nextSlide = () =>
+    setGalleryIndex((current) => (current + 1) % producerGallery.length);
+  const prevSlide = () =>
+    setGalleryIndex((current) =>
+      current === 0 ? producerGallery.length - 1 : current - 1,
+    );
+
   return (
     <Stack spacing={6}>
       <Box sx={{ textAlign: "center", pt: { xs: 2, md: 4 } }}>
-        <Typography
-          sx={{
-            textTransform: "uppercase",
-            letterSpacing: "0.24em",
-            fontSize: "0.7rem",
-            color: "rgba(0,0,0,0.45)",
-            mb: 1,
-          }}
-        >
-          Back to gallery
-        </Typography>
+        
         <Typography
           variant="h1"
           sx={{
@@ -72,55 +81,82 @@ export default function WePage() {
         </Typography>
       </Box>
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1.1fr 0.9fr" },
-          gap: { xs: 4, md: 6 },
-          alignItems: "start",
-        }}
-      >
-        <Stack spacing={2}>
+      <Stack spacing={2} alignItems="center" textAlign="center">
+        <Typography
+          sx={{
+            fontFamily: "Georgia, 'Times New Roman', serif",
+            fontStyle: "italic",
+            fontSize: "1.2rem",
+            color: "rgba(0,0,0,0.6)",
+            maxWidth: 720,
+            textShadow: "0 0 1px rgba(0,0,0,0.2)",
+          }}
+        >
+          {heroCopy.lead}
+        </Typography>
+        {heroCopy.paragraphs.map((text) => (
           <Typography
+            key={text}
             sx={{
               fontFamily: "Georgia, 'Times New Roman', serif",
-              fontStyle: "italic",
-              fontSize: "1.1rem",
+              fontSize: "0.98rem",
               color: "rgba(0,0,0,0.6)",
+              lineHeight: 1.9,
+              maxWidth: 760,
+              textShadow: "0 0 1px rgba(0,0,0,0.2)",
             }}
           >
-            {heroCopy.lead}
+            {text}
           </Typography>
-          {heroCopy.paragraphs.map((text) => (
-            <Typography key={text} variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-              {text}
-            </Typography>
-          ))}
-        </Stack>
-        <Box
-          sx={{
-            borderRadius: 2,
-            overflow: "hidden",
-            minHeight: { xs: 240, md: 360 },
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-      </Box>
+        ))}
+      </Stack>
 
       <Box
         sx={{
           width: "100%",
-          minHeight: { xs: 240, md: 320 },
+          minHeight: { xs: 320, md: 820 },
           borderRadius: 2,
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1600&q=80)",
+          overflow: "hidden",
+          position: "relative",
+          backgroundImage: `url(${producerGallery[galleryIndex]})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      />
+        onWheel={(event) => {
+          if (event.deltaY > 0) {
+            nextSlide();
+          } else if (event.deltaY < 0) {
+            prevSlide();
+          }
+        }}
+      >
+        <IconButton
+          onClick={prevSlide}
+          sx={{
+            position: "absolute",
+            left: 16,
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: "rgba(255,255,255,0.7)",
+            "&:hover": { backgroundColor: "rgba(255,255,255,0.9)" },
+          }}
+        >
+          <ArrowBackIosNewIcon fontSize="small" />
+        </IconButton>
+        <IconButton
+          onClick={nextSlide}
+          sx={{
+            position: "absolute",
+            right: 16,
+            top: "50%",
+            transform: "translateY(-50%)",
+            backgroundColor: "rgba(255,255,255,0.7)",
+            "&:hover": { backgroundColor: "rgba(255,255,255,0.9)" },
+          }}
+        >
+          <ArrowForwardIosIcon fontSize="small" />
+        </IconButton>
+      </Box>
 
       <Stack spacing={3}>
         <Box sx={{ textAlign: "center" }}>
