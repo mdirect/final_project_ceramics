@@ -18,6 +18,7 @@
     "test:e2e": "jest --testPathPattern=test/.*\\.e2e-spec\\.ts$",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:reset": "prisma migrate reset",
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
