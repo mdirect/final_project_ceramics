@@ -222,18 +222,7 @@ export default function WePage() {
         >
           Join our journey
         </Typography>
-        <Typography
-          variant="h2"
-          sx={{
-            textTransform: "none",
-            fontFamily: "Georgia, 'Times New Roman', serif",
-            fontWeight: 500,
-            mb: 2,
-          }}
-        >
-          Let's craft something meaningful together.
-        </Typography>
-        <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
+        <Stack direction="row" spacing={3} justifyContent="center" flexWrap="wrap" mt={2}>
           <Link href="/shop" style={{ textDecoration: "none" }}>
             <Button
               variant="outlined"
