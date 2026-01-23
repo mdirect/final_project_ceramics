@@ -6,30 +6,53 @@ import { usePathname } from "next/navigation";
 import { Header } from "@/src/widgets/header";
 import { Footer } from "@/src/widgets/footer";
 
-const gradientByPath: Record<string, string> = {
-  "/": "linear-gradient(135deg, #221e10 0%, #3a321d 35%, #4a4025 60%, #3a321d 80%, #221e10 100%)",
-  "/we": "linear-gradient(135deg, #221e10 0%, #3a321d 35%, #4a4025 60%, #3a321d 80%, #221e10 100%)",
-  "/shop": "linear-gradient(135deg, #1f1b0f 0%, #362f1b 40%, #4a4025 70%, #2c2717 100%)",
-  "/prestige": "linear-gradient(135deg, #201b10 0%, #3b321d 45%, #4a4025 70%, #231f12 100%)",
-  "/projects": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
-  "/events": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
-  "/contacts": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
-  "/policy": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
-  "/signin": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
-  "/cart": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+const gradientStopsByPath: Record<
+  string,
+  { start: string; mid: string; end: string }
+> = {
+  "/": { start: "#0a3a52", mid: "#061b2d", end: "#0b4f63" },
+  "/we": { start: "#0b3f46", mid: "#071c22", end: "#0d4b54" },
+  "/shop": { start: "#0e3b2f", mid: "#071c18", end: "#0f4a3a" },
+  "/prestige": { start: "#34293f", mid: "#17121d", end: "#47325a" },
+  "/projects": { start: "#0b3a52", mid: "#061825", end: "#0e4057" },
+  "/events": { start: "#3a3426", mid: "#1a1711", end: "#4a402e" },
+  "/contacts": { start: "#2c3246", mid: "#141824", end: "#3b4260" },
+  "/policy": { start: "#2b3a38", mid: "#141a19", end: "#3a4a48" },
+  "/signin": { start: "#3a2a2c", mid: "#1a1314", end: "#4a3336" },
+  "/cart": { start: "#2f3a2a", mid: "#151a14", end: "#3a4a34" },
 };
+
+const collectionsStops = { start: "#0b4152", mid: "#071f2a", end: "#0f5163" };
+const productsStops = { start: "#10334a", mid: "#091722", end: "#0f3f5a" };
+const projectsStops = { start: "#0a3850", mid: "#061725", end: "#0c465d" };
+
+function buildLinearGradient({
+  start,
+  mid,
+  end,
+}: {
+  start: string;
+  mid: string;
+  end: string;
+}) {
+  return `linear-gradient(135deg, ${start} 0%, ${mid} 45%, ${end} 100%)`;
+}
 
 function resolveGradient(pathname: string) {
   if (pathname.startsWith("/collections/")) {
-    return gradientByPath["/shop"];
+    // Настраиваемый градиент для страниц коллекций
+    return buildLinearGradient(collectionsStops);
   }
   if (pathname.startsWith("/products/")) {
-    return gradientByPath["/shop"];
+    // Настраиваемый градиент для страниц продуктов
+    return buildLinearGradient(productsStops);
   }
   if (pathname.startsWith("/projects/")) {
-    return gradientByPath["/projects"];
+    // Настраиваемый градиент для страниц проектов
+    return buildLinearGradient(projectsStops);
   }
-  return gradientByPath[pathname] ?? gradientByPath["/"];
+  const stops = gradientStopsByPath[pathname] ?? gradientStopsByPath["/"];
+  return buildLinearGradient(stops);
 }
 
 export function AppShell({ children }: PropsWithChildren) {
@@ -54,9 +77,8 @@ export function AppShell({ children }: PropsWithChildren) {
           pointerEvents: "none",
           zIndex: 0,
           background:
-            "radial-gradient(circle at 15% 20%, rgba(82,70,41,0.55) 0%, rgba(34,30,16,0) 40%), radial-gradient(circle at 80% 25%, rgba(88,74,43,0.45) 0%, rgba(34,30,16,0) 45%), radial-gradient(circle at 55% 70%, rgba(70,60,35,0.45) 0%, rgba(34,30,16,0) 50%), radial-gradient(circle at 20% 80%, rgba(50,44,28,0.6) 0%, rgba(34,30,16,0) 45%)",
-          mixBlendMode: "soft-light",
-          opacity: 0.65,
+            "radial-gradient(120% 80% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 60%), radial-gradient(100% 100% at 0% 0%, rgba(0, 0, 0, 0.35), transparent 50%)",
+          opacity: 1,
         }}
       />
       <Box

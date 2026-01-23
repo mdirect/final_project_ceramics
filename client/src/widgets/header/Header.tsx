@@ -3,10 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AppBar, Box, Container, Stack, Typography } from "@mui/material";
 import { sideNav, topNav } from "@/src/shared/config/site-nav";
-import { useState } from "react";
+
+const activeColor = "rgba(242,185,13,0.9)";
 
 export function Header() {
   const pathname = usePathname();
+  const isActiveHref = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
   return (
     <AppBar
       position="static"
@@ -25,42 +28,62 @@ export function Header() {
         >
           <Stack direction="row" spacing={2} flexWrap="wrap">
             {topNav.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isActiveHref(item.href);
               return (
-                <Link href={item.href} key={item.href}>
+                <Box
+                  component={Link}
+                  href={item.href}
+                  key={item.href}
+                  sx={{
+                    textDecoration: "none",
+                    borderBottom: isActive ? `1px solid ${activeColor}` : "none",
+                    paddingBottom: "2px",
+                    display: "inline-flex",
+                  }}
+                >
                   <Typography
                     sx={{
                       textTransform: "uppercase",
                       letterSpacing: "0.1em",
-                      opacity: isActive ? 1 : 0.75,
+                      opacity: isActive ? 1 : 0.7,
                       fontWeight: isActive ? 600 : 400,
-                      color: "text.primary",
+                      color: isActive ? activeColor : "text.primary",
                       padding: 1,
                     }}
                   >
                     {item.label}
                   </Typography>
-                </Link>
+                </Box>
               );
             })}
           </Stack>
           <Stack direction="row" spacing={2}>
             {sideNav.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isActiveHref(item.href);
               return (
-                <Link href={item.href} key={item.href}>
-                <Typography
+                <Box
+                  component={Link}
+                  href={item.href}
+                  key={item.href}
                   sx={{
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    opacity: isActive ? 1 : 0.75,
-                    fontWeight: isActive ? 600 : 400,
-                    color: "text.primary",
+                    textDecoration: "none",
+                    borderBottom: isActive ? `1px solid ${activeColor}` : "none",
+                    paddingBottom: "2px",
+                    display: "inline-flex",
                   }}
                 >
-                  {item.label}
-                </Typography>
-                </Link>
+                  <Typography
+                    sx={{
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      opacity: isActive ? 1 : 0.7,
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? activeColor : "text.primary",
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Box>
               );
             })}
           </Stack>
