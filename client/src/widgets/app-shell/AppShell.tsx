@@ -7,24 +7,24 @@ import { Header } from "@/src/widgets/header";
 import { Footer } from "@/src/widgets/footer";
 
 const gradientByPath: Record<string, string> = {
-  "/": "linear-gradient(10deg,rgb(138, 166, 92) 0%,rgb(192, 179, 124) 100%)",
-  "/we": "linear-gradient(5deg,rgb(207, 121, 68) 10%,rgb(75, 129, 176) 90%)",
-  "/shop": "linear-gradient(7deg,rgb(73, 155, 128) 0%,rgb(190, 193, 81) 100%)",
-  "/prestige": "linear-gradient(135deg,rgb(23, 82, 179) 0%,rgb(195, 161, 73) 100%)",
-  "/projects": "linear-gradient(135deg, #8b8482 0%, #a59c98 100%)",
-  "/events": "linear-gradient(135deg, #7f8a7c 0%, #97a08f 100%)",
-  "/contacts": "linear-gradient(135deg, #8d8785 0%, #a49b98 100%)",
-  "/policy": "linear-gradient(135deg, #7f8682 0%, #9aa19d 100%)",
-  "/signin": "linear-gradient(135deg, #8a8f7f 0%, #a2a892 100%)",
-  "/cart": "linear-gradient(135deg, #8a8a80 0%, #a3a39a 100%)",
+  "/": "linear-gradient(135deg, #221e10 0%, #3a321d 35%, #4a4025 60%, #3a321d 80%, #221e10 100%)",
+  "/we": "linear-gradient(135deg, #221e10 0%, #3a321d 35%, #4a4025 60%, #3a321d 80%, #221e10 100%)",
+  "/shop": "linear-gradient(135deg, #1f1b0f 0%, #362f1b 40%, #4a4025 70%, #2c2717 100%)",
+  "/prestige": "linear-gradient(135deg, #201b10 0%, #3b321d 45%, #4a4025 70%, #231f12 100%)",
+  "/projects": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+  "/events": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+  "/contacts": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+  "/policy": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+  "/signin": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
+  "/cart": "linear-gradient(135deg, #201b10 0%, #3a321d 45%, #4a4025 70%, #231f12 100%)",
 };
 
 function resolveGradient(pathname: string) {
   if (pathname.startsWith("/collections/")) {
-    return "linear-gradient(90deg,rgba(140, 93, 93, 0.69) 19%,rgb(229, 160, 76) 36%,rgb(156, 186, 103) 110%)";
+    return gradientByPath["/shop"];
   }
   if (pathname.startsWith("/products/")) {
-    return "linear-gradient(135deg,rgb(90, 133, 182) 0%,rgb(182, 99, 99) 100%)";
+    return gradientByPath["/shop"];
   }
   if (pathname.startsWith("/projects/")) {
     return gradientByPath["/projects"];
@@ -47,6 +47,18 @@ export function AppShell({ children }: PropsWithChildren) {
         overflow: "hidden",
       }}
     >
+      <Box
+        sx={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          background:
+            "radial-gradient(circle at 15% 20%, rgba(82,70,41,0.55) 0%, rgba(34,30,16,0) 40%), radial-gradient(circle at 80% 25%, rgba(88,74,43,0.45) 0%, rgba(34,30,16,0) 45%), radial-gradient(circle at 55% 70%, rgba(70,60,35,0.45) 0%, rgba(34,30,16,0) 50%), radial-gradient(circle at 20% 80%, rgba(50,44,28,0.6) 0%, rgba(34,30,16,0) 45%)",
+          mixBlendMode: "soft-light",
+          opacity: 0.65,
+        }}
+      />
       <Box
         sx={{
           position: "fixed",

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Card, CardContent, Chip, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, IconButton, Stack, Typography } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -103,11 +103,13 @@ const collectionMeta: Record<
 };
 
 const collectionFilters = [
-  { label: "All Objects", value: "all" },
+  { label: "All Works", value: "all" },
   { label: "Jewelry", value: "jewelry" },
   { label: "Ceramics", value: "ceramics" },
   { label: "Limited Edition", value: "limited" },
 ];
+
+const accent = "#f2b90d";
 
 export default function ShopPage() {
   const pageSize = 8;
@@ -138,69 +140,106 @@ export default function ShopPage() {
   }, [activeFilter]);
 
   return (
-    <Stack spacing={3}>
-      <Stack spacing={2} alignItems="center" textAlign="center">
-        <Box
+    <Stack spacing={6}>
+      <Stack spacing={1} sx={{ maxWidth: 880 }}>
+        <Typography
           sx={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            px: 2,
-            py: 1.2,
-            borderRadius: 999,
-            border: "1px solid rgba(255,255,255,0.28)",
-            backgroundColor: "rgba(255,255,255,0.1)",
-            backdropFilter: "blur(10px)",
+            textTransform: "uppercase",
+            letterSpacing: "0.2em",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            color: accent,
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexWrap: "wrap" }}>
-            <Typography
-              sx={{
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                fontSize: "0.9rem",
-                color: "rgba(255,255,255,0.7)",
-                fontWeight: 700,
-              }}
-            >
-              Filters
-            </Typography>
-            <Box sx={{ width: "1px", height: 16, backgroundColor: "rgba(255,255,255,0.35)" }} />
-            {collectionFilters.map((filter) => (
-              <Chip
-                key={filter.value}
-                label={filter.label}
-                size="medium"
-                onClick={() => setActiveFilter(filter.value)}
-                variant={activeFilter === filter.value ? "filled" : "outlined"}
-                sx={{
-                  borderColor: "rgba(255,255,255,0.35)",
-                  color: "rgba(255,255,255,0.9)",
-                  fontWeight: 700,
-                  backgroundColor:
-                    activeFilter === filter.value ? "rgba(255,255,255,0.28)" : "transparent",
-                  "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.22)",
-                    fontSize: ".9rem",
-                  },
-                }}
-              />
-            ))}
-          </Stack>
-        </Box>
-
-        <Typography variant="h1" sx={{ fontWeight: 500 }}>
-          Collections
+          Curated Series
         </Typography>
-
         <Typography
-          color="rgb(58, 64, 48)"
-          sx={{ fontWeight: 400, fontSize: "1.1rem", fontStyle: "italic" }}
+          sx={{
+            fontSize: { xs: "2.6rem", md: "4.4rem" },
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+            color: "rgba(255,255,255,0.95)",
+            fontWeight: 300,
+          }}
         >
-          Choose a collection to explore its curated items
+          The <Box component="span" sx={{ fontWeight: 700, fontStyle: "italic" }}>Collections</Box>
         </Typography>
+        <Typography
+          sx={{
+            mt: 2,
+            fontSize: { xs: "1rem", md: "1.1rem" },
+            color: "rgba(255,255,255,0.7)",
+            lineHeight: 1.8,
+          }}
+        >
+          Artisanal jewelry and ceramics crafted for the modern soul. Each piece tells a
+          story of the solstice, the moon, and the raw earth.
+        </Typography>
+      </Stack>
+
+      <Stack
+        direction="row"
+        flexWrap="wrap"
+        spacing={1.5}
+        sx={{
+          pb: 3,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          "& .MuiChip-root": { mb: 1 },
+        }}
+      >
+        {collectionFilters.map((filter) => (
+          <Chip
+            key={filter.value}
+            label={filter.label}
+            size="medium"
+            onClick={() => setActiveFilter(filter.value)}
+            sx={{
+              borderRadius: 999,
+              px: 2,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              backgroundColor: activeFilter === filter.value ? accent : "rgba(255,255,255,0.08)",
+              color: activeFilter === filter.value ? "rgba(18, 21, 26, 0.9)" : "rgba(255,255,255,0.9)",
+              "&:hover": {
+                backgroundColor:
+                  activeFilter === filter.value ? accent : "rgba(255,255,255,0.16)",
+              },
+            }}
+          />
+        ))}
+        <Link href="/shop/all_jewellery" style={{ textDecoration: "none" }}>
+          <Chip
+            label="All Jewellery"
+            size="medium"
+            sx={{
+              borderRadius: 999,
+              px: 2,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              backgroundColor: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.9)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+            }}
+          />
+        </Link>
+        <Link href="/shop/art_objects" style={{ textDecoration: "none" }}>
+          <Chip
+            label="Art Objects"
+            size="medium"
+            sx={{
+              borderRadius: 999,
+              px: 2,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              backgroundColor: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.9)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+            }}
+          />
+        </Link>
       </Stack>
 
       <Box
@@ -211,7 +250,7 @@ export default function ShopPage() {
             sm: "repeat(2, 1fr)",
             md: "repeat(4, 1fr)",
           },
-          gap: 2,
+          gap: 3,
         }}
       >
         {pageCollections.map((collection) => {
@@ -223,97 +262,92 @@ export default function ShopPage() {
           };
 
           return (
-          <Box key={collection.slug}>
-            <Link href={`/collections/${collection.slug}`} style={{ textDecoration: "none" }}>
-              <Card
+            <Link
+              key={collection.slug}
+              href={`/collections/${collection.slug}`}
+              style={{ textDecoration: "none" }}
+            >
+              <Box
+                className="collection-card"
                 sx={{
-                  borderRadius: 2,
+                  position: "relative",
+                  aspectRatio: "4 / 5",
+                  borderRadius: 3,
                   overflow: "hidden",
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  "&:hover": {
-                    transform: "translateY(-6px)",
-                    boxShadow: "0 18px 32px rgba(0,0,0,0.2)",
-                  },
+                  backgroundColor: "rgba(20,25,32,0.6)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  transition: "transform 0.5s ease",
+                  "&:hover": { transform: "translateY(-6px)" },
+                  "&:hover .collection-image": { transform: "scale(1.08)" },
+                  "&:hover .collection-cta": { opacity: 1 },
                 }}
               >
                 <Box
+                  className="collection-image"
                   sx={{
-                    position: "relative",
-                    pt: "95%",
+                    position: "absolute",
+                    inset: 0,
                     backgroundImage: `url(${meta.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    flexShrink: 0,
+                    transition: "transform 0.7s ease",
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)",
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    p: 2.5,
+                    borderRadius: 2,
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    backdropFilter: "blur(12px)",
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-end",
-                      gap: 1.5,
-                      p: 2.5,
-                      background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${meta.tone} 85%)`,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        color: "common.white",
-                      }}
-                    >
-                      {collection.label}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <CardContent sx={{ minHeight: { xs: 72, md: 86 } }}>
                   <Typography
-                    variant="body2"
-                    color="text.secondary"
                     sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
+                      color: "rgba(255,255,255,0.95)",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                      letterSpacing: "-0.01em",
                     }}
                   >
+                    {collection.label}
+                  </Typography>
+                  <Typography sx={{ mt: 0.5, color: "rgba(255,255,255,0.6)", fontSize: "0.85rem" }}>
                     {meta.description}
                   </Typography>
-                </CardContent>
-              </Card>
+                  <Typography
+                    className="collection-cta"
+                    sx={{
+                      mt: 2,
+                      color: accent,
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.18em",
+                      opacity: 0,
+                      transition: "opacity 0.3s ease",
+                    }}
+                  >
+                    Explore Collection →
+                  </Typography>
+                </Box>
+              </Box>
             </Link>
-          </Box>
           );
         })}
         {Array.from({ length: placeholders }).map((_, index) => (
-          <Box key={`placeholder-${index}`}>
-            <Card
-              sx={{
-                borderRadius: 2,
-                overflow: "hidden",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                visibility: "hidden",
-              }}
-            >
-              <Box sx={{ position: "relative", pt: "95%", flexShrink: 0 }} />
-              <CardContent sx={{ minHeight: { xs: 72, md: 86 } }}>
-                <Typography variant="body2">Placeholder</Typography>
-              </CardContent>
-            </Card>
-          </Box>
+          <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
         ))}
       </Box>
 
@@ -324,7 +358,7 @@ export default function ShopPage() {
         alignItems="center"
         justifyContent="center"
         spacing={2}
-        sx={{ mt: 4 }}
+        sx={{ mt: 2 }}
       >
         <IconButton
           onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -363,6 +397,85 @@ export default function ShopPage() {
           <ArrowForwardIosIcon fontSize="medium" />
         </IconButton>
       </Stack>
+
+      <Box
+        sx={{
+          mt: { xs: 6, md: 10 },
+          borderRadius: 4,
+          p: { xs: 3, md: 6 },
+          backgroundColor: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          backdropFilter: "blur(12px)",
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: -80,
+            right: -80,
+            width: 240,
+            height: 240,
+            borderRadius: "50%",
+            backgroundColor: "rgba(242,185,13,0.12)",
+            filter: "blur(40px)",
+          }}
+        />
+        <Stack spacing={2} sx={{ position: "relative" }}>
+          <Typography
+            sx={{
+              fontSize: { xs: "2rem", md: "2.6rem" },
+              fontWeight: 800,
+              color: "rgba(255,255,255,0.95)",
+            }}
+          >
+            Stay in the loop
+          </Typography>
+          <Typography sx={{ color: "rgba(255,255,255,0.7)", maxWidth: 680, mx: "auto" }}>
+            Join our inner circle for early access to limited artisanal drops and the stories
+            behind the kiln and bench.
+          </Typography>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box
+              component="input"
+              placeholder="Your email address"
+              sx={{
+                width: { xs: "100%", sm: 320 },
+                height: 48,
+                px: 2.5,
+                borderRadius: 2,
+                border: "1px solid rgba(255,255,255,0.15)",
+                backgroundColor: "rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.9)",
+                outline: "none",
+              }}
+            />
+            <Button
+              variant="contained"
+              sx={{
+                height: 48,
+                px: 4,
+                backgroundColor: accent,
+                color: "rgba(18,21,26,0.9)",
+                fontWeight: 800,
+                "&:hover": { backgroundColor: "#f6c423" },
+              }}
+            >
+              Join the Newsletter
+            </Button>
+          </Stack>
+          <Typography sx={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.45)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+            New collection drops every full moon
+          </Typography>
+        </Stack>
+      </Box>
     </Stack>
   );
 }

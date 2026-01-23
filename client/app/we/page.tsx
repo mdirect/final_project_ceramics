@@ -1,242 +1,248 @@
 "use client";
 
-import Link from "next/link";
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useState } from "react";
+import { Box, Stack, Typography } from "@mui/material";
 
-const heroCopy = {
-  title: "The Visionaries",
-  subtitle: "Winter Sparrow Eye",
-  lead:
-    "In the quiet space between the earth's weight and the sparrow's light, we find the resonance of Winter Sparrow Eye.",
-  paragraphs: [
-    "Winter Sparrow Eye emerged from a shared obsession with tactile honesty. As three creators coming from different disciplines—jewelry design, sculptural ceramics, and fine art—we sought to merge our worlds into a singular aesthetic language.",
-    "Our philosophy is rooted in the wabi-sabi appreciation of imperfection. Each piece of jewelry we forge and every ceramic vessel we craft carries the intention mark of the human hand. We do not strive for industrial perfection; we strive for emotional weight.",
-    "Our values are simple: sustainability through longevity, beauty through raw materiality, and a commitment to the slow movement of craftsmanship. We create for those who find poetry in the cracks of a glaze and the oxidation of sterling silver.",
-  ],
-};
+const accent = "#f2b90d";
+
+const storyTiles = [
+  {
+    title: "01. The Earthly Bond",
+    caption: "Ceramic textures meeting raw 18k gold.",
+    image:
+      "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "The Studio",
+    caption: "Light dancing on the wheel.",
+    image:
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=80",
+    offset: 40,
+  },
+  {
+    title: "The Soul",
+    caption: "A whisper of elegance.",
+    image:
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80",
+    offset: -40,
+  },
+];
 
 const team = [
   {
-    name: "Serg",
-    role: "Lead Metalsmith",
+    name: "Elena Vance",
+    role: "Lead Designer",
+    bio:
+      "A metalsmith with a background in architectural history, Elena translates the structure of historical ruins into wearable art.",
     image:
-      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
   },
   {
-    name: "Alex",
+    name: "Julian Thorne",
     role: "Master Ceramist",
+    bio:
+      "Julian finds beauty in imperfection. His broken-edge ceramic series anchors our tactile display philosophy.",
     image:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80",
   },
   {
-    name: "Tati",
+    name: "Sarah Chen",
     role: "Creative Director",
+    bio:
+      "Curating the visual narrative, Sarah ensures that every sparrow-eye detail aligns with our earth-toned aesthetic.",
     image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80",
   },
-];
-
-const producerGallery = [
-  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1800&q=80",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1800&q=80",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1800&q=80",
 ];
 
 export default function WePage() {
-  const [galleryIndex, setGalleryIndex] = useState(0);
-  const nextSlide = () =>
-    setGalleryIndex((current) => (current + 1) % producerGallery.length);
-  const prevSlide = () =>
-    setGalleryIndex((current) =>
-      current === 0 ? producerGallery.length - 1 : current - 1,
-    );
-
   return (
-    <Stack spacing={6}>
-      <Box sx={{ textAlign: "center", pt: { xs: 2, md: 4 } }}>
-        
-        <Typography
-          variant="h1"
-          sx={{
-            textTransform: "none",
-            letterSpacing: "0.02em",
-            fontWeight: 500,
-            fontFamily: "Georgia, 'Times New Roman', serif",
-          }}
-        >
-          {heroCopy.title}
-        </Typography>
-        <Typography
-          sx={{
-            mt: 1,
-            fontFamily: "Georgia, 'Times New Roman', serif",
-            fontStyle: "italic",
-            color: "rgba(0,0,0,0.5)",
-          }}
-        >
-          {heroCopy.subtitle}
-        </Typography>
-      </Box>
-
-      <Stack spacing={2} alignItems="center" textAlign="center">
+    <Stack spacing={8}>
+      <Box component="section" sx={{ py: { xs: 6, md: 10 }, textAlign: "center" }}>
         <Typography
           sx={{
             fontFamily: "Georgia, 'Times New Roman', serif",
             fontStyle: "italic",
-            fontSize: "1.2rem",
-            color: "rgba(0,0,0,0.6)",
-            maxWidth: 720,
-            textShadow: "0 0 1px rgba(0,0,0,0.2)",
+            color: accent,
+            fontSize: { xs: "1rem", md: "1.2rem" },
+            mb: 2,
           }}
         >
-          {heroCopy.lead}
+          Our Philosophy
         </Typography>
-        {heroCopy.paragraphs.map((text) => (
-          <Typography
-            key={text}
-            sx={{
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              fontSize: "0.98rem",
-              color: "rgba(0,0,0,0.6)",
-              lineHeight: 1.9,
-              maxWidth: 760,
-              textShadow: "0 0 1px rgba(0,0,0,0.2)",
-            }}
-          >
-            {text}
-          </Typography>
-        ))}
-      </Stack>
-
-      <Box
-        sx={{
-          width: "100%",
-          minHeight: { xs: 320, md: 820 },
-          borderRadius: 2,
-          overflow: "hidden",
-          position: "relative",
-          backgroundImage: `url(${producerGallery[galleryIndex]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-        onWheel={(event) => {
-          if (event.deltaY > 0) {
-            nextSlide();
-          } else if (event.deltaY < 0) {
-            prevSlide();
-          }
-        }}
-      >
-        <IconButton
-          onClick={prevSlide}
+        <Typography
           sx={{
-            position: "absolute",
-            left: 16,
-            top: "50%",
-            transform: "translateY(-50%)",
-            backgroundColor: "rgba(255,255,255,0.7)",
-            "&:hover": { backgroundColor: "rgba(255,255,255,0.9)" },
+            fontSize: { xs: "2.6rem", md: "4.2rem" },
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
+            color: "rgba(255,255,255,0.98)",
           }}
         >
-          <ArrowBackIosNewIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          onClick={nextSlide}
+          The Vision of
+          <Box component="span" sx={{ color: accent, display: "block" }}>
+            Quiet Craft.
+          </Box>
+        </Typography>
+        <Typography
           sx={{
-            position: "absolute",
-            right: 16,
-            top: "50%",
-            transform: "translateY(-50%)",
-            backgroundColor: "rgba(255,255,255,0.7)",
-            "&:hover": { backgroundColor: "rgba(255,255,255,0.9)" },
+            mt: 3,
+            maxWidth: 760,
+            mx: "auto",
+            fontSize: { xs: "1rem", md: "1.1rem" },
+            color: "rgba(255,255,255,0.85)",
+            lineHeight: 1.9,
           }}
         >
-          <ArrowForwardIosIcon fontSize="small" />
-        </IconButton>
+          Born from the silence of winter and the keen eye of the sparrow, our studio
+          merges the raw textures of earth with the refined elegance of gold. Every
+          piece is a dialogue between the hand and the medium.
+        </Typography>
       </Box>
 
-      <Stack spacing={3}>
-        <Box sx={{ textAlign: "center" }}>
-          <Typography
-            sx={{
-              textTransform: "uppercase",
-              letterSpacing: "0.22em",
-              fontSize: "0.7rem",
-              color: "rgba(0,0,0,0.45)",
-            }}
-          >
-            Our studio
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              textTransform: "none",
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              fontWeight: 500,
-            }}
-          >
-            Meet the team
-          </Typography>
-        </Box>
-
+      <Box component="section" sx={{ py: { xs: 2, md: 4 } }}>
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-            gap: 3,
+            gridTemplateColumns: { xs: "1fr", lg: "1.1fr 1fr" },
+            gap: { xs: 3, lg: 5 },
+            alignItems: "center",
+          }}
+        >
+          <Box>
+            <Box
+              sx={{
+                width: "100%",
+                aspectRatio: "4 / 5",
+                borderRadius: 3,
+                overflow: "hidden",
+                backgroundImage: `url(${storyTiles[0].image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                boxShadow: "0 24px 50px rgba(0,0,0,0.25)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                transition: "transform 0.7s ease",
+                "&:hover": { transform: "scale(1.02)" },
+              }}
+            />
+            <Box sx={{ mt: 2 }}>
+              <Typography
+                sx={{
+                  color: accent,
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                }}
+              >
+                {storyTiles[0].title}
+              </Typography>
+              <Typography sx={{ color: "rgba(255,255,255,0.72)", fontSize: "0.85rem" }}>
+                {storyTiles[0].caption}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 3 }}>
+            {storyTiles.slice(1).map((tile) => (
+              <Box key={tile.title} sx={{ transform: `translateY(${tile.offset ?? 0}px)` }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    aspectRatio: "3 / 4",
+                    borderRadius: 3,
+                    overflow: "hidden",
+                    backgroundImage: `url(${tile.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    boxShadow: "0 18px 40px rgba(0,0,0,0.25)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    transition: "transform 0.7s ease",
+                    "&:hover": { transform: "translateY(-6px)" },
+                  }}
+                />
+                <Box sx={{ mt: 2 }}>
+                  <Typography sx={{ color: "rgba(255,255,255,0.95)", fontWeight: 500 }}>
+                    {tile.title}
+                  </Typography>
+                  <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8rem" }}>
+                    {tile.caption}
+                  </Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box component="section" sx={{ pt: { xs: 6, md: 10 }, pb: 3 }}>
+        <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.1)", pt: 4 }}>
+          <Typography
+            sx={{
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontStyle: "italic",
+              fontSize: { xs: "1.8rem", md: "2.3rem" },
+              color: "rgba(255,255,255,0.98)",
+            }}
+          >
+            The Hands Behind the Craft
+          </Typography>
+        </Box>
+      </Box>
+
+      <Box component="section" sx={{ pb: { xs: 6, md: 10 } }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+            gap: { xs: 4, md: 6 },
           }}
         >
           {team.map((member) => (
-            <Box key={member.name} sx={{ textAlign: "center" }}>
+            <Box key={member.name} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Box
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: "50%",
+                  border: "2px solid rgba(242,185,13,0.25)",
+                  p: 1.2,
                   overflow: "hidden",
-                  backgroundImage: `url(${member.image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  pt: "120%",
-                  mb: 1.5,
+                  width: "100%",
+                  aspectRatio: "1 / 1",
                 }}
-              />
-              <Typography sx={{ fontWeight: 600 }}>{member.name}</Typography>
-              <Typography variant="body2" color="text.secondary">
-                {member.role}
-              </Typography>
+              >
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    backgroundImage: `url(${member.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    filter: "grayscale(1)",
+                    transition: "filter 0.5s ease",
+                    "&:hover": { filter: "grayscale(0)" },
+                  }}
+                />
+              </Box>
+              <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
+                <Typography sx={{ color: "rgba(255,255,255,0.98)", fontSize: "1.1rem", fontWeight: 600 }}>
+                  {member.name}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: accent,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.18em",
+                    fontSize: "0.72rem",
+                    mt: 0.5,
+                  }}
+                >
+                  {member.role}
+                </Typography>
+                <Typography sx={{ color: "rgba(255,255,255,0.82)", fontSize: "0.9rem", mt: 1.5 }}>
+                  {member.bio}
+                </Typography>
+              </Box>
             </Box>
           ))}
         </Box>
-      </Stack>
-
-      <Box sx={{ textAlign: "center", py: { xs: 2, md: 4 } }}>
-        <Typography
-          sx={{
-            textTransform: "uppercase",
-            letterSpacing: "0.24em",
-            fontSize: "0.7rem",
-            color: "rgba(0,0,0,0.45)",
-          }}
-        >
-          Join our journey
-        </Typography>
-        <Stack direction="row" spacing={3} justifyContent="center" flexWrap="wrap" mt={2}>
-          <Link href="/shop" style={{ textDecoration: "none" }}>
-            <Button
-              variant="outlined"
-              sx={{ textTransform: "uppercase", letterSpacing: "0.08em" }}
-            >
-              Explore collection
-            </Button>
-          </Link>
-          <Link href="/contacts" style={{ textDecoration: "none" }}>
-            <Button variant="text" sx={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Visit studio
-            </Button>
-          </Link>
-        </Stack>
       </Box>
     </Stack>
   );

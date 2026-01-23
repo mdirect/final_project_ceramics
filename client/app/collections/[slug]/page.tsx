@@ -7,22 +7,15 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Card,
-  CardContent,
   Checkbox,
   Divider,
   FormControlLabel,
   IconButton,
-  InputAdornment,
-  Radio,
-  RadioGroup,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useParams } from "next/navigation";
 import { collections } from "@/src/shared/config/collections";
-import SearchIcon from "@mui/icons-material/Search";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -157,6 +150,8 @@ const sortOptions = [
   { label: "Alphabetical", value: "alpha" },
 ];
 
+const accent = "#f2b90d";
+
 export default function CollectionPage() {
   const params = useParams<{ slug?: string | string[] }>();
   const slugValue = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
@@ -164,6 +159,7 @@ export default function CollectionPage() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
+  const [sortOpen, setSortOpen] = useState(false);
   const pageSize = 6;
   const formatTitle = (value?: string) =>
     value
@@ -225,183 +221,231 @@ export default function CollectionPage() {
   }, [page, pageCount]);
 
   return (
-    <Stack spacing={3}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: { xs: "flex-start", md: "center" },
-          justifyContent: "space-between",
-          gap: 2,
-          flexWrap: "wrap",
-        }}
-      >
-        <Box>
-          <Typography variant="h1">{title}</Typography>
-          <Typography color="rgb(49, 53, 42)" sx={{ fontWeight: 400, fontSize: "1.3rem" }}>
-            Collection items
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1.5}>
-          <TextField
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search collection..."
-            size="small"
-            sx={{
-              minWidth: { xs: 220, md: 280 },
-              backgroundColor: "rgba(255,255,255,0.16)",
-              borderRadius: 1.5,
-              "& fieldset": { borderColor: "rgba(255,255,255,0.35)" },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "rgba(255,255,255,0.7)" }} fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            href="/shop"
-            size="small"
-            variant="outlined"
-            sx={{
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              borderColor: "rgba(255,255,255,0.7)",
-              color: "rgba(255,255,255,0.9)",
-            }}
-          >
-            All collections
-          </Button>
-        </Stack>
-      </Box>
-
+    <Stack spacing={4}>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "240px 1fr" },
-          gap: 3,
+          gridTemplateColumns: { xs: "1fr", md: "280px 1fr" },
+          gap: 4,
+          alignItems: "start",
         }}
       >
-        <Stack
-          spacing={2}
-          sx={{
-            borderRadius: 2,
-            p: 2,
-            backgroundColor: "rgba(255,255,255,0.12)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            backdropFilter: "blur(6px)",
-          }}
-        >
-          <Typography sx={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Filter by
-          </Typography>
-          <Stack spacing={1.5}>
-            {filterGroups.map((group) => (
-              <Accordion
-                key={group.id}
-                defaultExpanded={group.id === "type" || group.id === "color"}
-                disableGutters
-                elevation={0}
-                sx={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: 2,
-                  "&:before": { display: "none" },
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255,255,255,0.8)" }} />}
-                  sx={{
-                    "& .MuiAccordionSummary-content": {
-                      margin: 0,
-                    },
-                  }}
-                >
-                  <Typography
-                    variant="body2"
+        <Box component="aside" sx={{ display: { xs: "none", md: "block" } }}>
+          <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
+            <Box>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+                Collections
+              </Typography>
+              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem", mb: 2 }}>
+                Artisanal excellence since 1994
+              </Typography>
+              <Stack spacing={0.5}>
+                {[
+                  { label: "All Creations", active: true },
+                  { label: "Fine Jewelry" },
+                  { label: "Ceramics" },
+                  { label: "New Arrivals" },
+                ].map((item) => (
+                  <Box
+                    key={item.label}
                     sx={{
-                      textTransform: "uppercase",
-                      letterSpacing: "0.12em",
-                      fontWeight: 600,
+                      px: 2,
+                      py: 1.3,
+                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.5,
+                      backgroundColor: item.active ? accent : "transparent",
+                      color: item.active ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
+                      fontWeight: item.active ? 700 : 500,
+                      fontSize: "0.9rem",
+                      "&:hover": {
+                        backgroundColor: item.active ? accent : "rgba(255,255,255,0.08)",
+                      },
                     }}
                   >
-                    {group.label}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Stack spacing={0.5}>
-                    {group.options.map((option) => {
-                      const selected = selectedFilters[group.id] ?? [];
-                      const isChecked = selected.includes(option);
-                      return (
-                        <FormControlLabel
-                          key={option}
-                          control={
-                            <Checkbox
-                              checked={isChecked}
-                              onChange={() =>
-                                setSelectedFilters((current) => {
-                                  const next = { ...current };
-                                  const currentValues = next[group.id] ?? [];
-                                  next[group.id] = currentValues.includes(option)
-                                    ? currentValues.filter((value) => value !== option)
-                                    : [...currentValues, option];
-                                  return next;
-                                })
-                              }
-                              sx={{
-                                color: "rgba(255,255,255,0.7)",
-                                "&.Mui-checked": { color: "rgba(255,255,255,0.95)" },
-                              }}
-                            />
-                          }
-                          label={
-                            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.85)" }}>
-                              {option}
-                            </Typography>
-                          }
-                        />
-                      );
-                    })}
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        backgroundColor: item.active ? "rgba(18,21,26,0.7)" : "rgba(255,255,255,0.4)",
+                      }}
+                    />
+                    {item.label}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+
+            <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+              {filterGroups.map((group, index) => (
+                <Accordion
+                  key={group.id}
+                  defaultExpanded={index < 2}
+                  disableGutters
+                  elevation={0}
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 2,
+                    "&:before": { display: "none" },
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255,255,255,0.6)" }} />}
+                    sx={{
+                      "& .MuiAccordionSummary-content": {
+                        margin: 0,
+                      },
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        textTransform: "uppercase",
+                        letterSpacing: "0.14em",
+                        fontWeight: 600,
+                        color: "rgba(255,255,255,0.6)",
+                      }}
+                    >
+                      {group.label}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ pt: 0 }}>
+                    <Stack spacing={0.5}>
+                      {group.options.map((option) => {
+                        const selected = selectedFilters[group.id] ?? [];
+                        const isChecked = selected.includes(option);
+                        return (
+                          <FormControlLabel
+                            key={option}
+                            control={
+                              <Checkbox
+                                checked={isChecked}
+                                onChange={() =>
+                                  setSelectedFilters((current) => {
+                                    const next = { ...current };
+                                    const currentValues = next[group.id] ?? [];
+                                    next[group.id] = currentValues.includes(option)
+                                      ? currentValues.filter((value) => value !== option)
+                                      : [...currentValues, option];
+                                    return next;
+                                  })
+                                }
+                                sx={{
+                                  color: "rgba(255,255,255,0.5)",
+                                  "&.Mui-checked": { color: accent },
+                                }}
+                              />
+                            }
+                            label={
+                              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                                {option}
+                              </Typography>
+                            }
+                          />
+                        );
+                      })}
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+              <Button
+                variant="outlined"
+                sx={{
+                  borderColor: "rgba(255,255,255,0.15)",
+                  color: "rgba(255,255,255,0.8)",
+                  textTransform: "none",
+                  fontWeight: 700,
+                  "&:hover": { borderColor: "rgba(255,255,255,0.35)" },
+                }}
+                onClick={() => setSelectedFilters({})}
+              >
+                Reset Filters
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+
+        <Stack spacing={3}>
+          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
+            <Box>
+              <Typography sx={{ fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+                {title}
+              </Typography>
+              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
+                Collection items
+              </Typography>
+            </Box>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
+                Showing {pagedItems.length} of {sortedItems.length} items
+              </Typography>
+              <Box sx={{ position: "relative" }}>
+                <Button
+                  onClick={() => setSortOpen((current) => !current)}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.8)",
+                    borderRadius: 2,
+                    px: 2.5,
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+                  }}
+                  endIcon={<ExpandMoreIcon />}
+                >
+                  {sortOptions.find((option) => option.value === sort)?.label ?? "Newest arrivals"}
+                </Button>
+                {sortOpen && (
+                  <Stack
+                    spacing={0}
+                    sx={{
+                      position: "absolute",
+                      right: 0,
+                      mt: 1,
+                      minWidth: 220,
+                      borderRadius: 2,
+                      backgroundColor: "rgba(20,20,20,0.9)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      zIndex: 5,
+                    }}
+                  >
+                    {sortOptions.map((option) => (
+                      <Box
+                        key={option.value}
+                        onClick={() => {
+                          setSort(option.value);
+                          setSortOpen(false);
+                        }}
+                        sx={{
+                          px: 2,
+                          py: 1.2,
+                          cursor: "pointer",
+                          fontSize: "0.85rem",
+                          color: "rgba(255,255,255,0.8)",
+                          "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+                        }}
+                      >
+                        {option.label}
+                      </Box>
+                    ))}
                   </Stack>
-                </AccordionDetails>
-              </Accordion>
-            ))}
+                )}
+              </Box>
+            </Stack>
           </Stack>
 
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.15)" }} />
-
-          <Typography sx={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Sort by
-          </Typography>
-          <RadioGroup value={sort} onChange={(event) => setSort(event.target.value)}>
-            {sortOptions.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                value={option.value}
-                control={<Radio sx={{ color: "rgba(255,255,255,0.6)" }} />}
-                label={
-                  <Typography variant="body2" color="text.secondary">
-                    {option.label}
-                  </Typography>
-                }
-              />
-            ))}
-          </RadioGroup>
-        </Stack>
-
-        <Stack spacing={2}>
           <Box
             sx={{
               display: "grid",
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
-                md: "repeat(3, 1fr)",
+                lg: "repeat(3, 1fr)",
               },
-              gap: 2,
+              gap: 3,
             }}
           >
             {pagedItems.map((item) => (
@@ -410,105 +454,161 @@ export default function CollectionPage() {
                 href={`/products/${item.id}?collection=${slugValue ?? ""}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                <Card
+              <Box className="product-card" sx={{ position: "relative" }}>
+                <Box
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: 3,
                     overflow: "hidden",
-                    background: "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 14px 26px rgba(0,0,0,0.18)",
-                    },
+                    aspectRatio: "4 / 5",
+                    position: "relative",
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
                   <Box
                     sx={{
-                      position: "relative",
-                      pt: "95%",
-                      backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%), url(${item.image})`,
+                      position: "absolute",
+                      inset: 0,
+                      backgroundImage: `url(${item.image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
-                      flexShrink: 0,
+                      transition: "transform 0.7s ease",
+                      ".product-card:hover &": { transform: "scale(1.08)" },
                     }}
                   />
-                  <CardContent sx={{ minHeight: { xs: 76, md: 88 } }}>
-                    <Typography
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 70%)",
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "flex-end",
+                      p: 2,
+                      opacity: 0,
+                      transition: "opacity 0.3s ease",
+                      ".product-card:hover &": { opacity: 1 },
+                    }}
+                  >
+                    <Button
+                      fullWidth
                       sx={{
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
+                        backgroundColor: "rgba(255,255,255,0.95)",
+                        color: "rgba(18,21,26,0.9)",
+                        fontWeight: 700,
+                        textTransform: "none",
+                        "&:hover": { backgroundColor: "rgba(255,255,255,1)" },
                       }}
                     >
+                      Quick View
+                    </Button>
+                  </Box>
+                  {item.tags.includes("new") && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 12,
+                        left: 12,
+                        px: 1.2,
+                        py: 0.4,
+                        borderRadius: 1,
+                        backgroundColor: accent,
+                        color: "rgba(18,21,26,0.9)",
+                        fontSize: "0.65rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      New
+                    </Box>
+                  )}
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1.5, gap: 1 }}>
+                  <Box>
+                    <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
                       {item.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.price}
+                    <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem" }}>
+                      {title}
                     </Typography>
-                  </CardContent>
-                </Card>
+                  </Box>
+                  <Typography sx={{ color: accent, fontWeight: 700 }}>{item.price}</Typography>
+                </Box>
+              </Box>
               </Link>
             ))}
             {Array.from({ length: placeholders }).map((_, index) => (
-              <Card
-                key={`placeholder-${index}`}
-                sx={{
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  visibility: "hidden",
-                }}
-              >
-                <Box sx={{ pt: "95%", flexShrink: 0 }} />
-                <CardContent sx={{ minHeight: { xs: 76, md: 88 } }} />
-              </Card>
+              <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
             ))}
           </Box>
 
-          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5} sx={{ mt: 2 }}>
             <IconButton
               onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={clampedPage === 1}
               sx={{
-                border: "1px solid rgba(255,255,255,0.35)",
-                color: "rgba(255,255,255,0.8)",
-                backgroundColor: "rgba(255,255,255,0.08)",
-                "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                backgroundColor: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.7)",
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
               }}
             >
               <ArrowBackIosNewIcon fontSize="small" />
             </IconButton>
-
-            <Typography
+            {[1, 2, 3].map((index) => (
+              <Box
+                key={index}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: index === clampedPage ? accent : "rgba(255,255,255,0.06)",
+                  color: index === clampedPage ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
+                  fontWeight: 700,
+                }}
+              >
+                {index}
+              </Box>
+            ))}
+            <Box sx={{ color: "rgba(255,255,255,0.35)", px: 0.5 }}>...</Box>
+            <Box
               sx={{
-                letterSpacing: "0.2em",
-                fontSize: "0.85rem",
-                textTransform: "uppercase",
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(255,255,255,0.06)",
                 color: "rgba(255,255,255,0.8)",
+                fontWeight: 700,
               }}
             >
-              {String(clampedPage).padStart(2, "0")} / {String(pageCount).padStart(2, "0")}
-            </Typography>
-
+              {pageCount}
+            </Box>
             <IconButton
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
               disabled={clampedPage === pageCount}
               sx={{
-                border: "1px solid rgba(255,255,255,0.35)",
-                color: "rgba(255,255,255,0.8)",
-                backgroundColor: "rgba(255,255,255,0.08)",
-                "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                backgroundColor: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.7)",
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
               }}
             >
               <ArrowForwardIosIcon fontSize="small" />
