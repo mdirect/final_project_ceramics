@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductDto } from './dto/product.dto';
 import { DbService } from '../db/db.service';
 
 @Injectable()
 export class ProductService {
   constructor(private readonly dbService: DbService) {}
 
-  async create(product: CreateProductDto) {
-    return await this.dbService.product.create({
-      data: product,
-    });
+  async create(product: ProductDto) {
+    return await this.dbService.product.create({ data: product });
   }
 
   async findAll() {
@@ -23,7 +20,7 @@ export class ProductService {
     });
   }
 
-  async update(id: number, product: UpdateProductDto) {
+  async update(id: number, product: ProductDto) {
     return await this.dbService.product.update({
       where: { id },
       data: product,
