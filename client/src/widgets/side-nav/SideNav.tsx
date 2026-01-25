@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Stack, Typography } from "@mui/material";
-import { sideNav } from "@/src/shared/config/site-nav";
+import { getSideNav } from "@/src/shared/config/site-nav";
+import { useAuth } from "@/src/shared/providers/AuthProvider";
 
 export function SideNav() {
   const pathname = usePathname();
+  const { user, isLoading } = useAuth();
+  const sideNav = getSideNav(Boolean(user) && !isLoading);
 
   return (
     <Stack spacing={1} alignItems="flex-end">
