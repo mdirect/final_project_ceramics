@@ -12,6 +12,7 @@ enum UserRole {
   ADMIN
 }
 
+// Пользователи
 model User {
   id          Int       @id @default(autoincrement())
   name        String
@@ -21,8 +22,64 @@ model User {
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  orders       Order[]
+  carts        Cart[]
 }
 
+// Корзина
+model Cart {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  productId  Int      @unique
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+// Заказы
+model Order {
+  id              Int             @id @default(autoincrement())
+  number          String          @unique
+  userId          Int
+  status          OrderStatus     @default(PENDING)
+  total           Decimal         @db.Decimal(10, 2)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  user            User            @relation(fields: [userId], references: [id])
+  orderItems      OrderItem[]
+}
+
+// Состав заказа
+model OrderItem {
+  id          Int             @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  productName String
+  price       Decimal         @db.Decimal(10, 2)
+  quantity    Int
+  total       Decimal         @db.Decimal(10, 2)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product         @relation(fields: [productId], references: [id])
+}
+
+// Коллекции (украшения, арт-объекты)
 model Collection {
   id          Int       @id @default(autoincrement())
   title       String
@@ -30,17 +87,22 @@ model Collection {
   image       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
   products    Product[]
 }
 
+// Товары
 model Product {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   collectionId Int
   name         String
   desc         String?
   image        String?
-  price        Float
+  price        Decimal    @db.Decimal(10, 2)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  Collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  carts        Cart[]
+  orderItems   OrderItem[]
 }
