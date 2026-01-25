@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.user.createMany({
+    skipDuplicates: true,
     data: [
       {
         name: 'Админ',
@@ -24,29 +25,59 @@ async function main() {
   await prisma.collection.createMany({
     data: [
       {
-        title: 'Collectiion 1',
-        description: 'Collectiion 1 description',
-        image: '1.png',
+        title: 'Hands',
+        description: null,
+        image: null,
       },
       {
-        title: 'Collectiion 2',
-        description: 'Collectiion 2 description',
-        image: '2.png',
+        title: 'Bearlings',
+        description: null,
+        image: null,
       },
       {
-        title: 'Collectiion 3',
-        description: 'Collectiion 3 description',
-        image: '3.png',
+        title: 'Dear Deer',
+        description: null,
+        image: null,
       },
       {
-        title: 'Collectiion 4',
-        description: 'Collectiion 4 description',
-        image: '4.png',
+        title: 'Lotus',
+        description: null,
+        image: null,
       },
       {
-        title: 'Collectiion 5',
-        description: 'Collectiion 5 description',
-        image: '5.png',
+        title: 'Microworld',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Sci-fi',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Masks and faces',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Floral',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Baroque',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Man and ball',
+        description: null,
+        image: null,
+      },
+      {
+        title: 'Out of collections',
+        description: null,
+        image: null,
       },
     ],
   });

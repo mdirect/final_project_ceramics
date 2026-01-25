@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import { useParams, useSearchParams } from "next/navigation";
+import { apiFetch } from "@/src/shared/api/http";
 import BrushIcon from "@mui/icons-material/Brush";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import CropSquareIcon from "@mui/icons-material/CropSquare";
@@ -12,7 +13,32 @@ import AddIcon from "@mui/icons-material/Add";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type Product = {
+  id: number;
+  name: string;
+  desc?: string | null;
+  image?: string | null;
+  price: number | string;
+  collectionId?: number;
+};
+
+const formatCurrency = (value?: number | string) => {
+  if (value === undefined || value === null) {
+    return "€—";
+  }
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) {
+    return String(value);
+  }
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(numeric);
+};
 
 export default function ProductPage() {
   const params = useParams<{ id?: string | string[] }>();
@@ -20,127 +46,66 @@ export default function ProductPage() {
   const searchParams = useSearchParams();
   const collectionSlug = searchParams.get("collection");
   const accent = "#f2b90d";
-
-  const products = [
-    {
-      id: "1",
-      name: "The Planet Holder",
-      price: "€120",
-      image:
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "A celestial-inspired piece with a soft metallic sheen and fine detailing.",
-      materials: ["Porcelain", "Gold luster", "Hand-polished glaze"],
-      size: "10 × 12 × 8 cm",
-      availability: "In stock",
-    },
-    {
-      id: "2",
-      name: "Chipper",
-      price: "€95",
-      image:
-        "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Minimal form with a balanced silhouette, ideal for everyday wear.",
-      materials: ["Stoneware", "Matte glaze"],
-      size: "7 × 5 × 3 cm",
-      availability: "Limited",
-    },
-    {
-      id: "3",
-      name: "Bones Rider",
-      price: "€110",
-      image:
-        "https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Bold texture and asymmetry, inspired by movement and contrast.",
-      materials: ["Porcelain", "Oxide wash"],
-      size: "9 × 6 × 4 cm",
-      availability: "In stock",
-    },
-    {
-      id: "4",
-      name: "Little Mask",
-      price: "€80",
-      image:
-        "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Expressive form with subtle grooves and an elegant matte finish.",
-      materials: ["Stoneware", "Satin glaze"],
-      size: "6 × 6 × 2 cm",
-      availability: "Made to order",
-    },
-    {
-      id: "5",
-      name: "Golden Eye",
-      price: "€140",
-      image:
-        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Luminous accents and layered glazing create depth and glow.",
-      materials: ["Porcelain", "Gold luster"],
-      size: "8 × 8 × 4 cm",
-      availability: "In stock",
-    },
-    {
-      id: "6",
-      name: "Night Bloom",
-      price: "€130",
-      image:
-        "https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Floral-inspired detailing with deep tones and delicate edges.",
-      materials: ["Porcelain", "Gloss glaze"],
-      size: "9 × 7 × 4 cm",
-      availability: "In stock",
-    },
-    {
-      id: "7",
-      name: "Shell",
-      price: "€90",
-      image:
-        "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Layered texture with soft curvature reminiscent of shoreline forms.",
-      materials: ["Stoneware", "Pearl glaze"],
-      size: "7 × 7 × 3 cm",
-      availability: "Limited",
-    },
-    {
-      id: "8",
-      name: "Bird Echo",
-      price: "€150",
-      image:
-        "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1600&q=80",
-      description:
-        "Graceful profile with intricate surface work and airy proportions.",
-      materials: ["Porcelain", "Crystal glaze"],
-      size: "11 × 8 × 5 cm",
-      availability: "In stock",
-    },
-  ];
-
-  const product = products.find((item) => item.id === idValue);
-  const fallback = {
-    id: idValue ?? "unknown",
-    name: `Product ${idValue ?? "—"}`,
-    price: "€—",
-    image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80",
-    description: "Gallery, description, materials, and availability.",
-    materials: ["Porcelain"],
-    size: "—",
-    availability: "Check availability",
-  };
-  const view = product ?? fallback;
-  const related = products.filter((item) => item.id !== view.id).slice(0, 6);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const galleryImages = [
-    view.image,
-    "https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=1600&q=80",
-    "https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?auto=format&fit=crop&w=1600&q=80",
-  ];
+  const fallbackImage =
+    "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80";
+
+  useEffect(() => {
+    if (!idValue) {
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      try {
+        const item = await apiFetch<Product>(`/product/${idValue}`);
+        if (!cancelled) {
+          setProduct(item);
+          setActiveImage(0);
+        }
+        const allProducts = await apiFetch<Product[]>("/product");
+        const relatedItems = allProducts
+          .filter((entry) => entry.id !== item.id)
+          .filter((entry) =>
+            item.collectionId ? entry.collectionId === item.collectionId : true,
+          )
+          .slice(0, 6);
+        if (!cancelled) {
+          setRelated(relatedItems);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "Не удалось загрузить товар.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [idValue]);
+
+  const viewName = product?.name ?? `Product ${idValue ?? "—"}`;
+  const viewSize = "—";
+  const galleryImages = useMemo(
+    () => [product?.image ?? fallbackImage],
+    [product?.image],
+  );
   const activeSrc = galleryImages[Math.min(activeImage, galleryImages.length - 1)];
 
   return (
@@ -160,9 +125,15 @@ export default function ProductPage() {
         </Link>
         <Typography sx={{ fontSize: "0.85rem" }}>/</Typography>
         <Typography sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.9)" }}>
-          {view.name}
+          {viewName}
         </Typography>
       </Stack>
+
+      {loadError && (
+        <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+          {loadError}
+        </Alert>
+      )}
 
       <Box
         sx={{
@@ -176,7 +147,7 @@ export default function ProductPage() {
           <Stack direction={{ xs: "row", lg: "column" }} spacing={2}>
             {galleryImages.map((src, index) => (
               <Box
-                key={`${view.id}-thumb-${index}`}
+                key={`${product?.id ?? idValue ?? "product"}-thumb-${index}`}
                 onClick={() => setActiveImage(index)}
                 sx={{
                   width: { xs: 72, lg: 96 },
@@ -214,6 +185,21 @@ export default function ProductPage() {
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
+            {isLoading && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 1,
+                  backgroundColor: "rgba(0,0,0,0.35)",
+                }}
+              >
+                <CircularProgress size={32} sx={{ color: accent }} />
+              </Box>
+            )}
             <Box
               sx={{
                 position: "absolute",
@@ -259,23 +245,12 @@ export default function ProductPage() {
         >
           <Stack spacing={3}>
             <Box>
-              <Typography
-                sx={{
-                  textTransform: "uppercase",
-                  letterSpacing: "0.2em",
-                  fontSize: "0.7rem",
-                  color: accent,
-                  fontWeight: 700,
-                }}
-              >
-                Limited Collection
-              </Typography>
-              <Typography sx={{ fontSize: "2rem", fontWeight: 700, mt: 1 }}>
-                {view.name}
+              <Typography sx={{ fontSize: "2rem", fontWeight: 700 }}>
+                {viewName}
               </Typography>
               <Stack direction="row" spacing={2} alignItems="baseline" sx={{ mt: 1 }}>
                 <Typography sx={{ fontSize: "1.7rem", color: accent, fontWeight: 300 }}>
-                  {view.price}
+                  {formatCurrency(product?.price)}
                 </Typography>
                 <Typography sx={{ color: "rgba(255,255,255,0.35)", textDecoration: "line-through" }}>
                   €165
@@ -297,6 +272,9 @@ export default function ProductPage() {
               >
                 Characteristics
               </Typography>
+              <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", mb: 2 }}>
+                {product?.desc?.trim() || "Описание скоро появится."}
+              </Typography>
               <Stack spacing={1.5}>
                 <Stack direction="row" spacing={1.5} alignItems="center">
                   <BrushIcon sx={{ color: accent, fontSize: 18 }} />
@@ -313,7 +291,7 @@ export default function ProductPage() {
                 <Stack direction="row" spacing={1.5} alignItems="center">
                   <CropSquareIcon sx={{ color: accent, fontSize: 18 }} />
                   <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem" }}>
-                    Dimensions: {view.size}
+                    Dimensions: {viewSize}
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1.5} alignItems="center">
@@ -451,7 +429,7 @@ export default function ProductPage() {
                     sx={{
                       width: "100%",
                       height: "100%",
-                      backgroundImage: `url(${item.image})`,
+                      backgroundImage: `url(${item.image ?? fallbackImage})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       transition: "transform 0.5s ease",
@@ -460,7 +438,9 @@ export default function ProductPage() {
                   />
                 </Box>
                 <Typography sx={{ mt: 1.5, fontWeight: 700 }}>{item.name}</Typography>
-                <Typography sx={{ color: accent, fontWeight: 600 }}>{item.price}</Typography>
+                <Typography sx={{ color: accent, fontWeight: 600 }}>
+                  {formatCurrency(item.price)}
+                </Typography>
               </Box>
             </Link>
           ))}
