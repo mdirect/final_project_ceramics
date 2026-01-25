@@ -10,6 +10,7 @@ import { ProfileModule } from './profile/profile.module';
 import { EventModule } from './event/event.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { PostModule } from './post/post.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PostModule } from './post/post.module';
     EventModule,
     CatalogModule,
     PostModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

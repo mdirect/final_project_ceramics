@@ -128,10 +128,7 @@ CREATE TABLE "Post" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Cart_userId_key" ON "Cart"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Cart_productId_key" ON "Cart"("productId");
+CREATE UNIQUE INDEX "Cart_userId_productId_key" ON "Cart"("userId", "productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_number_key" ON "Order"("number");

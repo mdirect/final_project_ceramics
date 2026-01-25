@@ -33,14 +33,16 @@ model User {
 // Корзина
 model Cart {
   id         Int      @id @default(autoincrement())
-  userId     Int      @unique
-  productId  Int      @unique
+  userId     Int
+  productId  Int
   quantity   Int      @default(1)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 enum OrderStatus {
