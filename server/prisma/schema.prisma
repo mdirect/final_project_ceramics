@@ -7,6 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ------------------------------------------------------------------------------------------------------
+// Shop
+// ------------------------------------------------------------------------------------------------------
 enum UserRole {
   USER
   ADMIN
@@ -106,3 +109,48 @@ model Product {
   carts        Cart[]
   orderItems   OrderItem[]
 }
+
+enum EventStatus {
+  UPCOMING
+  PAST
+}
+
+// ------------------------------------------------------------------------------------------------------
+// Мероприятия
+model Event {
+  id          Int         @id @default(autoincrement())
+  title       String
+  date        DateTime
+  place       String
+  desc        String?
+  image       String?
+  status      EventStatus @default(UPCOMING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// ------------------------------------------------------------------------------------------------------
+// Secret floor
+// ------------------------------------------------------------------------------------------------------
+// Каталоги (для secret floor)
+model Catalog {
+  id          Int         @id @default(autoincrement())
+  file        String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// Посты-журнал (для secret floor)
+model Post {
+  id          Int         @id @default(autoincrement())
+  title       String
+  desc        String
+  image       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// ------------------------------------------------------------------------------------------------------
+// About us
+// ------------------------------------------------------------------------------------------------------
+// ...
