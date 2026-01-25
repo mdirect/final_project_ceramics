@@ -92,6 +92,54 @@ async function main() {
     ],
   });
   console.log('Products seeds done');
+
+  await prisma.event.createMany({
+    data: [
+      {
+        title: 'Выставка ювелирных изделий',
+        date: '2026-02-25T10:00:00Z',
+        place: 'Галерея искусств',
+        desc: 'можно купить',
+        image: 'event.png',
+      },
+      {
+        title: 'Выставка керамики',
+        date: '2026-02-15T18:00:00Z',
+        place: 'Галерея искусств',
+        desc: 'Выставка современных керамических изделий',
+        image: 'event.jpg',
+        status: 'UPCOMING',
+      },
+      {
+        title: 'Выставка керамики',
+        date: '2025-02-15T18:00:00Z',
+        place: 'Галерея искусств',
+        desc: 'Выставка современных керамических изделий',
+        status: 'PAST',
+      },
+    ],
+  });
+  console.log('Events seeds done');
+
+  await prisma.post.createMany({
+    data: [
+      {
+        title: 'Новая коллекция керамики',
+        desc: 'Представляем новую коллекцию авторской керамики',
+        image: 'post.png',
+      },
+    ],
+  });
+  console.log('Posts seeds done');
+
+  await prisma.catalog.createMany({
+    data: [
+      {
+        file: 'catalogs/2026-catalog.pdf',
+      },
+    ],
+  });
+  console.log('Catalogs seeds done');
 }
 
 main()
