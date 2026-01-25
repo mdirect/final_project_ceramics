@@ -39,6 +39,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         email: true,
         name: true,
         role: true,
+        isActive: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -46,6 +47,11 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
+    }
+
+    // Проверяем, что аккаунт активен
+    if (!user.isActive) {
+      throw new UnauthorizedException('Аккаунт деактивирован');
     }
 
     return user;

@@ -22,9 +22,12 @@ export class AuthService {
   async register(registerDto: RegisterDto): Promise<UserEntity> {
     const { email, password, name } = registerDto;
 
-    // Проверяем, существует ли пользователь с таким email
-    const existingUser = await this.dbService.user.findUnique({
-      where: { email },
+    // Проверяем, существует ли активный пользователь с таким email
+    const existingUser = await this.dbService.user.findFirst({
+      where: { 
+        email,
+        isActive: true,
+      },
     });
 
     if (existingUser) {
@@ -46,6 +49,7 @@ export class AuthService {
         email: true,
         name: true,
         role: true,
+        isActive: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -137,10 +141,16 @@ export class AuthService {
         email: true,
         name: true,
         role: true,
+        isActive: true,
         createdAt: true,
         updatedAt: true,
       },
     });
+
+    // Проверяем, что пользователь активен
+    if (!user || !user.isActive) {
+      return null;
+    }
 
     return user;
   }
