@@ -727,11 +727,13 @@ export default function CollectionPage() {
             sx={{
               display: "grid",
               gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
+                xs: "minmax(0, 1fr)",
+                sm: "repeat(2, minmax(0, 1fr))",
+                lg: "repeat(3, minmax(0, 1fr))",
               },
               gap: 3,
+              alignItems: "start",
+              justifyItems: "stretch",
             }}
           >
             {isLoading && (
@@ -753,8 +755,10 @@ export default function CollectionPage() {
                 </Typography>
               </Box>
             )}
-            {pagedItems.map((item) => (
-              <Box key={item.id} sx={{ position: "relative" }}>
+            {pagedItems.map((item) => {
+              const primaryImage = item.images?.[0] ?? item.image;
+              return (
+                <Box key={item.id} sx={{ position: "relative", minWidth: 0 }}>
                 {isAdmin && (
                   <IconButton
                     onClick={(event) => {
@@ -795,22 +799,42 @@ export default function CollectionPage() {
                     border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      backgroundImage: (item.images?.[0] ?? item.image)
-                        ? `url(${item.images?.[0] ?? item.image})`
-                        : "none",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundColor: item.images?.[0] || item.image
-                        ? "transparent"
-                        : "rgba(255,255,255,0.08)",
-                      transition: "transform 0.7s ease",
-                      ".product-card:hover &": { transform: "scale(1.08)" },
-                    }}
-                  />
+                  {primaryImage ? (
+                    <>
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          inset: 0,
+                          backgroundImage: `url(${primaryImage})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          filter: "blur(14px)",
+                          transform: "scale(1.08)",
+                          opacity: 0.35,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          inset: 0,
+                          backgroundImage: `url(${primaryImage})`,
+                          backgroundSize: "contain",
+                          backgroundPosition: "center",
+                          backgroundRepeat: "no-repeat",
+                          transition: "transform 0.7s ease",
+                          ".product-card:hover &": { transform: "scale(1.03)" },
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        backgroundColor: "rgba(255,255,255,0.08)",
+                      }}
+                    />
+                  )}
                   <Box
                     sx={{
                       position: "absolute",
@@ -880,7 +904,8 @@ export default function CollectionPage() {
                 </Box>
                 </Link>
               </Box>
-            ))}
+            );
+            })}
             {Array.from({ length: placeholders }).map((_, index) => (
               <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
             ))}
