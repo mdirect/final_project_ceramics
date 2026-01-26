@@ -5,88 +5,71 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Box,
   Button,
   Checkbox,
-  Divider,
+  CircularProgress,
   FormControlLabel,
   IconButton,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useParams } from "next/navigation";
 import { collections } from "@/src/shared/config/collections";
+import { apiFetch } from "@/src/shared/api/http";
+import { useAuth } from "@/src/shared/providers/AuthProvider";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useEffect, useMemo, useState } from "react";
 
-const mockItems = [
-  {
-    id: "1",
-    name: "The Planet Holder",
-    price: "€120",
-    image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80",
-    tags: ["new"],
-  },
-  {
-    id: "2",
-    name: "Chipper",
-    price: "€95",
-    image:
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=80",
-    tags: ["classic"],
-  },
-  {
-    id: "3",
-    name: "Bones Rider",
-    price: "€110",
-    image:
-      "https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?auto=format&fit=crop&w=1200&q=80",
-    tags: ["limited"],
-  },
-  {
-    id: "4",
-    name: "Little Mask",
-    price: "€80",
-    image:
-      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80",
-    tags: ["new", "limited"],
-  },
-  {
-    id: "5",
-    name: "Golden Eye",
-    price: "€140",
-    image:
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=80",
-    tags: ["statement"],
-  },
-  {
-    id: "6",
-    name: "Night Bloom",
-    price: "€130",
-    image:
-      "https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?auto=format&fit=crop&w=1200&q=80",
-    tags: ["classic"],
-  },
-  {
-    id: "7",
-    name: "Shell",
-    price: "€90",
-    image:
-      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80",
-    tags: ["new"],
-  },
-  {
-    id: "8",
-    name: "Bird Echo",
-    price: "€150",
-    image:
-      "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=80",
-    tags: ["statement", "limited"],
-  },
-];
+type Collection = {
+  id: number;
+  title: string;
+  description?: string | null;
+  image?: string | null;
+};
+
+type Product = {
+  id: number;
+  collectionId: number;
+  name: string;
+  desc?: string | null;
+  image?: string | null;
+  images?: string[] | null;
+  price: number | string;
+  tags?: string[];
+};
+
+const formatCurrency = (value: number | string) => {
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) {
+    return String(value);
+  }
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(numeric);
+};
+
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+const parseImageUrls = (value: string) =>
+  value
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
 
 const filterGroups = [
   {
@@ -155,11 +138,31 @@ const accent = "#f2b90d";
 export default function CollectionPage() {
   const params = useParams<{ slug?: string | string[] }>();
   const slugValue = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
+  const { user } = useAuth();
+  const isAdmin = true;
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [sortOpen, setSortOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [collection, setCollection] = useState<Collection | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deletePending, setDeletePending] = useState<number | null>(null);
+  const [formState, setFormState] = useState({
+    name: "",
+    price: "",
+    image: "",
+    desc: "",
+  });
+  const imageUrls = useMemo(() => parseImageUrls(formState.image), [formState.image]);
+  const hasImageUrl = imageUrls.length > 0;
+  const isImageUrlValid =
+    !hasImageUrl || imageUrls.every((url) => imageExtensionRegex.test(url));
+  const previewImageUrl = imageUrls[0];
   const pageSize = 6;
   const formatTitle = (value?: string) =>
     value
@@ -171,26 +174,166 @@ export default function CollectionPage() {
       : "Collection";
 
   const matched = collections.find((collection) => collection.slug === slugValue);
-  const title = matched?.label ?? formatTitle(slugValue);
+  const configTitle = matched?.label;
+  const title = collection?.title ?? configTitle ?? formatTitle(slugValue);
+
+  useEffect(() => {
+    if (!slugValue) {
+      return;
+    }
+    let cancelled = false;
+
+    const loadData = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      setActionError(null);
+
+      try {
+        const allCollections = await apiFetch<Collection[]>("/collection");
+        const normalizedSlug = String(slugValue);
+        const numericId = Number(normalizedSlug);
+        const byId = Number.isNaN(numericId)
+          ? undefined
+          : allCollections.find((item) => item.id === numericId);
+        const bySlug = allCollections.find(
+          (item) => toSlug(item.title) === normalizedSlug,
+        );
+        const byTitle = configTitle
+          ? allCollections.find(
+              (item) => item.title.toLowerCase() === configTitle.toLowerCase(),
+            )
+          : undefined;
+        const selected = byId ?? bySlug ?? byTitle ?? null;
+
+        if (!selected) {
+          if (!cancelled) {
+            setCollection(null);
+            setProducts([]);
+            setLoadError("Коллекция не найдена в базе данных.");
+          }
+          return;
+        }
+
+        const allProducts = await apiFetch<Product[]>("/product");
+        const collectionProducts = allProducts.filter(
+          (item) => item.collectionId === selected.id,
+        );
+
+        if (!cancelled) {
+          setCollection(selected);
+          setProducts(collectionProducts);
+          setPage(1);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "Не удалось загрузить товары.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slugValue, configTitle]);
+
+  const handleCreateProduct = async () => {
+    if (!collection) {
+      setActionError("Не удалось определить коллекцию для товара.");
+      return;
+    }
+
+    const name = formState.name.trim();
+    const priceValue = Number(formState.price);
+
+    if (!name) {
+      setActionError("Название товара обязательно.");
+      return;
+    }
+
+    if (!formState.price || Number.isNaN(priceValue) || priceValue <= 0) {
+      setActionError("Цена должна быть числом больше 0.");
+      return;
+    }
+
+    if (!isImageUrlValid) {
+      setActionError("Нужны прямые ссылки на файлы (.jpg/.png/.webp).");
+      return;
+    }
+
+    setIsSaving(true);
+    setActionError(null);
+
+    try {
+      const images = imageUrls;
+      const created = await apiFetch<Product>("/product", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          price: priceValue,
+          image: images[0] ?? null,
+          images: images.length > 0 ? images : null,
+          desc: formState.desc.trim() || null,
+          collectionId: collection.id,
+        }),
+      });
+      setProducts((current) => [created, ...current]);
+      setFormState({ name: "", price: "", image: "", desc: "" });
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Не удалось добавить товар.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    setDeletePending(id);
+    setActionError(null);
+    try {
+      await apiFetch(`/product/${id}`, { method: "DELETE" });
+      setProducts((current) => current.filter((item) => item.id !== id));
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : "Не удалось удалить товар.",
+      );
+    } finally {
+      setDeletePending(null);
+    }
+  };
 
   const filteredItems = useMemo(() => {
     const term = search.trim().toLowerCase();
     const matchesSearch = (name: string) =>
       term.length === 0 || name.toLowerCase().includes(term);
-    const matchesFilters = (tags: string[]) => {
+    const matchesFilters = (tags?: string[]) => {
       const groups = Object.values(selectedFilters).filter((group) => group.length > 0);
       if (groups.length === 0) {
         return true;
       }
-      return groups.every((group) => group.some((value) => tags.includes(value)));
+      const safeTags = tags ?? [];
+      return groups.every((group) => group.some((value) => safeTags.includes(value)));
     };
 
-    return mockItems.filter(
+    return products.filter(
       (item) => matchesSearch(item.name) && matchesFilters(item.tags),
     );
-  }, [search, selectedFilters]);
+  }, [search, selectedFilters, products]);
 
-  const parsePrice = (value: string) => Number(value.replace(/[^\d.]/g, ""));
+  const parsePrice = (value: number | string) => {
+    const numeric = Number(value);
+    return Number.isNaN(numeric) ? 0 : numeric;
+  };
 
   const sortedItems = useMemo(() => {
     const items = [...filteredItems];
@@ -233,12 +376,7 @@ export default function CollectionPage() {
         <Box component="aside" sx={{ display: { xs: "none", md: "block" } }}>
           <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
             <Box>
-              <Typography sx={{ fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-                Collections
-              </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem", mb: 2 }}>
-                Artisanal excellence since 1994
-              </Typography>
+              
               <Stack spacing={0.5}>
                 {[
                   { label: "All Creations", active: true },
@@ -437,6 +575,154 @@ export default function CollectionPage() {
             </Stack>
           </Stack>
 
+          {loadError && (
+            <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+              {loadError}
+            </Alert>
+          )}
+
+          {isAdmin && (
+            <Box
+              sx={{
+                borderRadius: 3,
+                border: "1px solid rgba(255,255,255,0.12)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                p: 3,
+              }}
+            >
+              <Stack spacing={2}>
+                <Stack spacing={0.5}>
+                  <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+                    Админ-панель
+                  </Typography>
+                </Stack>
+                <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                  <TextField
+                    value={formState.name}
+                    onChange={(event) =>
+                      setFormState((current) => ({ ...current, name: event.target.value }))
+                    }
+                    label="Название"
+                    placeholder="Название товара"
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    sx={{
+                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "rgba(255,255,255,0.05)",
+                      },
+                    }}
+                  />
+                  <TextField
+                    value={formState.price}
+                    onChange={(event) =>
+                      setFormState((current) => ({ ...current, price: event.target.value }))
+                    }
+                    label="Цена"
+                    placeholder="Например 120"
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    sx={{
+                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "rgba(255,255,255,0.05)",
+                      },
+                    }}
+                  />
+                </Stack>
+                <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                {previewImageUrl && (
+                    <Box
+                      sx={{
+                        width: { xs: "100%", md: 220 },
+                        flexShrink: 0,
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        backgroundColor: "rgba(255,255,255,0.04)",
+                        aspectRatio: "4 / 5",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          backgroundImage: `url(${previewImageUrl})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <TextField
+                    value={formState.image}
+                    onChange={(event) =>
+                      setFormState((current) => ({ ...current, image: event.target.value }))
+                    }
+                    label="URL изображения"
+                    placeholder="https://... (можно несколько через запятую или новую строку)"
+                    fullWidth
+                    size="small"
+                    error={hasImageUrl && !isImageUrlValid}
+                    helperText={
+                      hasImageUrl && !isImageUrlValid
+                        ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
+                        : " "
+                    }
+                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
+                    sx={{
+                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "rgba(255,255,255,0.05)",
+                      },
+                    }}
+                  />
+                  <TextField
+                    value={formState.desc}
+                    onChange={(event) =>
+                      setFormState((current) => ({ ...current, desc: event.target.value }))
+                    }
+                    label="Описание"
+                    placeholder="Короткое описание"
+                    fullWidth
+                    size="small"
+                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    sx={{
+                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "rgba(255,255,255,0.05)",
+                      },
+                    }}
+                  />
+                </Stack>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                  <Button
+                    variant="contained"
+                    onClick={handleCreateProduct}
+                    disabled={isSaving || !collection || (hasImageUrl && !isImageUrlValid)}
+                    sx={{
+                      textTransform: "none",
+                      fontWeight: 700,
+                      backgroundColor: accent,
+                      color: "rgba(18,21,26,0.9)",
+                      "&:hover": { backgroundColor: "#f7cd4c" },
+                    }}
+                  >
+                    {isSaving ? "Сохранение..." : "Добавить товар"}
+                  </Button>
+                  {actionError && (
+                    <Alert severity="error" sx={{ flex: 1 }}>
+                      {actionError}
+                    </Alert>
+                  )}
+                </Stack>
+              </Stack>
+            </Box>
+          )}
+
           <Box
             sx={{
               display: "grid",
@@ -448,13 +734,57 @@ export default function CollectionPage() {
               gap: 3,
             }}
           >
-            {pagedItems.map((item) => (
-              <Link
-                key={item.id}
-                href={`/products/${item.id}?collection=${slugValue ?? ""}`}
-                style={{ textDecoration: "none", color: "inherit" }}
+            {isLoading && (
+              <Box
+                sx={{
+                  gridColumn: "1 / -1",
+                  display: "flex",
+                  justifyContent: "center",
+                  py: 4,
+                }}
               >
-              <Box className="product-card" sx={{ position: "relative" }}>
+                <CircularProgress size={32} sx={{ color: accent }} />
+              </Box>
+            )}
+            {!isLoading && sortedItems.length === 0 && (
+              <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
+                <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
+                  Пока нет товаров в этой коллекции.
+                </Typography>
+              </Box>
+            )}
+            {pagedItems.map((item) => (
+              <Box key={item.id} sx={{ position: "relative" }}>
+                {isAdmin && (
+                  <IconButton
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      void handleDeleteProduct(item.id);
+                    }}
+                    disabled={deletePending === item.id}
+                    sx={{
+                      position: "absolute",
+                      top: 12,
+                      right: 12,
+                      zIndex: 2,
+                      backgroundColor: "rgba(0,0,0,0.55)",
+                      color: "rgba(255,255,255,0.9)",
+                      "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+                    }}
+                  >
+                    {deletePending === item.id ? (
+                      <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.9)" }} />
+                    ) : (
+                      <DeleteOutlineIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                )}
+                <Link
+                  href={`/products/${item.id}?collection=${slugValue ?? ""}`}
+                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                >
+                <Box className="product-card" sx={{ position: "relative" }}>
                 <Box
                   sx={{
                     borderRadius: 3,
@@ -469,9 +799,14 @@ export default function CollectionPage() {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      backgroundImage: `url(${item.image})`,
+                      backgroundImage: (item.images?.[0] ?? item.image)
+                        ? `url(${item.images?.[0] ?? item.image})`
+                        : "none",
                       backgroundSize: "cover",
                       backgroundPosition: "center",
+                      backgroundColor: item.images?.[0] || item.image
+                        ? "transparent"
+                        : "rgba(255,255,255,0.08)",
                       transition: "transform 0.7s ease",
                       ".product-card:hover &": { transform: "scale(1.08)" },
                     }}
@@ -508,7 +843,7 @@ export default function CollectionPage() {
                       Quick View
                     </Button>
                   </Box>
-                  {item.tags.includes("new") && (
+                  {item.tags?.includes("new") && (
                     <Box
                       sx={{
                         position: "absolute",
@@ -538,10 +873,13 @@ export default function CollectionPage() {
                       {title}
                     </Typography>
                   </Box>
-                  <Typography sx={{ color: accent, fontWeight: 700 }}>{item.price}</Typography>
+                  <Typography sx={{ color: accent, fontWeight: 700 }}>
+                    {formatCurrency(item.price)}
+                  </Typography>
                 </Box>
+                </Box>
+                </Link>
               </Box>
-              </Link>
             ))}
             {Array.from({ length: placeholders }).map((_, index) => (
               <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />

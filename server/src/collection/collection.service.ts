@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCollectionDto } from './dto/create-collection.dto';
-import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { CollectionDto } from './dto/collection.dto';
 import { DbService } from '../db/db.service';
 
 @Injectable()
 export class CollectionService {
   constructor(private readonly dbService: DbService) {}
 
-  async create(collection: CreateCollectionDto) {
+  async create(collection: CollectionDto) {
     return await this.dbService.collection.create({ data: collection });
   }
 
@@ -21,7 +20,7 @@ export class CollectionService {
     });
   }
 
-  async update(id: number, collection: UpdateCollectionDto) {
+  async update(id: number, collection: CollectionDto) {
     return await this.dbService.collection.update({
       where: { id },
       data: collection,

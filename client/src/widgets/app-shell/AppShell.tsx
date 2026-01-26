@@ -6,53 +6,30 @@ import { usePathname } from "next/navigation";
 import { Header } from "@/src/widgets/header";
 import { Footer } from "@/src/widgets/footer";
 
-const gradientStopsByPath: Record<
-  string,
-  { start: string; mid: string; end: string }
-> = {
-  "/": { start: "#0a3a52", mid: "#061b2d", end: "#0b4f63" },
-  "/we": { start: "#0b3f46", mid: "#071c22", end: "#0d4b54" },
-  "/shop": { start: "#0e3b2f", mid: "#071c18", end: "#0f4a3a" },
-  "/prestige": { start: "#34293f", mid: "#17121d", end: "#47325a" },
-  "/projects": { start: "#0b3a52", mid: "#061825", end: "#0e4057" },
-  "/events": { start: "#3a3426", mid: "#1a1711", end: "#4a402e" },
-  "/contacts": { start: "#2c3246", mid: "#141824", end: "#3b4260" },
-  "/policy": { start: "#2b3a38", mid: "#141a19", end: "#3a4a48" },
-  "/signin": { start: "#3a2a2c", mid: "#1a1314", end: "#4a3336" },
-  "/cart": { start: "#2f3a2a", mid: "#151a14", end: "#3a4a34" },
+const gradientByPath: Record<string, string> = {
+  "/": "linear-gradient(120deg, #f26a4b 0%, #f5b54c 45%, #9be15d 100%)",
+  "/we": "linear-gradient(170deg,rgb(71, 105, 178) 20%,rgba(247, 150, 24, 0.85) 90%)",
+  "/shop": "linear-gradient(130deg,rgb(128, 71, 203) 10%,rgb(77, 128, 114) 35%,rgb(213, 153, 24) 105%)",
+  "/prestige": "linear-gradient(200deg,rgb(83, 131, 207) -10%,rgba(75, 0, 224, 0.54) 60%,rgba(237, 118, 14, 0.67) 100%)",
+  "/projects": "linear-gradient(55deg, #141e30 0%, #355c7d 45%, #f67280 110%)",
+  "/events": "linear-gradient(145deg, #0f2027 0%, #2c5364 45%, #f7c873 100%)",
+  "/contacts": "linear-gradient(145deg, #2b5876 0%, #4e4376 50%, #f8cdda 100%)",
+  "/policy": "linear-gradient(145deg, #1a2a3a 0%, #3f5c7a 55%,rgb(66, 187, 114) 100%)",
+  "/signin": "linear-gradient(185deg, #20243a 0%, #4a4f87 60%,rgb(198, 88, 63) 90%)",
+  "/cart": "linear-gradient(150deg, #16222a 0%, #3a6073 60%, #f2c94c 90%)",
 };
-
-const collectionsStops = { start: "#0b4152", mid: "#071f2a", end: "#0f5163" };
-const productsStops = { start: "#10334a", mid: "#091722", end: "#0f3f5a" };
-const projectsStops = { start: "#0a3850", mid: "#061725", end: "#0c465d" };
-
-function buildLinearGradient({
-  start,
-  mid,
-  end,
-}: {
-  start: string;
-  mid: string;
-  end: string;
-}) {
-  return `linear-gradient(135deg, ${start} 0%, ${mid} 45%, ${end} 100%)`;
-}
 
 function resolveGradient(pathname: string) {
   if (pathname.startsWith("/collections/")) {
-    // Настраиваемый градиент для страниц коллекций
-    return buildLinearGradient(collectionsStops);
+    return "linear-gradient(95deg, #ff9a9e -5%,rgba(134, 129, 127, 0.61) 40%,rgb(249, 171, 227) 150%)";
   }
   if (pathname.startsWith("/products/")) {
-    // Настраиваемый градиент для страниц продуктов
-    return buildLinearGradient(productsStops);
+    return "linear-gradient(135deg, #43cea2 0%, #185a9d 55%, #fbc7d4 100%)";
   }
   if (pathname.startsWith("/projects/")) {
-    // Настраиваемый градиент для страниц проектов
-    return buildLinearGradient(projectsStops);
+    return gradientByPath["/projects"];
   }
-  const stops = gradientStopsByPath[pathname] ?? gradientStopsByPath["/"];
-  return buildLinearGradient(stops);
+  return gradientByPath[pathname] ?? gradientByPath["/"];
 }
 
 export function AppShell({ children }: PropsWithChildren) {
@@ -66,6 +43,8 @@ export function AppShell({ children }: PropsWithChildren) {
         display: "flex",
         flexDirection: "column",
         background: gradient,
+        backgroundAttachment: "fixed",
+        backgroundSize: "cover",
         position: "relative",
         overflow: "hidden",
       }}

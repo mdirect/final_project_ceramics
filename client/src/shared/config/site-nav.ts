@@ -13,8 +13,8 @@ export const topNav: NavItem[] = [
   { label: "POLICY", href: "/policy" },
 ];
 
-export const sideNav: NavItem[] = [
-  { label: "Sign in", href: "/signin" },
+export const getSideNav = (isAuthed: boolean): NavItem[] => [
+  { label: isAuthed ? "Profile" : "Sign in", href: isAuthed ? "/profile" : "/signin" },
   { label: "Cart", href: "/cart" },
 ];
 

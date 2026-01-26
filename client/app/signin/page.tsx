@@ -1,6 +1,75 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Alert,
+  Box,
+  Button,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { userApi } from "@/src/entities/user/api";
+import { apiFetch } from "@/src/shared/api/http";
+import { useAuth } from "@/src/shared/providers/AuthProvider";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const { refreshUser } = useAuth();
+  const [formValues, setFormValues] = useState({
+    email: "",
+    password: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
+
+  const handleChange =
+    (field: keyof typeof formValues) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setFormValues((prev) => ({ ...prev, [field]: event.target.value }));
+    };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setToast(null);
+
+    const email = formValues.email.trim();
+    const { password } = formValues;
+
+    if (!email || !password) {
+      setToast({ message: "Fill in all fields to continue.", severity: "error" });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await apiFetch(userApi.signin, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      await refreshUser();
+      setToast({ message: "Signed in successfully.", severity: "success" });
+      setFormValues({ email: "", password: "" });
+      setTimeout(() => {
+        router.push("/shop");
+      }, 400);
+    } catch (error) {
+      setToast({
+        message: error instanceof Error ? error.message : "Sign in failed.",
+        severity: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Stack spacing={5} alignItems="center" sx={{ py: { xs: 4, md: 6 } }}>
       <Stack spacing={1} textAlign="center">
@@ -16,7 +85,7 @@ export default function SignInPage() {
             color: "rgba(255,255,255,0.95)",
           }}
         >
-          Registration
+          Sign in
         </Typography>
         <Typography
           sx={{
@@ -24,7 +93,7 @@ export default function SignInPage() {
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          Create an account to save your collection
+          Welcome back. Please enter your details
         </Typography>
       </Stack>
 
@@ -40,47 +109,8 @@ export default function SignInPage() {
           border: "1px solid rgba(255,255,255,0.12)",
         }}
       >
-        <Stack spacing={3}>
+        <Stack spacing={3} component="form" onSubmit={handleSubmit}>
           <Stack spacing={2}>
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: "0.62rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.24em",
-                  color: "rgba(255,255,255,0.5)",
-                  fontWeight: 600,
-                  mb: 0.75,
-                  ml: 0.5,
-                }}
-              >
-                Full Name
-              </Typography>
-              <TextField
-                placeholder="Elena Vance"
-                variant="outlined"
-                fullWidth
-                InputProps={{ sx: { borderRadius: 2 } }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    borderRadius: 2,
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(255,255,255,0.12)",
-                  },
-                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(255,255,255,0.22)",
-                  },
-                  "& .MuiOutlinedInput-input": {
-                    color: "rgba(255,255,255,0.92)",
-                  },
-                  "& .MuiOutlinedInput-input::placeholder": {
-                    color: "rgba(255,255,255,0.25)",
-                  },
-                }}
-              />
-            </Box>
             <Box>
               <Typography
                 sx={{
@@ -100,6 +130,9 @@ export default function SignInPage() {
                 type="email"
                 variant="outlined"
                 fullWidth
+                value={formValues.email}
+                onChange={handleChange("email")}
+                autoComplete="email"
                 InputProps={{ sx: { borderRadius: 2 } }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -140,46 +173,9 @@ export default function SignInPage() {
                 type="password"
                 variant="outlined"
                 fullWidth
-                InputProps={{ sx: { borderRadius: 2 } }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    borderRadius: 2,
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(255,255,255,0.12)",
-                  },
-                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(255,255,255,0.22)",
-                  },
-                  "& .MuiOutlinedInput-input": {
-                    color: "rgba(255,255,255,0.92)",
-                  },
-                  "& .MuiOutlinedInput-input::placeholder": {
-                    color: "rgba(255,255,255,0.25)",
-                  },
-                }}
-              />
-            </Box>
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: "0.62rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.24em",
-                  color: "rgba(255,255,255,0.5)",
-                  fontWeight: 600,
-                  mb: 0.75,
-                  ml: 0.5,
-                }}
-              >
-                Repeat Password
-              </Typography>
-              <TextField
-                placeholder="••••••••"
-                type="password"
-                variant="outlined"
-                fullWidth
+                value={formValues.password}
+                onChange={handleChange("password")}
+                autoComplete="current-password"
                 InputProps={{ sx: { borderRadius: 2 } }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
@@ -203,9 +199,11 @@ export default function SignInPage() {
             </Box>
           </Stack>
 
-          <Stack spacing={1.5} sx={{ pt: 1 }}>
+          <Stack spacing={1.5} sx={{ pt: 1, pb: 0.5 }}>
             <Button
               variant="contained"
+              type="submit"
+              disabled={isSubmitting}
               sx={{
                 textTransform: "uppercase",
                 letterSpacing: "0.22em",
@@ -217,14 +215,53 @@ export default function SignInPage() {
                 "&:hover": { backgroundColor: "#0f0f0f" },
               }}
             >
-              Create Account
+              Sign in
             </Button>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  color: "rgba(255,255,255,0.6)",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Don&apos;t have an account?
+              </Typography>
+              <Button
+                component={Link}
+                href="/signup"
+                variant="text"
+                sx={{
+                  textTransform: "none",
+                  letterSpacing: "0.08em",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.92)",
+                  minWidth: "auto",
+                  px: 0.5,
+                  textDecoration: "underline",
+                  textDecorationColor: "rgba(255,255,255,0.5)",
+                  textUnderlineOffset: "0.2em",
+                  "&:hover": {
+                    textDecorationColor: "rgba(255,255,255,0.85)",
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
+                Sign up
+              </Button>
+            </Stack>
             <Typography
               sx={{
-                fontSize: "0.62rem",
-                color: "rgba(255,255,255,0.4)",
+                fontSize: "0.7rem",
+                color: "rgba(255,255,255,0.72)",
                 textAlign: "center",
-                letterSpacing: "0.04em",
+                letterSpacing: "0.06em",
               }}
             >
               By registering you agree to our privacy policy and studio rules.
@@ -243,6 +280,26 @@ export default function SignInPage() {
       >
         WSE Jewellery • Ceramic collections and projects
       </Typography>
+      <Snackbar
+        open={Boolean(toast)}
+        autoHideDuration={3500}
+        onClose={() => setToast(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setToast(null)}
+          severity={toast?.severity ?? "success"}
+          variant="filled"
+          sx={{
+            width: "100%",
+            backgroundColor:
+              toast?.severity === "success" ? "#1f2b22" : "#3a1f23",
+            color: "rgba(255,255,255,0.92)",
+          }}
+        >
+          {toast?.message ?? ""}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
