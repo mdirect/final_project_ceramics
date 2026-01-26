@@ -1,0 +1,16 @@
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+export class ProductDto {
+  @IsNotEmpty({ message: 'Заголовок обязателен' })
+  @IsString({ message: 'Заголовок должен быть строкой' })
+  name: string;
+  @IsOptional()
+  @IsString({ message: 'Описание должно быть строкой' })
+  desc?: string | null;
+  @IsOptional()
+  @IsString({ message: 'Изображение должно быть строкой' })
+  image?: string | null;
+  @IsNumber()
+  price: number;
+  @IsNumber()
+  collectionId: number;
+}
