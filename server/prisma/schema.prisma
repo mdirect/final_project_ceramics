@@ -114,10 +114,7 @@ model Product {
   orderItems OrderItem[]
 }
 
-enum EventStatus {
-  UPCOMING
-  PAST
-}
+
 
 model Worker {
   id        Int       @id @default(autoincrement())
