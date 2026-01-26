@@ -15,7 +15,6 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useEffect, useMemo, useState } from "react";
-import { collections } from "@/src/shared/config/collections";
 import { apiFetch } from "@/src/shared/api/http";
 
 const collectionMeta: Record<
@@ -123,10 +122,27 @@ const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
 
 const accent = "#f2b90d";
 
+type Collection = {
+  id: number;
+  title: string;
+  description?: string | null;
+  image?: string | null;
+};
+
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 export default function ShopPage() {
   const pageSize = 8;
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [collectionsData, setCollectionsData] = useState<Collection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
   const [collectionForm, setCollectionForm] = useState({
     title: "",
     description: "",
@@ -136,15 +152,27 @@ export default function ShopPage() {
   const [collectionMessage, setCollectionMessage] = useState<string | null>(null);
   const [isCollectionSaving, setIsCollectionSaving] = useState(false);
 
+  const mappedCollections = useMemo(
+    () =>
+      collectionsData.map((collection) => ({
+        id: collection.id,
+        slug: toSlug(collection.title),
+        label: collection.title,
+        description: collection.description ?? undefined,
+        image: collection.image ?? undefined,
+      })),
+    [collectionsData],
+  );
+
   const filteredCollections = useMemo(() => {
     if (activeFilter === "all") {
-      return collections;
+      return mappedCollections;
     }
-    return collections.filter((collection) => {
+    return mappedCollections.filter((collection) => {
       const meta = collectionMeta[collection.slug];
       return (meta?.category ?? "other") === activeFilter;
     });
-  }, [activeFilter]);
+  }, [activeFilter, mappedCollections]);
 
   const pageCount = Math.max(1, Math.ceil(filteredCollections.length / pageSize));
   const clampedPage = Math.min(page, pageCount);
@@ -162,6 +190,34 @@ export default function ShopPage() {
   useEffect(() => {
     setPage(1);
   }, [activeFilter]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadCollections = async () => {
+      setCollectionsLoading(true);
+      setCollectionsError(null);
+      try {
+        const data = await apiFetch<Collection[]>("/collection");
+        if (!cancelled) {
+          setCollectionsData(data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setCollectionsError(
+            error instanceof Error ? error.message : "Не удалось загрузить коллекции.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setCollectionsLoading(false);
+        }
+      }
+    };
+    void loadCollections();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleCreateCollection = async () => {
     const title = collectionForm.title.trim();
@@ -404,6 +460,12 @@ export default function ShopPage() {
         </Stack>
       </Box>
 
+      {collectionsError && (
+        <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+          {collectionsError}
+        </Alert>
+      )}
+
       <Box
         sx={{
           display: "grid",
@@ -415,99 +477,125 @@ export default function ShopPage() {
           gap: 3,
         }}
       >
-        {pageCollections.map((collection) => {
-          const meta = collectionMeta[collection.slug] ?? {
-            image: "/collections/out-of-collections.svg",
-            tone: "rgba(20, 20, 20, 0.7)",
-            accent: "#e6e6e6",
-            description: "Curated ceramics with a distinct personality.",
-          };
+        {collectionsLoading && (
+          <Box
+            sx={{
+              gridColumn: "1 / -1",
+              display: "flex",
+              justifyContent: "center",
+              py: 4,
+            }}
+          >
+            <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
+              Загрузка коллекций...
+            </Typography>
+          </Box>
+        )}
+        {!collectionsLoading && pageCollections.length === 0 && (
+          <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
+            <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
+              Коллекций пока нет.
+            </Typography>
+          </Box>
+        )}
+        {!collectionsLoading &&
+          pageCollections.map((collection) => {
+            const image =
+              collection.image ??
+              collectionMeta[collection.slug]?.image ??
+              "/collections/out-of-collections.svg";
+            const description =
+              collection.description ??
+              collectionMeta[collection.slug]?.description ??
+              "Curated ceramics with a distinct personality.";
 
-          return (
-            <Link
-              key={collection.slug}
-              href={`/collections/${collection.slug}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Box
-                className="collection-card"
-                sx={{
-                  position: "relative",
-                  aspectRatio: "4 / 5",
-                  borderRadius: 3,
-                  overflow: "hidden",
-                  backgroundColor: "rgba(20,25,32,0.6)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  transition: "transform 0.5s ease",
-                  "&:hover": { transform: "translateY(-6px)" },
-                  "&:hover .collection-image": { transform: "scale(1.08)" },
-                  "&:hover .collection-cta": { opacity: 1 },
-                }}
+            return (
+              <Link
+                key={collection.slug}
+                href={`/collections/${collection.slug}`}
+                style={{ textDecoration: "none" }}
               >
                 <Box
-                  className="collection-image"
+                  className="collection-card"
                   sx={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${meta.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    transition: "transform 0.7s ease",
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)",
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                    p: 2.5,
-                    borderRadius: 2,
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    backdropFilter: "blur(12px)",
+                    position: "relative",
+                    aspectRatio: "4 / 5",
+                    borderRadius: 3,
+                    overflow: "hidden",
+                    backgroundColor: "rgba(20,25,32,0.6)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    transition: "transform 0.5s ease",
+                    "&:hover": { transform: "translateY(-6px)" },
+                    "&:hover .collection-image": { transform: "scale(1.08)" },
+                    "&:hover .collection-cta": { opacity: 1 },
                   }}
                 >
-                  <Typography
+                  <Box
+                    className="collection-image"
                     sx={{
-                      color: "rgba(255,255,255,0.95)",
-                      fontSize: "1.1rem",
-                      fontWeight: 700,
-                      letterSpacing: "-0.01em",
+                      position: "absolute",
+                      inset: 0,
+                      backgroundImage: `url(${image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      transition: "transform 0.7s ease",
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)",
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                      p: 2.5,
+                      borderRadius: 2,
+                      backgroundColor: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      backdropFilter: "blur(12px)",
                     }}
                   >
-                    {collection.label}
-                  </Typography>
-                  <Typography sx={{ mt: 0.5, color: "rgba(255,255,255,0.6)", fontSize: "0.85rem" }}>
-                    {meta.description}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        color: "rgba(255,255,255,0.95)",
+                        fontSize: "1.1rem",
+                        fontWeight: 700,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {collection.label}
+                    </Typography>
                   <Typography
-                    className="collection-cta"
-                    sx={{
-                      mt: 2,
-                      color: accent,
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.18em",
-                      opacity: 0,
-                      transition: "opacity 0.3s ease",
-                    }}
+                    sx={{ mt: 0.5, color: "rgba(255,255,255,0.6)", fontSize: "0.85rem" }}
                   >
-                    Explore Collection →
+                    {description}
                   </Typography>
+                    <Typography
+                      className="collection-cta"
+                      sx={{
+                        mt: 2,
+                        color: accent,
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.18em",
+                        opacity: 0,
+                        transition: "opacity 0.3s ease",
+                      }}
+                    >
+                      Explore Collection →
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
         {Array.from({ length: placeholders }).map((_, index) => (
           <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
         ))}
