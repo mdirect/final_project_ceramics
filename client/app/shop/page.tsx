@@ -1,12 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Button, Chip, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useEffect, useMemo, useState } from "react";
 import { collections } from "@/src/shared/config/collections";
+import { apiFetch } from "@/src/shared/api/http";
 
 const collectionMeta: Record<
   string,
@@ -109,12 +119,22 @@ const collectionFilters = [
   { label: "Limited Edition", value: "limited" },
 ];
 
+const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+
 const accent = "#f2b90d";
 
 export default function ShopPage() {
   const pageSize = 8;
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [collectionForm, setCollectionForm] = useState({
+    title: "",
+    description: "",
+    image: "",
+  });
+  const [collectionError, setCollectionError] = useState<string | null>(null);
+  const [collectionMessage, setCollectionMessage] = useState<string | null>(null);
+  const [isCollectionSaving, setIsCollectionSaving] = useState(false);
 
   const filteredCollections = useMemo(() => {
     if (activeFilter === "all") {
@@ -134,25 +154,55 @@ export default function ShopPage() {
     return filteredCollections.slice(start, start + pageSize);
   }, [clampedPage, filteredCollections]);
   const placeholders = Math.max(0, pageSize - pageCollections.length);
+  const trimmedCollectionImage = collectionForm.image.trim();
+  const hasCollectionImage = trimmedCollectionImage.length > 0;
+  const isCollectionImageValid =
+    hasCollectionImage && imageExtensionRegex.test(trimmedCollectionImage);
 
   useEffect(() => {
     setPage(1);
   }, [activeFilter]);
 
+  const handleCreateCollection = async () => {
+    const title = collectionForm.title.trim();
+    if (!title) {
+      setCollectionError("Название коллекции обязательно.");
+      return;
+    }
+
+    if (hasCollectionImage && !isCollectionImageValid) {
+      setCollectionError("Нужна прямая ссылка на файл (.jpg/.png/.webp).");
+      return;
+    }
+
+    setIsCollectionSaving(true);
+    setCollectionError(null);
+    setCollectionMessage(null);
+
+    try {
+      await apiFetch("/collection", {
+        method: "POST",
+        body: JSON.stringify({
+          title,
+          description: collectionForm.description.trim() || null,
+          image: trimmedCollectionImage || null,
+        }),
+      });
+      setCollectionMessage("Коллекция добавлена.");
+      setCollectionForm({ title: "", description: "", image: "" });
+    } catch (error) {
+      setCollectionError(
+        error instanceof Error ? error.message : "Не удалось добавить коллекцию.",
+      );
+    } finally {
+      setIsCollectionSaving(false);
+    }
+  };
+
   return (
     <Stack spacing={6}>
       <Stack spacing={1} sx={{ maxWidth: 880 }}>
-        <Typography
-          sx={{
-            textTransform: "uppercase",
-            letterSpacing: "0.2em",
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            color: accent,
-          }}
-        >
-          Curated Series
-        </Typography>
+        
         <Typography
           sx={{
             fontSize: { xs: "2.6rem", md: "4.4rem" },
@@ -168,8 +218,8 @@ export default function ShopPage() {
           sx={{
             mt: 2,
             fontSize: { xs: "1rem", md: "1.1rem" },
-            color: "rgba(255,255,255,0.7)",
-            lineHeight: 1.8,
+            color: "rgba(255, 255, 255, 0.89)",
+            lineHeight: 1.5,
           }}
         >
           Artisanal jewelry and ceramics crafted for the modern soul. Each piece tells a
@@ -241,6 +291,118 @@ export default function ShopPage() {
           />
         </Link>
       </Stack>
+
+      <Box
+        sx={{
+          borderRadius: 3,
+          border: "1px solid rgba(255,255,255,0.12)",
+          backgroundColor: "rgba(255,255,255,0.04)",
+          p: { xs: 3, md: 4 },
+        }}
+      >
+        <Stack spacing={2}>
+          <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+            Админ-панель: добавить коллекцию
+          </Typography>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            <TextField
+              value={collectionForm.title}
+              onChange={(event) =>
+                setCollectionForm((current) => ({
+                  ...current,
+                  title: event.target.value,
+                }))
+              }
+              label="Название"
+              placeholder="Название коллекции"
+              fullWidth
+              size="small"
+              InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+              sx={{
+                "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                },
+              }}
+            />
+            <TextField
+              value={collectionForm.image}
+              onChange={(event) =>
+                setCollectionForm((current) => ({
+                  ...current,
+                  image: event.target.value,
+                }))
+              }
+              label="URL изображения"
+              placeholder="https://..."
+              fullWidth
+              size="small"
+              error={hasCollectionImage && !isCollectionImageValid}
+              helperText={
+                hasCollectionImage && !isCollectionImageValid
+                  ? "Нужна прямая ссылка на файл (.jpg/.png/.webp)"
+                  : " "
+              }
+              InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+              FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
+              sx={{
+                "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                },
+              }}
+            />
+          </Stack>
+          <TextField
+            value={collectionForm.description}
+            onChange={(event) =>
+              setCollectionForm((current) => ({
+                ...current,
+                description: event.target.value,
+              }))
+            }
+            label="Описание"
+            placeholder="Короткое описание"
+            fullWidth
+            size="small"
+            multiline
+            minRows={2}
+            InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+            sx={{
+              "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "rgba(255,255,255,0.05)",
+              },
+            }}
+          />
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+            <Button
+              variant="contained"
+              onClick={handleCreateCollection}
+              disabled={isCollectionSaving || (hasCollectionImage && !isCollectionImageValid)}
+              sx={{
+                textTransform: "none",
+                fontWeight: 700,
+                backgroundColor: accent,
+                color: "rgba(18,21,26,0.9)",
+                "&:hover": { backgroundColor: "#f7cd4c" },
+              }}
+            >
+              {isCollectionSaving ? "Сохранение..." : "Добавить коллекцию"}
+            </Button>
+            {collectionError && (
+              <Alert severity="error" sx={{ flex: 1 }}>
+                {collectionError}
+              </Alert>
+            )}
+            {collectionMessage && (
+              <Alert severity="success" sx={{ flex: 1 }}>
+                {collectionMessage}
+              </Alert>
+            )}
+          </Stack>
+        </Stack>
+      </Box>
 
       <Box
         sx={{
@@ -401,8 +563,12 @@ export default function ShopPage() {
       <Box
         sx={{
           mt: { xs: 6, md: 10 },
-          borderRadius: 4,
-          p: { xs: 3, md: 6 },
+          width: "100%",
+          maxWidth: 900,
+          mx: "auto",
+          alignSelf: "center",
+          borderRadius: 3,
+          p: { xs: 2.5, md: 4 },
           backgroundColor: "rgba(255,255,255,0.06)",
           border: "1px solid rgba(255,255,255,0.1)",
           backdropFilter: "blur(12px)",
@@ -423,7 +589,11 @@ export default function ShopPage() {
             filter: "blur(40px)",
           }}
         />
-        <Stack spacing={2} sx={{ position: "relative" }}>
+        <Stack
+          spacing={2}
+          sx={{ position: "relative", textAlign: "center" }}
+          alignItems="center"
+        >
           <Typography
             sx={{
               fontSize: { xs: "2rem", md: "2.6rem" },
@@ -433,7 +603,14 @@ export default function ShopPage() {
           >
             Stay in the loop
           </Typography>
-          <Typography sx={{ color: "rgba(255,255,255,0.7)", maxWidth: 680, mx: "auto" }}>
+          <Typography
+            sx={{
+              color: "rgba(255,255,255,0.7)",
+              maxWidth: 620,
+              mx: "auto",
+              textAlign: "center",
+            }}
+          >
             Join our inner circle for early access to limited artisanal drops and the stories
             behind the kiln and bench.
           </Typography>
@@ -471,7 +648,15 @@ export default function ShopPage() {
               Join the Newsletter
             </Button>
           </Stack>
-          <Typography sx={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.45)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          <Typography
+            sx={{
+              fontSize: "0.75rem",
+              color: "rgba(255,255,255,0.45)",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              textAlign: "center",
+            }}
+          >
             New collection drops every full moon
           </Typography>
         </Stack>

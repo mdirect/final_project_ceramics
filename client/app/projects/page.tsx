@@ -80,41 +80,7 @@ export default function ProjectsPage() {
           gap between ancient craft and modern silhouette.
         </Typography>
       </Box>
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          gap: { xs: 3, md: 6 },
-          borderBottom: "1px solid rgba(255,255,255,0.12)",
-          pb: 3,
-          maxWidth: 960,
-          mx: "auto",
-        }}
-      >
-        {[
-          { label: "The Founders", active: true },
-          { label: "Creative Process", active: false },
-          { label: "Collaborations", active: false },
-        ].map((tab) => (
-          <Box
-            key={tab.label}
-            sx={{
-              textAlign: "center",
-              borderBottom: tab.active ? `2px solid ${accent}` : "2px solid transparent",
-              pb: 2,
-              px: 1,
-              color: tab.active ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
-              textTransform: "uppercase",
-              letterSpacing: "0.18em",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-            }}
-          >
-            {tab.label}
-          </Box>
-        ))}
-      </Box>
+      
 
       <Box
         sx={{
