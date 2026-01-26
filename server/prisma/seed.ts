@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const prisma = new PrismaClient();
 
@@ -22,106 +24,78 @@ async function main() {
   });
   console.log('Users seeds done');
 
-  await prisma.collection.createMany({
-    data: [
-      {
-        title: 'Hands',
-        description: null,
-        image: null,
+  const seedDir = join(__dirname, 'seed-data');
+  const collectionsPath = join(seedDir, 'collections.json');
+  const productsPath = join(seedDir, 'products.json');
+
+  const collectionsSeed = JSON.parse(
+    readFileSync(collectionsPath, 'utf-8'),
+  ) as Array<{ title: string; description?: string | null; image?: string | null }>;
+  const productsSeed = JSON.parse(readFileSync(productsPath, 'utf-8')) as Array<{
+    name: string;
+    desc?: string | null;
+    image?: string | null;
+    images?: string[];
+    price: number | string;
+    collectionTitle: string;
+  }>;
+
+  const collectionIdByTitle = new Map<string, number>();
+  for (const collection of collectionsSeed) {
+    const created = await prisma.collection.upsert({
+      where: { title: collection.title },
+      create: {
+        title: collection.title,
+        description: collection.description ?? null,
+        image: collection.image ?? null,
       },
-      {
-        title: 'Bearlings',
-        description: null,
-        image: null,
+      update: {
+        description: collection.description ?? null,
+        image: collection.image ?? null,
       },
-      {
-        title: 'Dear Deer',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Lotus',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Microworld',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Sci-fi',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Masks and faces',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Floral',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Baroque',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Man and ball',
-        description: null,
-        image: null,
-      },
-      {
-        title: 'Out of collections',
-        description: null,
-        image: null,
-      },
-    ],
-  });
+    });
+    collectionIdByTitle.set(created.title, created.id);
+  }
   console.log('Collections seeds done');
 
-  await prisma.product.createMany({
-    data: [
-      {
-        collectionId: 1,
-        name: 'Product 1',
-        desc: 'Product 1 description',
-        image: '1.png',
-        price: 1000,
-      },
-      {
-        collectionId: 1,
-        name: 'Product 2',
-        desc: 'Product 2 description',
-        image: '2.png',
-        price: 2000,
-      },
-      {
-        collectionId: 2,
-        name: 'Product 3',
-        desc: 'Product 3 description',
-        image: '3.png',
-        price: 3000,
-      },
-      {
-        collectionId: 2,
-        name: 'Product 4',
-        desc: 'Product 4 description',
-        image: '4.png',
-        price: 4000,
-      },
-      {
-        collectionId: 3,
-        name: 'Product 5',
-        desc: 'Product 5 description',
-        image: '5.png',
-        price: 5000,
-      },
-    ],
+  const productsData = productsSeed.map((product) => {
+    const collectionId = collectionIdByTitle.get(product.collectionTitle);
+    if (!collectionId) {
+      throw new Error(`Collection not found for product: ${product.name}`);
+    }
+    const images = product.images ?? [];
+    const image = product.image ?? images[0] ?? null;
+    const price = Number(product.price);
+    if (Number.isNaN(price)) {
+      throw new Error(`Invalid price for product: ${product.name}`);
+    }
+    return {
+      collectionId,
+      name: product.name,
+      desc: product.desc ?? null,
+      image,
+      images,
+      price,
+    };
   });
+
+  for (const product of productsData) {
+    await prisma.product.upsert({
+      where: {
+        collectionId_name: {
+          collectionId: product.collectionId,
+          name: product.name,
+        },
+      },
+      create: product,
+      update: {
+        desc: product.desc ?? null,
+        image: product.image ?? null,
+        images: product.images ?? [],
+        price: product.price,
+      },
+    });
+  }
   console.log('Products seeds done');
 
   await prisma.event.createMany({

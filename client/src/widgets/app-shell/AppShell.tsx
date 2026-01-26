@@ -130,7 +130,10 @@ export function AppShell({ children }: PropsWithChildren) {
         </Box>
       </Box>
       <Header />
-      <Container sx={{ flex: 1, py: 4, position: "relative", zIndex: 1 }}>
+      <Container
+        maxWidth="xl"
+        sx={{ flex: 1, py: 4, position: "relative", zIndex: 1 }}
+      >
         <Stack spacing={3}>{children}</Stack>
       </Container>
       <Box sx={{ position: "relative", zIndex: 1 }}>

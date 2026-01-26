@@ -73,13 +73,9 @@ const parseImageUrls = (value: string) =>
 
 const filterGroups = [
   {
-    id: "type",
-    label: "Type",
-    options: [
-      "Painted image",
-      "Relief",
-      "Three-dimensional",
-    ],
+    id: "form",
+    label: "Form",
+    options: ["Painted image", "Relief", "Three-dimensional"],
   },
   {
     id: "color",
@@ -87,23 +83,23 @@ const filterGroups = [
     options: ["Colourful", "White", "Black", "Yellow", "Green"],
   },
   {
-    id: "finish",
-    label: "Finish",
+    id: "surface",
+    label: "Surface medium",
     options: ["Glaze", "Engobe", "Acrylic", "Epoxy resin", "Light-reflecting pigment"],
   },
   {
-    id: "suspension",
-    label: "Suspension",
+    id: "hanging",
+    label: "Hanging material",
     options: ["Chain", "Beading wire", "Memory wire", "Decorative cord"],
   },
   {
     id: "composition",
-    label: "Composition",
+    label: "Composition type",
     options: ["Multi-part jewelry", "Single-piece jewelry"],
   },
   {
-    id: "availability",
-    label: "Availability",
+    id: "production",
+    label: "Production type",
     options: ["Regularly", "May be repeated", "Part of collection", "Single piece"],
   },
   {
@@ -163,7 +159,7 @@ export default function CollectionPage() {
   const isImageUrlValid =
     !hasImageUrl || imageUrls.every((url) => imageExtensionRegex.test(url));
   const previewImageUrl = imageUrls[0];
-  const pageSize = 6;
+  const pageSize = 12;
   const formatTitle = (value?: string) =>
     value
       ? value
@@ -373,48 +369,86 @@ export default function CollectionPage() {
           alignItems: "start",
         }}
       >
-        <Box component="aside" sx={{ display: { xs: "none", md: "block" } }}>
+        <Box
+          component="aside"
+          sx={{
+            display: { xs: "none", md: "block" },
+            borderRadius: 3,
+            border: "1px solid rgba(255,255,255,0.18)",
+            backgroundColor: "rgba(12,14,20,0.35)",
+            boxShadow: "0 8px 20px rgba(23, 18, 25, 0.6)",
+            backdropFilter: "blur(14px)",
+            p: 2,
+          }}
+        >
           <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
-            <Box>
-              
-              <Stack spacing={0.5}>
-                {[
-                  { label: "All Creations", active: true },
-                  { label: "Fine Jewelry" },
-                  { label: "Ceramics" },
-                  { label: "New Arrivals" },
-                ].map((item) => (
-                  <Box
-                    key={item.label}
+            <Stack spacing={1.5}>
+              <Typography
+                sx={{
+                  textTransform: "uppercase",
+                  letterSpacing: "0.14em",
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  color: "rgba(255,255,255,0.6)",
+                }}
+              >
+                Sort by
+              </Typography>
+              <Box sx={{ position: "relative" }}>
+                <Button
+                  onClick={() => setSortOpen((current) => !current)}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.8)",
+                    borderRadius: 2,
+                    px: 2.5,
+                    width: "100%",
+                    justifyContent: "space-between",
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+                  }}
+                  endIcon={<ExpandMoreIcon />}
+                >
+                  {sortOptions.find((option) => option.value === sort)?.label ?? "Newest arrivals"}
+                </Button>
+                {sortOpen && (
+                  <Stack
+                    spacing={0}
                     sx={{
-                      px: 2,
-                      py: 1.3,
+                      position: "absolute",
+                      left: 0,
+                      right: 0,
+                      mt: 1,
                       borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                      backgroundColor: item.active ? accent : "transparent",
-                      color: item.active ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
-                      fontWeight: item.active ? 700 : 500,
-                      fontSize: "0.9rem",
-                      "&:hover": {
-                        backgroundColor: item.active ? accent : "rgba(255,255,255,0.08)",
-                      },
+                      backgroundColor: "rgba(20,20,20,0.9)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      zIndex: 5,
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        backgroundColor: item.active ? "rgba(18,21,26,0.7)" : "rgba(255,255,255,0.4)",
-                      }}
-                    />
-                    {item.label}
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
+                    {sortOptions.map((option) => (
+                      <Box
+                        key={option.value}
+                        onClick={() => {
+                          setSort(option.value);
+                          setSortOpen(false);
+                        }}
+                        sx={{
+                          px: 2,
+                          py: 1.2,
+                          cursor: "pointer",
+                          fontSize: "0.85rem",
+                          color: "rgba(255,255,255,0.8)",
+                          "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+                        }}
+                      >
+                        {option.label}
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
+            </Stack>
 
             <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
               {filterGroups.map((group, index) => (
@@ -424,8 +458,8 @@ export default function CollectionPage() {
                   disableGutters
                   elevation={0}
                   sx={{
-                    backgroundColor: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.14)",
                     borderRadius: 2,
                     "&:before": { display: "none" },
                   }}
@@ -509,10 +543,10 @@ export default function CollectionPage() {
         <Stack spacing={3}>
           <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
             <Box>
-              <Typography sx={{ fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+              <Typography sx={{ fontSize: "2.8rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.95)" }}>
                 {title}
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
+              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "1.2rem" }}>
                 Collection items
               </Typography>
             </Box>
@@ -520,58 +554,21 @@ export default function CollectionPage() {
               <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
                 Showing {pagedItems.length} of {sortedItems.length} items
               </Typography>
-              <Box sx={{ position: "relative" }}>
-                <Button
-                  onClick={() => setSortOpen((current) => !current)}
-                  sx={{
-                    textTransform: "none",
+              <TextField
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search"
+                size="small"
+                InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                sx={{
+                  minWidth: 220,
+                  "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                  "& .MuiOutlinedInput-root": {
                     backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "rgba(255,255,255,0.8)",
-                    borderRadius: 2,
-                    px: 2.5,
-                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
-                  }}
-                  endIcon={<ExpandMoreIcon />}
-                >
-                  {sortOptions.find((option) => option.value === sort)?.label ?? "Newest arrivals"}
-                </Button>
-                {sortOpen && (
-                  <Stack
-                    spacing={0}
-                    sx={{
-                      position: "absolute",
-                      right: 0,
-                      mt: 1,
-                      minWidth: 220,
-                      borderRadius: 2,
-                      backgroundColor: "rgba(20,20,20,0.9)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      zIndex: 5,
-                    }}
-                  >
-                    {sortOptions.map((option) => (
-                      <Box
-                        key={option.value}
-                        onClick={() => {
-                          setSort(option.value);
-                          setSortOpen(false);
-                        }}
-                        sx={{
-                          px: 2,
-                          py: 1.2,
-                          cursor: "pointer",
-                          fontSize: "0.85rem",
-                          color: "rgba(255,255,255,0.8)",
-                          "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
-                        }}
-                      >
-                        {option.label}
-                      </Box>
-                    ))}
-                  </Stack>
-                )}
-              </Box>
+                    borderColor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              />
             </Stack>
           </Stack>
 
@@ -585,8 +582,10 @@ export default function CollectionPage() {
             <Box
               sx={{
                 borderRadius: 3,
-                border: "1px solid rgba(255,255,255,0.12)",
-                backgroundColor: "rgba(255,255,255,0.04)",
+                border: "2px solid rgba(255, 255, 255, 0.87)",
+                backgroundColor: "rgba(8,12,18,0.5)",
+                boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+                backdropFilter: "blur(14px)",
                 p: 3,
               }}
             >
@@ -771,7 +770,7 @@ export default function CollectionPage() {
                       position: "absolute",
                       top: 12,
                       right: 12,
-                      zIndex: 2,
+                      zIndex: 2,             
                       backgroundColor: "rgba(0,0,0,0.55)",
                       color: "rgba(255,255,255,0.9)",
                       "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
@@ -845,27 +844,43 @@ export default function CollectionPage() {
                   <Box
                     sx={{
                       position: "absolute",
-                      inset: 0,
+                      left: 16,
+                      right: 16,
+                      bottom: 14,
+                      p: 1.4,
+                      borderRadius: 2,
+                      background: "linear-gradient(90deg, rgba(47, 45, 45, 0.37) 0%, rgba(135, 131, 135, 0.35) 60%)",
+                      border: "2px solid rgba(255,255,255,0.14)",
+                      backdropFilter: "blur(3px)",
                       display: "flex",
-                      alignItems: "flex-end",
-                      p: 2,
-                      opacity: 0,
-                      transition: "opacity 0.3s ease",
-                      ".product-card:hover &": { opacity: 1 },
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 1.5,
                     }}
                   >
-                    <Button
-                      fullWidth
+                    <Typography
                       sx={{
-                        backgroundColor: "rgba(255,255,255,0.95)",
-                        color: "rgba(18,21,26,0.9)",
                         fontWeight: 700,
-                        textTransform: "none",
-                        "&:hover": { backgroundColor: "rgba(255,255,255,1)" },
+                        color: "rgba(255,255,255,0.95)",
+                        fontSize: "1.2rem",
+                        letterSpacing: "-0.01em",
                       }}
                     >
-                      Quick View
-                    </Button>
+                      {item.name}
+                    </Typography>
+                    <Box
+                      sx={{
+                        px: 1.2,
+                        py: 0.4,
+                        borderRadius: 999,
+                        backgroundColor: "rgba(242,185,13,0.18)",
+                        border: "1px solid rgba(242,185,13,0.4)",
+                      }}
+                    >
+                      <Typography sx={{ color: accent, fontWeight: 600, fontSize: "0.95rem" }}>
+                        {formatCurrency(item.price)}
+                      </Typography>
+                    </Box>
                   </Box>
                   {item.tags?.includes("new") && (
                     <Box
@@ -888,27 +903,11 @@ export default function CollectionPage() {
                     </Box>
                   )}
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1.5, gap: 1 }}>
-                  <Box>
-                    <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-                      {item.name}
-                    </Typography>
-                    <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem" }}>
-                      {title}
-                    </Typography>
-                  </Box>
-                  <Typography sx={{ color: accent, fontWeight: 700 }}>
-                    {formatCurrency(item.price)}
-                  </Typography>
-                </Box>
                 </Box>
                 </Link>
               </Box>
             );
             })}
-            {Array.from({ length: placeholders }).map((_, index) => (
-              <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
-            ))}
           </Box>
 
           <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5} sx={{ mt: 2 }}>
@@ -927,40 +926,67 @@ export default function CollectionPage() {
             >
               <ArrowBackIosNewIcon fontSize="small" />
             </IconButton>
-            {[1, 2, 3].map((index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: index === clampedPage ? accent : "rgba(255,255,255,0.06)",
-                  color: index === clampedPage ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
-                  fontWeight: 700,
-                }}
-              >
-                {index}
-              </Box>
-            ))}
-            <Box sx={{ color: "rgba(255,255,255,0.35)", px: 0.5 }}>...</Box>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(255,255,255,0.06)",
-                color: "rgba(255,255,255,0.8)",
-                fontWeight: 700,
-              }}
-            >
-              {pageCount}
-            </Box>
+            {pageCount <= 5
+              ? Array.from({ length: pageCount }, (_, index) => index + 1).map((index) => (
+                  <Box
+                    key={index}
+                    onClick={() => setPage(index)}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      backgroundColor:
+                        index === clampedPage ? accent : "rgba(255,255,255,0.06)",
+                      color:
+                        index === clampedPage
+                          ? "rgba(18,21,26,0.9)"
+                          : "rgba(255,255,255,0.8)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {index}
+                  </Box>
+                ))
+              : [
+                  1,
+                  Math.max(2, clampedPage - 1),
+                  clampedPage,
+                  Math.min(pageCount - 1, clampedPage + 1),
+                  pageCount,
+                ]
+                  .filter((value, index, array) => array.indexOf(value) === index)
+                  .map((index, idx, array) => (
+                    <Box key={`${index}-${idx}`} sx={{ display: "flex", alignItems: "center" }}>
+                      {idx > 0 && index - (array[idx - 1] ?? 0) > 1 ? (
+                        <Box sx={{ color: "rgba(255,255,255,0.35)", px: 0.5 }}>...</Box>
+                      ) : null}
+                      <Box
+                        onClick={() => setPage(index)}
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          backgroundColor:
+                            index === clampedPage ? accent : "rgba(255,255,255,0.06)",
+                          color:
+                            index === clampedPage
+                              ? "rgba(18,21,26,0.9)"
+                              : "rgba(255,255,255,0.8)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {index}
+                      </Box>
+                    </Box>
+                  ))}
             <IconButton
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
               disabled={clampedPage === pageCount}

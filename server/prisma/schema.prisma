@@ -94,6 +94,8 @@ model Collection {
   updatedAt   DateTime  @updatedAt
 
   products    Product[]
+
+  @@unique([title])
 }
 
 // Товары
@@ -111,6 +113,8 @@ model Product {
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   carts        Cart[]
   orderItems   OrderItem[]
+
+  @@unique([collectionId, name])
 }
 
 enum EventStatus {

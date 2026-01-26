@@ -351,8 +351,10 @@ export default function ShopPage() {
       <Box
         sx={{
           borderRadius: 3,
-          border: "1px solid rgba(255,255,255,0.12)",
-          backgroundColor: "rgba(255,255,255,0.04)",
+          border: "2px solid rgba(255, 255, 255, 0.84)",
+          backgroundColor: "rgba(8,12,18,0.5)",
+          boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+          backdropFilter: "blur(14px)",
           p: { xs: 3, md: 4 },
         }}
       >
@@ -545,37 +547,33 @@ export default function ShopPage() {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)",
+                      background: "linear-gradient(180deg, rgba(0,0,0,0.08) 10%, rgba(0,0,0,0.45) 100%)",
                     }}
                   />
                   <Box
                     sx={{
                       position: "absolute",
-                      left: 16,
-                      right: 16,
+                      left:16,
+                      right:16,
                       bottom: 16,
-                      p: 2.5,
+                      p: 2,
                       borderRadius: 2,
                       backgroundColor: "rgba(255,255,255,0.06)",
                       border: "1px solid rgba(255,255,255,0.12)",
-                      backdropFilter: "blur(12px)",
+                      backdropFilter: "blur(2px)",
                     }}
                   >
                     <Typography
                       sx={{
                         color: "rgba(255,255,255,0.95)",
-                        fontSize: "1.1rem",
+                        fontSize: "1.5rem",
+                        fontStyle: "italic",
                         fontWeight: 700,
                         letterSpacing: "-0.01em",
                       }}
                     >
                       {collection.label}
                     </Typography>
-                  <Typography
-                    sx={{ mt: 0.5, color: "rgba(255,255,255,0.6)", fontSize: "0.85rem" }}
-                  >
-                    {description}
-                  </Typography>
                     <Typography
                       className="collection-cta"
                       sx={{
@@ -601,14 +599,18 @@ export default function ShopPage() {
         ))}
       </Box>
 
-      <Box sx={{ height: { xs: 16, md: 14 } }} />
+      <Box sx={{ height: 0 }} />
 
       <Stack
         direction="row"
         alignItems="center"
         justifyContent="center"
         spacing={2}
-        sx={{ mt: 2 }}
+        sx={{
+          mt: 0,
+          position: "relative",
+          top: -24,
+        }}
       >
         <IconButton
           onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -620,13 +622,13 @@ export default function ShopPage() {
             "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
           }}
         >
-          <ArrowBackIosNewIcon fontSize="medium" />
+          <ArrowBackIosNewIcon fontSize="large" />
         </IconButton>
 
         <Typography
           sx={{
             letterSpacing: "0.2em",
-            fontSize: "0.85rem",
+            fontSize: "1rem",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.8)",
           }}
@@ -644,7 +646,7 @@ export default function ShopPage() {
             "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
           }}
         >
-          <ArrowForwardIosIcon fontSize="medium" />
+          <ArrowForwardIosIcon fontSize="large" />
         </IconButton>
       </Stack>
 

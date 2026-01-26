@@ -240,24 +240,7 @@ export default function ProductPage() {
                 }}
               />
             )}
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 16,
-                left: 16,
-                px: 2,
-                py: 0.7,
-                borderRadius: 999,
-                backgroundColor: "rgba(0,0,0,0.35)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.8)",
-              }}
-            >
-              Hover to zoom
-            </Box>
+            
           </Box>
         </Stack>
 
