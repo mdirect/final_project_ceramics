@@ -20,6 +20,7 @@ type Product = {
   name: string;
   desc?: string | null;
   image?: string | null;
+  images?: string[] | null;
   price: number | string;
   collectionId?: number;
 };
@@ -102,10 +103,13 @@ export default function ProductPage() {
 
   const viewName = product?.name ?? `Product ${idValue ?? "—"}`;
   const viewSize = "—";
-  const galleryImages = useMemo(
-    () => [product?.image ?? fallbackImage],
-    [product?.image],
-  );
+  const galleryImages = useMemo(() => {
+    const images = product?.images?.filter(Boolean) ?? [];
+    if (images.length > 0) {
+      return images;
+    }
+    return [product?.image ?? fallbackImage];
+  }, [product?.image, product?.images]);
   const activeSrc = galleryImages[Math.min(activeImage, galleryImages.length - 1)];
 
   return (

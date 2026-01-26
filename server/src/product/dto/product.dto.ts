@@ -1,4 +1,4 @@
-  import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsArray, IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
   export class ProductDto {
     @IsNotEmpty({ message: 'Заголовок обязателен' })
@@ -12,6 +12,11 @@
     @IsOptional()
     @IsString({ message: 'Изображение должно быть строкой' })
     image?: string | null;
+
+  @IsOptional()
+  @IsArray({ message: 'Изображения должны быть массивом' })
+  @IsString({ each: true, message: 'Изображение должно быть строкой' })
+  images?: string[] | null;
 
     @IsNumber()
     price:number;

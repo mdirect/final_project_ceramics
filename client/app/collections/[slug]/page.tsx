@@ -39,6 +39,7 @@ type Product = {
   name: string;
   desc?: string | null;
   image?: string | null;
+  images?: string[] | null;
   price: number | string;
   tags?: string[];
 };
@@ -64,6 +65,11 @@ const toSlug = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+const parseImageUrls = (value: string) =>
+  value
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
 
 const filterGroups = [
   {
@@ -152,9 +158,11 @@ export default function CollectionPage() {
     image: "",
     desc: "",
   });
-  const trimmedImageUrl = formState.image.trim();
-  const hasImageUrl = trimmedImageUrl.length > 0;
-  const isImageUrlValid = hasImageUrl && imageExtensionRegex.test(trimmedImageUrl);
+  const imageUrls = useMemo(() => parseImageUrls(formState.image), [formState.image]);
+  const hasImageUrl = imageUrls.length > 0;
+  const isImageUrlValid =
+    !hasImageUrl || imageUrls.every((url) => imageExtensionRegex.test(url));
+  const previewImageUrl = imageUrls[0];
   const pageSize = 6;
   const formatTitle = (value?: string) =>
     value
@@ -257,16 +265,23 @@ export default function CollectionPage() {
       return;
     }
 
+    if (!isImageUrlValid) {
+      setActionError("Нужны прямые ссылки на файлы (.jpg/.png/.webp).");
+      return;
+    }
+
     setIsSaving(true);
     setActionError(null);
 
     try {
+      const images = imageUrls;
       const created = await apiFetch<Product>("/product", {
         method: "POST",
         body: JSON.stringify({
           name,
           price: priceValue,
-          image: formState.image.trim() || null,
+          image: images[0] ?? null,
+          images: images.length > 0 ? images : null,
           desc: formState.desc.trim() || null,
           collectionId: collection.id,
         }),
@@ -618,7 +633,7 @@ export default function CollectionPage() {
                   />
                 </Stack>
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-                  {isImageUrlValid && (
+                {previewImageUrl && (
                     <Box
                       sx={{
                         width: { xs: "100%", md: 220 },
@@ -634,7 +649,7 @@ export default function CollectionPage() {
                         sx={{
                           width: "100%",
                           height: "100%",
-                          backgroundImage: `url(${trimmedImageUrl})`,
+                          backgroundImage: `url(${previewImageUrl})`,
                           backgroundSize: "cover",
                           backgroundPosition: "center",
                         }}
@@ -647,13 +662,13 @@ export default function CollectionPage() {
                       setFormState((current) => ({ ...current, image: event.target.value }))
                     }
                     label="URL изображения"
-                    placeholder="https://..."
+                    placeholder="https://... (можно несколько через запятую или новую строку)"
                     fullWidth
                     size="small"
                     error={hasImageUrl && !isImageUrlValid}
                     helperText={
                       hasImageUrl && !isImageUrlValid
-                        ? "Нужна прямая ссылка на файл (.jpg/.png/.webp)"
+                        ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
                         : " "
                     }
                     InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
@@ -784,10 +799,14 @@ export default function CollectionPage() {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      backgroundImage: item.image ? `url(${item.image})` : "none",
+                      backgroundImage: (item.images?.[0] ?? item.image)
+                        ? `url(${item.images?.[0] ?? item.image})`
+                        : "none",
                       backgroundSize: "cover",
                       backgroundPosition: "center",
-                      backgroundColor: item.image ? "transparent" : "rgba(255,255,255,0.08)",
+                      backgroundColor: item.images?.[0] || item.image
+                        ? "transparent"
+                        : "rgba(255,255,255,0.08)",
                       transition: "transform 0.7s ease",
                       ".product-card:hover &": { transform: "scale(1.08)" },
                     }}

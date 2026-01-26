@@ -7,7 +7,13 @@ export class ProductService {
   constructor(private readonly dbService: DbService) {}
 
   async create(product: ProductDto) {
-    return await this.dbService.product.create({ data: product });
+    const images = product.images ?? [];
+    const data = {
+      ...product,
+      images,
+      image: product.image ?? images[0] ?? null,
+    };
+    return await this.dbService.product.create({ data });
   }
 
   async findAll() {
@@ -21,9 +27,22 @@ export class ProductService {
   }
 
   async update(id: number, product: ProductDto) {
+    const images =
+      product.images === undefined ? undefined : product.images ?? [];
+    const image =
+      product.image !== undefined
+        ? product.image
+        : images && images.length > 0
+          ? images[0]
+          : undefined;
+    const data = {
+      ...product,
+      images,
+      image,
+    };
     return await this.dbService.product.update({
       where: { id },
-      data: product,
+      data,
     });
   }
 
