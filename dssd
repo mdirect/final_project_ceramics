@@ -1,0 +1,15 @@
+ 
+ { productId: 1, tagId: 1 },
+  { productId: 1, tagId: 6 },
+  { productId: 1, tagId: 12 },
+  { productId: 1, tagId: 15 },
+  { productId: 1, tagId: 19 },
+
+  // Product 2
+  { productId: 2, tagId: 5 },
+  { productId: 2, tagId: 7 },
+  { productId: 2, tagId: 13 },
+  { productId: 2, tagId: 17 },
+  { productId: 2, tagId: 21 },
+  { productId: 2, tagId: 23 },
+  

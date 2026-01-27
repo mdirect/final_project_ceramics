@@ -109,13 +109,47 @@ model Product {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  collection Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  carts      Cart[]
-  orderItems OrderItem[]
+  collection      Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  carts           Cart[]
+  orderItems      OrderItem[]
+  productTagLink  ProductTagLink[]
 }
 
+enum Filter {
+  Form
+  Color
+  Glaze_type
+  Composition_type
+  Production_type
+  Motif_type
+}
 
+model Tag {
+  id           Int      @id @default(autoincrement())
+  filter       Filter
+  tag          String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
+  productTagLink  ProductTagLink[]
+}
+
+model ProductTagLink {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  tagId     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, tagId])
+}
+
+// ------------------------------------------------------------------------------------------------------
+// About us
+// ------------------------------------------------------------------------------------------------------
 model Worker {
   id        Int       @id @default(autoincrement())
   name      String
@@ -187,8 +221,3 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-// ------------------------------------------------------------------------------------------------------
-// About us
-// ------------------------------------------------------------------------------------------------------
-// ...

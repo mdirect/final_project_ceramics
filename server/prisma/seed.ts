@@ -1,26 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcrypt';
+import { tag } from './seeds/tag';
+import { user } from './seeds/user';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.createMany({
-    skipDuplicates: true,
-    data: [
-      {
-        name: 'Админ',
-        email: 'admin@ya.ru',
-        password: await hash('Qwerty1!', 10),
-        role: 'ADMIN',
-      },
-      {
-        name: 'Дарья',
-        email: 'test@ya.ru',
-        password: await hash('Qwerty1!', 10),
-      },
-    ],
-  });
-  console.log('Users seeds done');
+  await user(prisma);
+  await tag(prisma);
 
   await prisma.collection.createMany({
     data: [
@@ -123,6 +109,23 @@ async function main() {
     ],
   });
   console.log('Products seeds done');
+
+  await prisma.productTagLink.createMany({
+    data: [
+      { productId: 1, tagId: 1 },
+      { productId: 1, tagId: 6 },
+      { productId: 1, tagId: 12 },
+      { productId: 1, tagId: 15 },
+      { productId: 1, tagId: 19 },
+      { productId: 2, tagId: 5 },
+      { productId: 2, tagId: 7 },
+      { productId: 2, tagId: 13 },
+      { productId: 2, tagId: 17 },
+      { productId: 2, tagId: 21 },
+      { productId: 2, tagId: 23 },
+    ],
+  });
+  console.log('Link tag and product seeds done');
 
   await prisma.event.createMany({
     data: [
