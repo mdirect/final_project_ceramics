@@ -1,13 +1,20 @@
-export type CartItem = {
-  productId: string;
-  quantity: number;
-  price: number;
+export type CartProduct = {
+  id: number;
+  name: string;
+  price: number | string;
+  image?: string | null;
+  collectionId?: number | null;
 };
 
-export type Cart = {
-  id: string;
+export type CartItem = {
+  productId: number;
+  quantity: number;
+  product: CartProduct;
+};
+
+export type CartState = {
   items: CartItem[];
-  currency: string;
   total: number;
+  count: number;
 };
 

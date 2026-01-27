@@ -1,24 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { Alert, Box, Button, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, IconButton, Snackbar, Stack, Typography } from "@mui/material";
 import { useParams, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/src/shared/api/http";
 import BrushIcon from "@mui/icons-material/Brush";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
-import CropSquareIcon from "@mui/icons-material/CropSquare";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useCart } from "@/src/shared/providers/CartProvider";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 type Product = {
   id: number;
   name: string;
   desc?: string | null;
+  finish?: string | null;
+  important?: string | null;
+  material?: string | null;
   image?: string | null;
   images?: string[] | null;
   price: number | string;
@@ -53,6 +57,11 @@ export default function ProductPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const relatedRef = useRef<HTMLDivElement | null>(null);
+  const { addItem, isLoading: isCartUpdating, error: cartError } = useCart();
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">("success");
   const fallbackImage =
     "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80";
 
@@ -85,7 +94,7 @@ export default function ProductPage() {
           setLoadError(
             error instanceof Error
               ? error.message
-              : "Не удалось загрузить товар.",
+              : "Failed to load product.",
           );
         }
       } finally {
@@ -102,7 +111,24 @@ export default function ProductPage() {
   }, [idValue]);
 
   const viewName = product?.name ?? `Product ${idValue ?? "—"}`;
-  const viewSize = "—";
+  const descValue = product?.desc?.trim() || "Description will be available soon.";
+  const detailItems = [
+    {
+      label: "Finish",
+      value: product?.finish?.trim(),
+      icon: <DragIndicatorIcon sx={{ color: accent, fontSize: 22 }} />,
+    },
+    {
+      label: "Material",
+      value: product?.material?.trim(),
+      icon: <DragIndicatorIcon sx={{ color: accent, fontSize: 22 }} />,
+    },
+    {
+      label: "Important",
+      value: product?.important?.trim(),
+      icon: <DragIndicatorIcon sx={{ color: accent, fontSize: 22 }} />,
+    },
+  ].filter((item) => Boolean(item.value));
   const galleryImages = useMemo(() => {
     const images = product?.images?.filter(Boolean) ?? [];
     if (images.length > 0) {
@@ -111,24 +137,48 @@ export default function ProductPage() {
     return [product?.image ?? fallbackImage];
   }, [product?.image, product?.images]);
   const activeSrc = galleryImages[Math.min(activeImage, galleryImages.length - 1)];
+  const scrollRelated = (direction: "left" | "right") => {
+    const node = relatedRef.current;
+    if (!node) {
+      return;
+    }
+    const delta = Math.round(node.clientWidth * 0.85);
+    node.scrollBy({
+      left: direction === "left" ? -delta : delta,
+      behavior: "smooth",
+    });
+  };
+  const hasMultipleImages = galleryImages.length > 1;
+  const handlePrevImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+    setActiveImage((value) => (value - 1 + galleryImages.length) % galleryImages.length);
+  };
+  const handleNextImage = () => {
+    if (!hasMultipleImages) {
+      return;
+    }
+    setActiveImage((value) => (value + 1) % galleryImages.length);
+  };
 
   return (
     <Stack spacing={6}>
       <Stack direction="row" spacing={1} sx={{ color: "rgba(255,255,255,0.5)" }}>
         <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <Typography sx={{ fontSize: "0.85rem", "&:hover": { color: accent } }}>Home</Typography>
+          <Typography sx={{ fontSize: "1rem", "&:hover": { color: accent } }}>Home</Typography>
         </Link>
-        <Typography sx={{ fontSize: "0.85rem" }}>/</Typography>
+        <Typography sx={{ fontSize: "1rem" }}>/</Typography>
         <Link
           href={collectionSlug ? `/collections/${collectionSlug}` : "/shop"}
           style={{ textDecoration: "none", color: "inherit" }}
         >
-          <Typography sx={{ fontSize: "0.85rem", "&:hover": { color: accent } }}>
+          <Typography sx={{ fontSize: "1rem", "&:hover": { color: accent } }}>
             {collectionSlug ?? "Collections"}
           </Typography>
         </Link>
-        <Typography sx={{ fontSize: "0.85rem" }}>/</Typography>
-        <Typography sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.9)" }}>
+        <Typography sx={{ fontSize: "1rem" }}>/</Typography>
+        <Typography sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.9)" }}>
           {viewName}
         </Typography>
       </Stack>
@@ -142,45 +192,18 @@ export default function ProductPage() {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", lg: "7fr 5fr" },
-          gap: { xs: 4, lg: 6 },
+          gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 560px) minmax(0, 440px)" },
+          gap: { xs: 4, lg: 5 },
           alignItems: "start",
+          justifyContent: "center",
         }}
       >
-        <Stack spacing={3} direction={{ xs: "column-reverse", lg: "row" }}>
-          <Stack direction={{ xs: "row", lg: "column" }} spacing={2}>
-            {galleryImages.map((src, index) => (
-              <Box
-                key={`${product?.id ?? idValue ?? "product"}-thumb-${index}`}
-                onClick={() => setActiveImage(index)}
-                sx={{
-                  width: { xs: 72, lg: 96 },
-                  height: { xs: 72, lg: 96 },
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border:
-                    index === activeImage
-                      ? `2px solid ${accent}`
-                      : "1px solid rgba(255,255,255,0.1)",
-                  cursor: "pointer",
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundImage: `url(${src})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    filter: index === activeImage ? "none" : "grayscale(0.5)",
-                  }}
-                />
-              </Box>
-            ))}
-          </Stack>
+        <Stack spacing={2.5} direction="column">
           <Box
             sx={{
               flex: 1,
+              maxWidth: { xs: "100%", lg: 560 },
+              maxHeight: { xs: 520, lg: 640 },
               borderRadius: 3,
               overflow: "hidden",
               aspectRatio: "4 / 5",
@@ -226,8 +249,12 @@ export default function ProductPage() {
                     backgroundSize: "contain",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
+                    transform: "translateZ(0)",
+                    transformOrigin: "center",
+                    willChange: "transform",
+                    backfaceVisibility: "hidden",
                     transition: "transform 0.7s ease",
-                    "&:hover": { transform: "scale(1.03)" },
+                    "&:hover": { transform: "translateZ(0) scale(1.03)" },
                   }}
                 />
               </>
@@ -240,24 +267,97 @@ export default function ProductPage() {
                 }}
               />
             )}
-            
+            {hasMultipleImages && (
+              <>
+                <IconButton
+                  onClick={handlePrevImage}
+                  aria-label="Previous image"
+                  sx={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(10,12,16,0.6)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.8)",
+                    "&:hover": { backgroundColor: "rgba(10,12,16,0.8)" },
+                  }}
+                >
+                  <ChevronLeftIcon />
+                </IconButton>
+                <IconButton
+                  onClick={handleNextImage}
+                  aria-label="Next image"
+                  sx={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(10,12,16,0.6)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    color: "rgba(255,255,255,0.8)",
+                    "&:hover": { backgroundColor: "rgba(10,12,16,0.8)" },
+                  }}
+                >
+                  <ChevronRightIcon />
+                </IconButton>
+              </>
+            )}
           </Box>
+          {hasMultipleImages && (
+            <Stack direction="row" spacing={1.5} sx={{ flexWrap: "wrap" }}>
+              {galleryImages.map((src, index) => (
+                <Box
+                  key={`${product?.id ?? idValue ?? "product"}-thumb-${index}`}
+                  onClick={() => setActiveImage(index)}
+                  sx={{
+                    width: { xs: 64, lg: 84 },
+                    height: { xs: 64, lg: 84 },
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border:
+                      index === activeImage
+                        ? `2px solid ${accent}`
+                        : "1px solid rgba(255,255,255,0.1)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundImage: `url(${src})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      filter: index === activeImage ? "none" : "grayscale(0.5)",
+                    }}
+                  />
+                </Box>
+              ))}
+            </Stack>
+          )}
         </Stack>
 
         <Box
           sx={{
             borderRadius: 3,
-            p: { xs: 3, md: 4 },
-            backgroundColor: "rgba(34, 30, 16, 0.6)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            backdropFilter: "blur(20px)",
+            p: { xs: 3, md: 3.5 },
+            backgroundColor: "rgba(20, 22, 28, 0.72)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            backdropFilter: "blur(18px)",
             position: "sticky",
             top: 96,
           }}
         >
-          <Stack spacing={3}>
+          <Stack spacing={2.5}>
             <Box>
-              <Typography sx={{ fontSize: "2rem", fontWeight: 700 }}>
+              <Typography sx={{ fontSize: "2rem", fontWeight: 700, fontFamily: "var(--font-playfair)" }}>
                 {viewName}
               </Typography>
               <Stack direction="row" spacing={2} alignItems="baseline" sx={{ mt: 1 }}>
@@ -282,35 +382,47 @@ export default function ProductPage() {
                   mb: 2,
                 }}
               >
-                Characteristics
+                About the product
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", mb: 2 }}>
-                {product?.desc?.trim() || "Описание скоро появится."}
-              </Typography>
-              <Stack spacing={1.5}>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <BrushIcon sx={{ color: accent, fontSize: 18 }} />
-                  <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem" }}>
-                    Hand-thrown stoneware
+              <Stack spacing={2}>
+                <Box>
+                  <Typography
+                    sx={{
+                      textTransform: "uppercase",
+                      letterSpacing: "0.16em",
+                      fontSize: "0.82rem",
+                      color: accent,
+                      mb: 0.8,
+                    }}
+                  >
+                    Description
                   </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <LocalFloristIcon sx={{ color: accent, fontSize: 18 }} />
-                  <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem" }}>
-                    24k Gold Luster accents
+                  <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "0.95rem", lineHeight: 1.7 }}>
+                    {descValue}
                   </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <CropSquareIcon sx={{ color: accent, fontSize: 18 }} />
-                  <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem" }}>
-                    Dimensions: {viewSize}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <VerifiedIcon sx={{ color: accent, fontSize: 18 }} />
-                  <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem" }}>
-                    Includes Certificate of Authenticity
-                  </Typography>
+                </Box>
+                <Box sx={{ height: 2, backgroundColor: "rgba(255,255,255,0.08)" }} />
+                <Stack spacing={1.8}>
+                  {detailItems.map((item) => (
+                    <Stack key={item.label} direction="row" spacing={1.5} alignItems="flex-start" >
+                      <Box sx={{ pt: 0.2 }}>{item.icon}</Box>
+                      <Box>
+                        <Typography
+                          sx={{
+                            textTransform: "uppercase",
+                            letterSpacing: "0.16em",
+                            fontSize: "0.82rem",
+                            color: accent,
+                          }}
+                        >
+                          {item.label}
+                        </Typography>
+                        <Typography sx={{ color: "rgba(255,255,255,0.8)", fontSize: "0.9rem", mt: 0.4, lineHeight: 1.6 }}>
+                          {item.value}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  ))}
                 </Stack>
               </Stack>
             </Box>
@@ -351,6 +463,29 @@ export default function ProductPage() {
                     fontWeight: 800,
                     "&:hover": { backgroundColor: "#f6c423" },
                   }}
+                  disabled={!product || isCartUpdating}
+                  onClick={async () => {
+                    if (!product) {
+                      return;
+                    }
+                    const success = await addItem(
+                      {
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.image ?? null,
+                        collectionId: product.collectionId ?? null,
+                      },
+                      quantity
+                    );
+                    setToastMessage(
+                      success
+                        ? "Item added to cart."
+                        : "Unable to add item to cart."
+                    );
+                    setToastSeverity(success ? "success" : "error");
+                    setToastOpen(true);
+                  }}
                 >
                   Add to Cart
                 </Button>
@@ -369,9 +504,9 @@ export default function ProductPage() {
             </Stack>
 
             <Stack direction="row" spacing={2} alignItems="center" sx={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>
-              <Typography>Free Global Shipping</Typography>
+              <Typography>Free global shipping</Typography>
               <Box sx={{ width: 4, height: 4, borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.2)" }} />
-              <Typography>30-Day Returns</Typography>
+              <Typography>30-day returns</Typography>
             </Stack>
           </Stack>
         </Box>
@@ -382,6 +517,7 @@ export default function ProductPage() {
           <Typography sx={{ fontSize: "1.4rem", fontWeight: 700 }}>Recommended for You</Typography>
           <Stack direction="row" spacing={1}>
             <IconButton
+              onClick={() => scrollRelated("left")}
               sx={{
                 width: 40,
                 height: 40,
@@ -394,6 +530,7 @@ export default function ProductPage() {
               <ChevronLeftIcon />
             </IconButton>
             <IconButton
+              onClick={() => scrollRelated("right")}
               sx={{
                 width: 40,
                 height: 40,
@@ -408,6 +545,7 @@ export default function ProductPage() {
           </Stack>
         </Stack>
         <Box
+          ref={relatedRef}
           sx={{
             display: "grid",
             gridAutoFlow: "column",
@@ -415,6 +553,9 @@ export default function ProductPage() {
             gap: 3,
             overflowX: "auto",
             pb: 2,
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            "&::-webkit-scrollbar": { display: "none" },
           }}
         >
           {related.map((item) => (
@@ -458,6 +599,22 @@ export default function ProductPage() {
           ))}
         </Box>
       </Box>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={2500}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 10 }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity={toastSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {toastMessage || cartError}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }

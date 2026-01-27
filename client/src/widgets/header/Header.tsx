@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppBar, Box, Button, Container, Stack, Typography } from "@mui/material";
 import { getSideNav, topNav } from "@/src/shared/config/site-nav";
 import { useAuth } from "@/src/shared/providers/AuthProvider";
+import { useCart } from "@/src/shared/providers/CartProvider";
 
 const activeColor = "rgba(242,185,13,0.9)";
 
@@ -12,6 +13,11 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
+  const { items } = useCart();
+  const badgeCount = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items]
+  );
   const isAuthed = Boolean(user) && !isLoading;
   const sideNav = getSideNav(isAuthed);
   const isActiveHref = (href: string) =>
@@ -204,6 +210,8 @@ export function Header() {
                     borderBottom: isActive ? `1px solid ${activeColor}` : "none",
                     paddingBottom: "2px",
                     display: "inline-flex",
+                    position: "relative",
+                    alignItems: "center",
                   }}
                 >
                   <Typography
@@ -219,6 +227,28 @@ export function Header() {
                   >
                     {item.label}
                   </Typography>
+                  {item.href === "/cart" && badgeCount > 0 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: -3,
+                        right: -6,
+                        minWidth: 18,
+                        height: 18,
+                        px: 0.5,
+                        borderRadius: "999px",
+                        backgroundColor: activeColor,
+                        color: "rgba(10,12,16,0.9)",
+                        fontSize: "0.65rem",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {badgeCount}
+                    </Box>
+                  )}
                 </Box>
               );
             })}

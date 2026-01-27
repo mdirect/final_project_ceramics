@@ -1,3 +1,3 @@
-export type { Cart, CartItem } from "./model/types";
+export type { CartItem, CartProduct, CartState } from "./model/types";
 export { cartApi } from "./api";
 

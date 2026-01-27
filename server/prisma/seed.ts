@@ -24,6 +24,9 @@ async function main() {
     images?: string[];
     price: number | string;
     collectionTitle: string;
+    material?: string | null;
+    finish?: string | null;
+    important?: string | null;
   }>;
 
   const collectionIdByTitle = new Map<string, number>();
@@ -62,6 +65,9 @@ async function main() {
       image,
       images,
       price,
+      material: product.material ?? null,
+      finish: product.finish ?? null,
+      important: product.important ?? null,
     };
   });
 
@@ -79,6 +85,9 @@ async function main() {
         image: product.image ?? null,
         images: product.images ?? [],
         price: product.price,
+        material: product.material ?? null,
+        finish: product.finish ?? null,
+        important: product.important ?? null,
       },
     });
   }
@@ -98,6 +107,7 @@ async function main() {
       { productId: 2, tagId: 21 },
       { productId: 2, tagId: 23 },
     ],
+    skipDuplicates: true,
   });
   console.log('Link tag and product seeds done');
 

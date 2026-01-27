@@ -200,7 +200,7 @@ export default function CollectionPage() {
           if (!cancelled) {
             setCollection(null);
             setProducts([]);
-            setLoadError("Коллекция не найдена в базе данных.");
+            setLoadError("Collection not found in the database.");
           }
           return;
         }
@@ -220,7 +220,7 @@ export default function CollectionPage() {
           setLoadError(
             error instanceof Error
               ? error.message
-              : "Не удалось загрузить товары.",
+              : "Failed to load products.",
           );
         }
       } finally {
@@ -239,7 +239,7 @@ export default function CollectionPage() {
 
   const handleCreateProduct = async () => {
     if (!collection) {
-      setActionError("Не удалось определить коллекцию для товара.");
+      setActionError("Unable to determine collection for the product.");
       return;
     }
 
@@ -247,17 +247,17 @@ export default function CollectionPage() {
     const priceValue = Number(formState.price);
 
     if (!name) {
-      setActionError("Название товара обязательно.");
+      setActionError("Product name is required.");
       return;
     }
 
     if (!formState.price || Number.isNaN(priceValue) || priceValue <= 0) {
-      setActionError("Цена должна быть числом больше 0.");
+      setActionError("Price must be a number greater than 0.");
       return;
     }
 
     if (!isImageUrlValid) {
-      setActionError("Нужны прямые ссылки на файлы (.jpg/.png/.webp).");
+      setActionError("Direct file links are required (.jpg/.png/.webp).");
       return;
     }
 
@@ -281,7 +281,7 @@ export default function CollectionPage() {
       setFormState({ name: "", price: "", image: "", desc: "" });
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Не удалось добавить товар.",
+        error instanceof Error ? error.message : "Failed to add product.",
       );
     } finally {
       setIsSaving(false);
@@ -296,7 +296,7 @@ export default function CollectionPage() {
       setProducts((current) => current.filter((item) => item.id !== id));
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Не удалось удалить товар.",
+        error instanceof Error ? error.message : "Failed to remove product.",
       );
     } finally {
       setDeletePending(null);
@@ -638,7 +638,7 @@ export default function CollectionPage() {
                       fontSize: "0.62rem",
                     }}
                   >
-                    Админ-панель
+                    Admin panel
                   </Typography>
                 </Stack>
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -647,8 +647,8 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, name: event.target.value }))
                     }
-                    label="Название"
-                    placeholder="Название товара"
+                    label="Name"
+                    placeholder="Product name"
                     fullWidth
                     size="small"
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -665,8 +665,8 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, price: event.target.value }))
                     }
-                    label="Цена"
-                    placeholder="Например 120"
+                    label="Price"
+                    placeholder="For example 120"
                     fullWidth
                     size="small"
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -708,14 +708,14 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, image: event.target.value }))
                     }
-                    label="URL изображения"
-                    placeholder="https://... (можно несколько через запятую или новую строку)"
+                    label="Image URL"
+                    placeholder="https://... (multiple allowed, comma or newline)"
                     fullWidth
                     size="small"
                     error={hasImageUrl && !isImageUrlValid}
                     helperText={
                       hasImageUrl && !isImageUrlValid
-                        ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
+                        ? "Direct file links required (.jpg/.png/.webp)"
                         : " "
                     }
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -733,8 +733,8 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, desc: event.target.value }))
                     }
-                    label="Описание"
-                    placeholder="Короткое описание"
+                    label="Description"
+                    placeholder="Short description"
                     fullWidth
                     size="small"
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -762,7 +762,7 @@ export default function CollectionPage() {
                       "&:hover": { backgroundColor: "#f7cd4c" },
                     }}
                   >
-                    {isSaving ? "Сохранение..." : "Добавить товар"}
+                    {isSaving ? "Saving..." : "Add product"}
                   </Button>
                   {actionError && (
                     <Alert severity="error" sx={{ flex: 1 }}>
@@ -802,7 +802,7 @@ export default function CollectionPage() {
             {!isLoading && sortedItems.length === 0 && (
               <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
                 <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
-                  Пока нет товаров в этой коллекции.
+                  No products in this collection yet.
                 </Typography>
               </Box>
             )}

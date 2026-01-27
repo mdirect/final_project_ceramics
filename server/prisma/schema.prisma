@@ -106,6 +106,8 @@ model Product {
   desc         String?
   image        String?
   material     String?
+  finish       String?
+  important    String?
   images       String[] @default([])
   price        Decimal  @db.Decimal(10, 2)
   createdAt    DateTime @default(now())

@@ -5,6 +5,9 @@ export type Product = {
   name: string;
   price: number;
   description?: string;
+  finish?: string;
+  important?: string;
+  material?: string;
   materials?: string[];
   tags?: string[];
   images?: string[];

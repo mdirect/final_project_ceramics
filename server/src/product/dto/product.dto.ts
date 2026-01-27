@@ -16,6 +16,18 @@ export class ProductDto {
   desc?: string | null;
 
   @IsOptional()
+  @IsString({ message: 'Отделка должна быть строкой' })
+  finish?: string | null;
+
+  @IsOptional()
+  @IsString({ message: 'Предостережение должно быть строкой' })
+  important?: string | null;
+
+  @IsOptional()
+  @IsString({ message: 'Материал должен быть строкой' })
+  material?: string | null;
+
+  @IsOptional()
   @IsString({ message: 'Изображение должно быть строкой' })
   image?: string | null;
 
