@@ -12,6 +12,7 @@ import {
   CircularProgress,
   FormControlLabel,
   IconButton,
+  InputAdornment,
   Stack,
   TextField,
   Typography,
@@ -24,6 +25,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
 
 type Collection = {
@@ -73,13 +75,9 @@ const parseImageUrls = (value: string) =>
 
 const filterGroups = [
   {
-    id: "type",
-    label: "Type",
-    options: [
-      "Painted image",
-      "Relief",
-      "Three-dimensional",
-    ],
+    id: "form",
+    label: "Form",
+    options: ["Painted image", "Relief", "Three-dimensional"],
   },
   {
     id: "color",
@@ -87,23 +85,23 @@ const filterGroups = [
     options: ["Colourful", "White", "Black", "Yellow", "Green"],
   },
   {
-    id: "finish",
-    label: "Finish",
+    id: "surface",
+    label: "Surface medium",
     options: ["Glaze", "Engobe", "Acrylic", "Epoxy resin", "Light-reflecting pigment"],
   },
   {
-    id: "suspension",
-    label: "Suspension",
+    id: "hanging",
+    label: "Hanging material",
     options: ["Chain", "Beading wire", "Memory wire", "Decorative cord"],
   },
   {
     id: "composition",
-    label: "Composition",
+    label: "Composition type",
     options: ["Multi-part jewelry", "Single-piece jewelry"],
   },
   {
-    id: "availability",
-    label: "Availability",
+    id: "production",
+    label: "Production type",
     options: ["Regularly", "May be repeated", "Part of collection", "Single piece"],
   },
   {
@@ -163,7 +161,7 @@ export default function CollectionPage() {
   const isImageUrlValid =
     !hasImageUrl || imageUrls.every((url) => imageExtensionRegex.test(url));
   const previewImageUrl = imageUrls[0];
-  const pageSize = 6;
+  const pageSize = 12;
   const formatTitle = (value?: string) =>
     value
       ? value
@@ -364,173 +362,53 @@ export default function CollectionPage() {
   }, [page, pageCount]);
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} sx={{ fontFamily: "var(--font-inter)" }}>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "280px 1fr" },
-          gap: 4,
+          gridTemplateColumns: { xs: "1fr", md: "260px 1fr" },
+          gap: { xs: 4, lg: 5 },
           alignItems: "start",
         }}
       >
-        <Box component="aside" sx={{ display: { xs: "none", md: "block" } }}>
+        <Box
+          component="aside"
+          sx={{
+            display: { xs: "none", md: "block" },
+            borderRadius: 1,
+            border: "1px solid rgba(242, 185, 13, 0.32)",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            backdropFilter: "blur(12px)",
+            p: 2.5,
+          }}
+        >
           <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
-            <Box>
-              
-              <Stack spacing={0.5}>
-                {[
-                  { label: "All Creations", active: true },
-                  { label: "Fine Jewelry" },
-                  { label: "Ceramics" },
-                  { label: "New Arrivals" },
-                ].map((item) => (
-                  <Box
-                    key={item.label}
-                    sx={{
-                      px: 2,
-                      py: 1.3,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                      backgroundColor: item.active ? accent : "transparent",
-                      color: item.active ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
-                      fontWeight: item.active ? 700 : 500,
-                      fontSize: "0.9rem",
-                      "&:hover": {
-                        backgroundColor: item.active ? accent : "rgba(255,255,255,0.08)",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        backgroundColor: item.active ? "rgba(18,21,26,0.7)" : "rgba(255,255,255,0.4)",
-                      }}
-                    />
-                    {item.label}
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
-
-            <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              {filterGroups.map((group, index) => (
-                <Accordion
-                  key={group.id}
-                  defaultExpanded={index < 2}
-                  disableGutters
-                  elevation={0}
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 2,
-                    "&:before": { display: "none" },
-                  }}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255,255,255,0.6)" }} />}
-                    sx={{
-                      "& .MuiAccordionSummary-content": {
-                        margin: 0,
-                      },
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        textTransform: "uppercase",
-                        letterSpacing: "0.14em",
-                        fontWeight: 600,
-                        color: "rgba(255,255,255,0.6)",
-                      }}
-                    >
-                      {group.label}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ pt: 0 }}>
-                    <Stack spacing={0.5}>
-                      {group.options.map((option) => {
-                        const selected = selectedFilters[group.id] ?? [];
-                        const isChecked = selected.includes(option);
-                        return (
-                          <FormControlLabel
-                            key={option}
-                            control={
-                              <Checkbox
-                                checked={isChecked}
-                                onChange={() =>
-                                  setSelectedFilters((current) => {
-                                    const next = { ...current };
-                                    const currentValues = next[group.id] ?? [];
-                                    next[group.id] = currentValues.includes(option)
-                                      ? currentValues.filter((value) => value !== option)
-                                      : [...currentValues, option];
-                                    return next;
-                                  })
-                                }
-                                sx={{
-                                  color: "rgba(255,255,255,0.5)",
-                                  "&.Mui-checked": { color: accent },
-                                }}
-                              />
-                            }
-                            label={
-                              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
-                                {option}
-                              </Typography>
-                            }
-                          />
-                        );
-                      })}
-                    </Stack>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-              <Button
-                variant="outlined"
+            <Stack spacing={1.5}>
+              <Typography
                 sx={{
-                  borderColor: "rgba(255,255,255,0.15)",
-                  color: "rgba(255,255,255,0.8)",
-                  textTransform: "none",
-                  fontWeight: 700,
-                  "&:hover": { borderColor: "rgba(255,255,255,0.35)" },
+                  textTransform: "uppercase",
+                  letterSpacing: "0.2em",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  color: "rgba(148,163,184,0.8)",
                 }}
-                onClick={() => setSelectedFilters({})}
               >
-                Reset Filters
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-
-        <Stack spacing={3}>
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
-            <Box>
-              <Typography sx={{ fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-                {title}
-              </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
-                Collection items
-              </Typography>
-            </Box>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
-                Showing {pagedItems.length} of {sortedItems.length} items
+                Sort by
               </Typography>
               <Box sx={{ position: "relative" }}>
                 <Button
                   onClick={() => setSortOpen((current) => !current)}
                   sx={{
                     textTransform: "none",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "rgba(255,255,255,0.8)",
-                    borderRadius: 2,
-                    px: 2.5,
-                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(226,232,240,0.9)",
+                    borderRadius: 1,
+                    px: 2,
+                    width: "100%",
+                    justifyContent: "space-between",
+                    fontSize: "0.88rem",
+                    "&:hover": { backgroundColor: "rgba(0,0,0,0.55)" },
                   }}
                   endIcon={<ExpandMoreIcon />}
                 >
@@ -541,9 +419,9 @@ export default function CollectionPage() {
                     spacing={0}
                     sx={{
                       position: "absolute",
+                      left: 0,
                       right: 0,
                       mt: 1,
-                      minWidth: 220,
                       borderRadius: 2,
                       backgroundColor: "rgba(20,20,20,0.9)",
                       border: "1px solid rgba(255,255,255,0.12)",
@@ -573,6 +451,171 @@ export default function CollectionPage() {
                 )}
               </Box>
             </Stack>
+
+            <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              {filterGroups.map((group, index) => (
+                <Accordion
+                  key={group.id}
+                  defaultExpanded={index < 2}
+                  disableGutters
+                  elevation={0}
+                  sx={{
+                    backgroundColor: "transparent",
+                    borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 0,
+                    "&:before": { display: "none" },
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255,255,255,0.6)" }} />}
+                    sx={{
+                      "& .MuiAccordionSummary-content": {
+                        margin: 0,
+                      },
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        textTransform: "uppercase",
+                        letterSpacing: "0.2em",
+                        fontWeight: 600,
+                    fontSize: "0.8rem",
+                        color: "rgba(148,163,184,0.8)",
+                      }}
+                    >
+                      {group.label}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ pt: 0 }}>
+                    <Stack spacing={0.5}>
+                      {group.options.map((option) => {
+                        const selected = selectedFilters[group.id] ?? [];
+                        const isChecked = selected.includes(option);
+                        return (
+                          <FormControlLabel
+                            key={option}
+                            control={
+                              <Checkbox
+                                checked={isChecked}
+                                onChange={() =>
+                                  setSelectedFilters((current) => {
+                                    const next = { ...current };
+                                    const currentValues = next[group.id] ?? [];
+                                    next[group.id] = currentValues.includes(option)
+                                      ? currentValues.filter((value) => value !== option)
+                                      : [...currentValues, option];
+                                    return next;
+                                  })
+                                }
+                                sx={{
+                                  color: "rgba(148,163,184,0.6)",
+                                  "&.Mui-checked": { color: accent },
+                                }}
+                              />
+                            }
+                            label={
+                              <Typography
+                                variant="body2"
+                                sx={{ color: "rgba(226,232,240,0.85)", fontSize: "0.96rem" }}
+                              >
+                                {option}
+                              </Typography>
+                            }
+                          />
+                        );
+                      })}
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+              <Button
+                variant="outlined"
+                sx={{
+                  borderColor: "rgba(255,255,255,0.12)",
+                  color: "rgba(226,232,240,0.85)",
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.2em",
+                  "&:hover": { borderColor: "rgba(255,255,255,0.28)" },
+                }}
+                onClick={() => setSelectedFilters({})}
+              >
+                Reset Filters
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+
+        <Stack spacing={3}>
+          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: "2.6rem", md: "3.8rem" },
+                  fontWeight: 600,
+                  fontFamily: "var(--font-playfair)",
+                  color: "rgba(255, 255, 255, 0.98)",
+                }}
+              >
+                {title}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "rgba(242,185,13,0.75)",
+                  fontSize: "0.9rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.32em",
+                  fontWeight: 600,
+                  mt: 0.5,
+                }}
+              >
+                Collection items
+              </Typography>
+            </Box>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography
+                sx={{
+                  color: "rgba(226, 232, 240, 0.97)",
+                  fontSize: "0.82rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.2em",
+                }}
+              >
+                Showing {pagedItems.length} of {sortedItems.length} items
+              </Typography>
+              <TextField
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search"
+                size="small"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon sx={{ fontSize: "1.3rem", color: "rgba(226,232,240,0.4)" }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  minWidth: 280,
+                  "& .MuiInputBase-input": {
+                    color: "rgba(226,232,240,0.85)",
+                    fontSize: "0.9rem",
+                    py: 0.85,
+                    "&::placeholder": {
+                      fontSize: "0.88rem",
+                    },
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(0,0,0,0.25)",
+                    borderColor: "rgba(255,255,255,0.12)",
+                    borderRadius: 999,
+                    pr: 0.5,
+                  },
+                }}
+              />
+            </Stack>
           </Stack>
 
           {loadError && (
@@ -584,15 +627,24 @@ export default function CollectionPage() {
           {isAdmin && (
             <Box
               sx={{
-                borderRadius: 3,
-                border: "1px solid rgba(255,255,255,0.12)",
-                backgroundColor: "rgba(255,255,255,0.04)",
+                borderRadius: 1.5,
+                border: "1px solid rgba(242,185,13,0.2)",
+                backgroundColor: "rgba(0,0,0,0.45)",
+                backdropFilter: "blur(12px)",
                 p: 3,
               }}
             >
               <Stack spacing={2}>
                 <Stack spacing={0.5}>
-                  <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      color: "rgba(242,185,13,0.9)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.28em",
+                      fontSize: "0.62rem",
+                    }}
+                  >
                     Админ-панель
                   </Typography>
                 </Stack>
@@ -606,11 +658,12 @@ export default function CollectionPage() {
                     placeholder="Название товара"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -623,11 +676,12 @@ export default function CollectionPage() {
                     placeholder="Например 120"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -638,10 +692,10 @@ export default function CollectionPage() {
                       sx={{
                         width: { xs: "100%", md: 220 },
                         flexShrink: 0,
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        backgroundColor: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
                         aspectRatio: "4 / 5",
                       }}
                     >
@@ -671,12 +725,13 @@ export default function CollectionPage() {
                         ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
                         : " "
                     }
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
-                    FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                    FormHelperTextProps={{ sx: { color: "rgba(226,232,240,0.45)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -689,11 +744,12 @@ export default function CollectionPage() {
                     placeholder="Короткое описание"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -704,8 +760,10 @@ export default function CollectionPage() {
                     onClick={handleCreateProduct}
                     disabled={isSaving || !collection || (hasImageUrl && !isImageUrlValid)}
                     sx={{
-                      textTransform: "none",
-                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      letterSpacing: "0.22em",
+                      fontSize: "0.65rem",
                       backgroundColor: accent,
                       color: "rgba(18,21,26,0.9)",
                       "&:hover": { backgroundColor: "#f7cd4c" },
@@ -727,11 +785,13 @@ export default function CollectionPage() {
             sx={{
               display: "grid",
               gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
+                xs: "minmax(0, 1fr)",
+                md: "repeat(2, minmax(0, 1fr))",
+                xl: "repeat(3, minmax(0, 1fr))",
               },
-              gap: 3,
+              gap: { xs: 4, md: 4.5 },
+              alignItems: "start",
+              justifyItems: "stretch",
             }}
           >
             {isLoading && (
@@ -753,137 +813,168 @@ export default function CollectionPage() {
                 </Typography>
               </Box>
             )}
-            {pagedItems.map((item) => (
-              <Box key={item.id} sx={{ position: "relative" }}>
-                {isAdmin && (
-                  <IconButton
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      void handleDeleteProduct(item.id);
-                    }}
-                    disabled={deletePending === item.id}
-                    sx={{
-                      position: "absolute",
-                      top: 12,
-                      right: 12,
-                      zIndex: 2,
-                      backgroundColor: "rgba(0,0,0,0.55)",
-                      color: "rgba(255,255,255,0.9)",
-                      "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-                    }}
-                  >
-                    {deletePending === item.id ? (
-                      <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.9)" }} />
-                    ) : (
-                      <DeleteOutlineIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                )}
-                <Link
-                  href={`/products/${item.id}?collection=${slugValue ?? ""}`}
-                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
-                >
-                <Box className="product-card" sx={{ position: "relative" }}>
+            {pagedItems.map((item) => {
+              const primaryImage = item.images?.[0] ?? item.image;
+              return (
                 <Box
+                  key={item.id}
                   sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    aspectRatio: "4 / 5",
                     position: "relative",
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    minWidth: 0,
+                    "&:hover .delete-btn": { opacity: 1 },
+                    "&:hover .product-image": {
+                      filter: "grayscale(0%)",
+                      transform: "scale(1.06)",
+                    },
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      backgroundImage: (item.images?.[0] ?? item.image)
-                        ? `url(${item.images?.[0] ?? item.image})`
-                        : "none",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundColor: item.images?.[0] || item.image
-                        ? "transparent"
-                        : "rgba(255,255,255,0.08)",
-                      transition: "transform 0.7s ease",
-                      ".product-card:hover &": { transform: "scale(1.08)" },
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 70%)",
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "flex-end",
-                      p: 2,
-                      opacity: 0,
-                      transition: "opacity 0.3s ease",
-                      ".product-card:hover &": { opacity: 1 },
-                    }}
-                  >
-                    <Button
-                      fullWidth
-                      sx={{
-                        backgroundColor: "rgba(255,255,255,0.95)",
-                        color: "rgba(18,21,26,0.9)",
-                        fontWeight: 700,
-                        textTransform: "none",
-                        "&:hover": { backgroundColor: "rgba(255,255,255,1)" },
+                  {isAdmin && (
+                    <IconButton
+                      className="delete-btn"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        void handleDeleteProduct(item.id);
                       }}
-                    >
-                      Quick View
-                    </Button>
-                  </Box>
-                  {item.tags?.includes("new") && (
-                    <Box
+                      disabled={deletePending === item.id}
                       sx={{
                         position: "absolute",
                         top: 12,
-                        left: 12,
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 1,
-                        backgroundColor: accent,
-                        color: "rgba(18,21,26,0.9)",
-                        fontSize: "0.65rem",
-                        fontWeight: 800,
-                        letterSpacing: "0.18em",
-                        textTransform: "uppercase",
+                        right: 12,
+                        zIndex: 2,
+                        backgroundColor: "rgba(0,0,0,0.6)",
+                        color: "rgba(255,255,255,0.85)",
+                        opacity: 0,
+                        transition: "opacity 0.2s ease",
+                        "&:hover": { backgroundColor: "rgba(5, 5, 5, 0.75)", color: "#fca5a5" },
                       }}
                     >
-                      New
-                    </Box>
+                      {deletePending === item.id ? (
+                        <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.9)" }} />
+                      ) : (
+                        <DeleteOutlineIcon fontSize="small" />
+                      )}
+                    </IconButton>
                   )}
+                  <Link
+                    href={`/products/${item.id}?collection=${slugValue ?? ""}`}
+                    style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                  >
+                    <Box
+                      className="product-card"
+                      sx={{
+                        borderRadius: 2,
+                        backgroundColor: "rgba(38, 38, 38, 0.45)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid rgba(242,185,13,0.15)",
+                        p: 1.5,
+                        aspectRatio: "4 / 5",
+                        display: "flex",
+                        flexDirection: "column",
+                        transition: "transform 0.3s ease",
+                        position: "relative",
+                      }}
+                    >
+                      {item.tags?.includes("new") && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            px: 1,
+                            py: 0.4,
+                            borderRadius: 0.5,
+                            backgroundColor: accent,
+                            color: "rgba(18,21,26,0.9)",
+                            fontSize: "0.6rem",
+                            fontWeight: 700,
+                            letterSpacing: "0.2em",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          New
+                        </Box>
+                      )}
+                      <Box
+                        sx={{
+                          position: "relative",
+                          flexGrow: 1,
+                          borderRadius: 2,
+                          overflow: "hidden",
+                          backgroundColor: "rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        {primaryImage ? (
+                          <Box
+                            className="product-image"
+                            component="img"
+                            src={primaryImage}
+                            alt={item.name}
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center",
+                              transform: "scale(1)",
+                              filter: "grayscale(30%)",
+                              transition: "transform 0.7s ease, filter 0.7s ease",
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              inset: 0,
+                              backgroundColor: "rgba(255,255,255,0.08)",
+                            }}
+                          />
+                        )}
+                      </Box>
+                      <Box
+                        sx={{
+                          pt: 2,
+                          px: 0.5,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 2,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "var(--font-playfair)",
+                            fontSize: "1.2rem",
+                            color: "rgba(255,255,255,0.95)",
+                          }}
+                        >
+                          {item.name}
+                        </Typography>
+                        <Box
+                          sx={{
+                            px: 1.2,
+                            py: 0.4,
+                            borderRadius: 1,
+                            backgroundColor: "rgba(242,185,13,0.18)",
+                            border: "1px solid rgba(242,185,13,0.35)",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "rgba(242,185,13,0.95)",
+                              fontWeight: 600,
+                              fontSize: "0.7rem",
+                              letterSpacing: "0.12em",
+                            }}
+                          >
+                            {formatCurrency(item.price)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Link>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1.5, gap: 1 }}>
-                  <Box>
-                    <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-                      {item.name}
-                    </Typography>
-                    <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem" }}>
-                      {title}
-                    </Typography>
-                  </Box>
-                  <Typography sx={{ color: accent, fontWeight: 700 }}>
-                    {formatCurrency(item.price)}
-                  </Typography>
-                </Box>
-                </Box>
-                </Link>
-              </Box>
-            ))}
-            {Array.from({ length: placeholders }).map((_, index) => (
-              <Box key={`placeholder-${index}`} sx={{ aspectRatio: "4 / 5", visibility: "hidden" }} />
-            ))}
+            );
+            })}
           </Box>
 
           <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5} sx={{ mt: 2 }}>
@@ -902,40 +993,67 @@ export default function CollectionPage() {
             >
               <ArrowBackIosNewIcon fontSize="small" />
             </IconButton>
-            {[1, 2, 3].map((index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: index === clampedPage ? accent : "rgba(255,255,255,0.06)",
-                  color: index === clampedPage ? "rgba(18,21,26,0.9)" : "rgba(255,255,255,0.8)",
-                  fontWeight: 700,
-                }}
-              >
-                {index}
-              </Box>
-            ))}
-            <Box sx={{ color: "rgba(255,255,255,0.35)", px: 0.5 }}>...</Box>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(255,255,255,0.06)",
-                color: "rgba(255,255,255,0.8)",
-                fontWeight: 700,
-              }}
-            >
-              {pageCount}
-            </Box>
+            {pageCount <= 5
+              ? Array.from({ length: pageCount }, (_, index) => index + 1).map((index) => (
+                  <Box
+                    key={index}
+                    onClick={() => setPage(index)}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      backgroundColor:
+                        index === clampedPage ? accent : "rgba(255,255,255,0.06)",
+                      color:
+                        index === clampedPage
+                          ? "rgba(18,21,26,0.9)"
+                          : "rgba(255,255,255,0.8)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {index}
+                  </Box>
+                ))
+              : [
+                  1,
+                  Math.max(2, clampedPage - 1),
+                  clampedPage,
+                  Math.min(pageCount - 1, clampedPage + 1),
+                  pageCount,
+                ]
+                  .filter((value, index, array) => array.indexOf(value) === index)
+                  .map((index, idx, array) => (
+                    <Box key={`${index}-${idx}`} sx={{ display: "flex", alignItems: "center" }}>
+                      {idx > 0 && index - (array[idx - 1] ?? 0) > 1 ? (
+                        <Box sx={{ color: "rgba(255,255,255,0.35)", px: 0.5 }}>...</Box>
+                      ) : null}
+                      <Box
+                        onClick={() => setPage(index)}
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          backgroundColor:
+                            index === clampedPage ? accent : "rgba(255,255,255,0.06)",
+                          color:
+                            index === clampedPage
+                              ? "rgba(18,21,26,0.9)"
+                              : "rgba(255,255,255,0.8)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {index}
+                      </Box>
+                    </Box>
+                  ))}
             <IconButton
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
               disabled={clampedPage === pageCount}

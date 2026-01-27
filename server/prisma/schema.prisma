@@ -93,7 +93,9 @@ model Collection {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  products Product[]
+  products    Product[]
+
+  @@unique([title])
 }
 
 // Товары
@@ -109,9 +111,11 @@ model Product {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  collection Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  carts      Cart[]
-  orderItems OrderItem[]
+collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  carts        Cart[]
+  orderItems   OrderItem[]
+
+  @@unique([collectionId, name])
 }
 
 
@@ -144,6 +148,7 @@ model ProjectPic {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
 }
 
 enum EventStatus {

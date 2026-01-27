@@ -204,35 +204,43 @@ export default function ProductPage() {
                 <CircularProgress size={32} sx={{ color: accent }} />
               </Box>
             )}
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                backgroundImage: `url(${activeSrc})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                transition: "transform 0.7s ease",
-                "&:hover": { transform: "scale(1.06)" },
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 16,
-                left: 16,
-                px: 2,
-                py: 0.7,
-                borderRadius: 999,
-                backgroundColor: "rgba(0,0,0,0.35)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.8)",
-              }}
-            >
-              Hover to zoom
-            </Box>
+            {activeSrc ? (
+              <>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: `url(${activeSrc})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    filter: "blur(18px)",
+                    transform: "scale(1.08)",
+                    opacity: 0.35,
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: `url(${activeSrc})`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    transition: "transform 0.7s ease",
+                    "&:hover": { transform: "scale(1.03)" },
+                  }}
+                />
+              </>
+            ) : (
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                }}
+              />
+            )}
+            
           </Box>
         </Stack>
 

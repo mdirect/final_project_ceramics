@@ -31,6 +31,29 @@
 $ npm install
 ```
 
+## Seed data (collections/products)
+
+```bash
+# Export your current local DB into seed JSON files
+$ npx tsx prisma/export-seed.ts
+
+# Load seed data into your database (upsert by collection title + product name)
+$ npm run seed
+```
+
+## Teammates setup (local)
+
+```bash
+# 1) Install deps
+$ npm install
+
+# 2) Apply migrations
+$ npm run prisma:migrate:dev
+
+# 3) Seed collections + products from JSON
+$ npm run seed
+```
+
 ## Compile and run the project
 
 ```bash
