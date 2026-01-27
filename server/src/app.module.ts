@@ -16,6 +16,8 @@ import { EventModule } from './event/event.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { PostModule } from './post/post.module';
 import { CartModule } from './cart/cart.module';
+import { OrderModule } from './order/order.module';
+import { OrderItemModule } from './order-item/order-item.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { CartModule } from './cart/cart.module';
     WorkerModule,
     ProjectModule,
     ProjectPicModule,
+    OrderModule,
+    OrderItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
