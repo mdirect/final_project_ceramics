@@ -12,6 +12,7 @@ import {
   CircularProgress,
   FormControlLabel,
   IconButton,
+  InputAdornment,
   Stack,
   TextField,
   Typography,
@@ -24,6 +25,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
 
 type Collection = {
@@ -360,12 +362,12 @@ export default function CollectionPage() {
   }, [page, pageCount]);
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} sx={{ fontFamily: "var(--font-inter)" }}>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "280px 1fr" },
-          gap: 4,
+          gridTemplateColumns: { xs: "1fr", md: "260px 1fr" },
+          gap: { xs: 4, lg: 5 },
           alignItems: "start",
         }}
       >
@@ -373,12 +375,11 @@ export default function CollectionPage() {
           component="aside"
           sx={{
             display: { xs: "none", md: "block" },
-            borderRadius: 3,
-            border: "1px solid rgba(255,255,255,0.18)",
-            backgroundColor: "rgba(12,14,20,0.35)",
-            boxShadow: "0 8px 20px rgba(23, 18, 25, 0.6)",
-            backdropFilter: "blur(14px)",
-            p: 2,
+            borderRadius: 1,
+            border: "1px solid rgba(242, 185, 13, 0.32)",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            backdropFilter: "blur(12px)",
+            p: 2.5,
           }}
         >
           <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
@@ -386,10 +387,10 @@ export default function CollectionPage() {
               <Typography
                 sx={{
                   textTransform: "uppercase",
-                  letterSpacing: "0.14em",
+                  letterSpacing: "0.2em",
                   fontWeight: 600,
-                  fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.6)",
+                  fontSize: "0.8rem",
+                  color: "rgba(148,163,184,0.8)",
                 }}
               >
                 Sort by
@@ -399,14 +400,15 @@ export default function CollectionPage() {
                   onClick={() => setSortOpen((current) => !current)}
                   sx={{
                     textTransform: "none",
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "rgba(255,255,255,0.8)",
-                    borderRadius: 2,
-                    px: 2.5,
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(226,232,240,0.9)",
+                    borderRadius: 1,
+                    px: 2,
                     width: "100%",
                     justifyContent: "space-between",
-                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+                    fontSize: "0.88rem",
+                    "&:hover": { backgroundColor: "rgba(0,0,0,0.55)" },
                   }}
                   endIcon={<ExpandMoreIcon />}
                 >
@@ -450,7 +452,7 @@ export default function CollectionPage() {
               </Box>
             </Stack>
 
-            <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+            <Stack spacing={2} sx={{ pt: 2, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               {filterGroups.map((group, index) => (
                 <Accordion
                   key={group.id}
@@ -458,9 +460,9 @@ export default function CollectionPage() {
                   disableGutters
                   elevation={0}
                   sx={{
-                    backgroundColor: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                    borderRadius: 2,
+                    backgroundColor: "transparent",
+                    borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: 0,
                     "&:before": { display: "none" },
                   }}
                 >
@@ -476,9 +478,10 @@ export default function CollectionPage() {
                       variant="body2"
                       sx={{
                         textTransform: "uppercase",
-                        letterSpacing: "0.14em",
+                        letterSpacing: "0.2em",
                         fontWeight: 600,
-                        color: "rgba(255,255,255,0.6)",
+                    fontSize: "0.8rem",
+                        color: "rgba(148,163,184,0.8)",
                       }}
                     >
                       {group.label}
@@ -506,13 +509,16 @@ export default function CollectionPage() {
                                   })
                                 }
                                 sx={{
-                                  color: "rgba(255,255,255,0.5)",
+                                  color: "rgba(148,163,184,0.6)",
                                   "&.Mui-checked": { color: accent },
                                 }}
                               />
                             }
                             label={
-                              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
+                              <Typography
+                                variant="body2"
+                                sx={{ color: "rgba(226,232,240,0.85)", fontSize: "0.96rem" }}
+                              >
                                 {option}
                               </Typography>
                             }
@@ -526,11 +532,13 @@ export default function CollectionPage() {
               <Button
                 variant="outlined"
                 sx={{
-                  borderColor: "rgba(255,255,255,0.15)",
-                  color: "rgba(255,255,255,0.8)",
-                  textTransform: "none",
-                  fontWeight: 700,
-                  "&:hover": { borderColor: "rgba(255,255,255,0.35)" },
+                  borderColor: "rgba(255,255,255,0.12)",
+                  color: "rgba(226,232,240,0.85)",
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.2em",
+                  "&:hover": { borderColor: "rgba(255,255,255,0.28)" },
                 }}
                 onClick={() => setSelectedFilters({})}
               >
@@ -543,15 +551,38 @@ export default function CollectionPage() {
         <Stack spacing={3}>
           <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
             <Box>
-              <Typography sx={{ fontSize: "2.8rem", fontWeight: 700, color: "rgba(255, 255, 255, 0.95)" }}>
+              <Typography
+                sx={{
+                  fontSize: { xs: "2.6rem", md: "3.8rem" },
+                  fontWeight: 600,
+                  fontFamily: "var(--font-playfair)",
+                  color: "rgba(255, 255, 255, 0.98)",
+                }}
+              >
                 {title}
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "1.2rem" }}>
+              <Typography
+                sx={{
+                  color: "rgba(242,185,13,0.75)",
+                  fontSize: "0.9rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.32em",
+                  fontWeight: 600,
+                  mt: 0.5,
+                }}
+              >
                 Collection items
               </Typography>
             </Box>
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem" }}>
+              <Typography
+                sx={{
+                  color: "rgba(226, 232, 240, 0.97)",
+                  fontSize: "0.82rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.2em",
+                }}
+              >
                 Showing {pagedItems.length} of {sortedItems.length} items
               </Typography>
               <TextField
@@ -559,13 +590,28 @@ export default function CollectionPage() {
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search"
                 size="small"
-                InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon sx={{ fontSize: "1.3rem", color: "rgba(226,232,240,0.4)" }} />
+                    </InputAdornment>
+                  ),
+                }}
                 sx={{
-                  minWidth: 220,
-                  "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                  minWidth: 280,
+                  "& .MuiInputBase-input": {
+                    color: "rgba(226,232,240,0.85)",
+                    fontSize: "0.9rem",
+                    py: 0.85,
+                    "&::placeholder": {
+                      fontSize: "0.88rem",
+                    },
+                  },
                   "& .MuiOutlinedInput-root": {
-                    backgroundColor: "rgba(255,255,255,0.06)",
+                    backgroundColor: "rgba(0,0,0,0.25)",
                     borderColor: "rgba(255,255,255,0.12)",
+                    borderRadius: 999,
+                    pr: 0.5,
                   },
                 }}
               />
@@ -581,17 +627,24 @@ export default function CollectionPage() {
           {isAdmin && (
             <Box
               sx={{
-                borderRadius: 3,
-                border: "2px solid rgba(255, 255, 255, 0.87)",
-                backgroundColor: "rgba(8,12,18,0.5)",
-                boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
-                backdropFilter: "blur(14px)",
+                borderRadius: 1.5,
+                border: "1px solid rgba(242,185,13,0.2)",
+                backgroundColor: "rgba(0,0,0,0.45)",
+                backdropFilter: "blur(12px)",
                 p: 3,
               }}
             >
               <Stack spacing={2}>
                 <Stack spacing={0.5}>
-                  <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      color: "rgba(242,185,13,0.9)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.28em",
+                      fontSize: "0.62rem",
+                    }}
+                  >
                     Админ-панель
                   </Typography>
                 </Stack>
@@ -605,11 +658,12 @@ export default function CollectionPage() {
                     placeholder="Название товара"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -622,11 +676,12 @@ export default function CollectionPage() {
                     placeholder="Например 120"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -637,10 +692,10 @@ export default function CollectionPage() {
                       sx={{
                         width: { xs: "100%", md: 220 },
                         flexShrink: 0,
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        backgroundColor: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
                         aspectRatio: "4 / 5",
                       }}
                     >
@@ -670,12 +725,13 @@ export default function CollectionPage() {
                         ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
                         : " "
                     }
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
-                    FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                    FormHelperTextProps={{ sx: { color: "rgba(226,232,240,0.45)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -688,11 +744,12 @@ export default function CollectionPage() {
                     placeholder="Короткое описание"
                     fullWidth
                     size="small"
-                    InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                    InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
-                      "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                      "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
                       "& .MuiOutlinedInput-root": {
-                        backgroundColor: "rgba(255,255,255,0.05)",
+                        backgroundColor: "rgba(0,0,0,0.35)",
+                        borderRadius: 1,
                       },
                     }}
                   />
@@ -703,8 +760,10 @@ export default function CollectionPage() {
                     onClick={handleCreateProduct}
                     disabled={isSaving || !collection || (hasImageUrl && !isImageUrlValid)}
                     sx={{
-                      textTransform: "none",
-                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      letterSpacing: "0.22em",
+                      fontSize: "0.65rem",
                       backgroundColor: accent,
                       color: "rgba(18,21,26,0.9)",
                       "&:hover": { backgroundColor: "#f7cd4c" },
@@ -727,10 +786,10 @@ export default function CollectionPage() {
               display: "grid",
               gridTemplateColumns: {
                 xs: "minmax(0, 1fr)",
-                sm: "repeat(2, minmax(0, 1fr))",
-                lg: "repeat(3, minmax(0, 1fr))",
+                md: "repeat(2, minmax(0, 1fr))",
+                xl: "repeat(3, minmax(0, 1fr))",
               },
-              gap: 3,
+              gap: { xs: 4, md: 4.5 },
               alignItems: "start",
               justifyItems: "stretch",
             }}
@@ -757,155 +816,163 @@ export default function CollectionPage() {
             {pagedItems.map((item) => {
               const primaryImage = item.images?.[0] ?? item.image;
               return (
-                <Box key={item.id} sx={{ position: "relative", minWidth: 0 }}>
-                {isAdmin && (
-                  <IconButton
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      void handleDeleteProduct(item.id);
-                    }}
-                    disabled={deletePending === item.id}
-                    sx={{
-                      position: "absolute",
-                      top: 12,
-                      right: 12,
-                      zIndex: 2,             
-                      backgroundColor: "rgba(0,0,0,0.55)",
-                      color: "rgba(255,255,255,0.9)",
-                      "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
-                    }}
-                  >
-                    {deletePending === item.id ? (
-                      <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.9)" }} />
-                    ) : (
-                      <DeleteOutlineIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                )}
-                <Link
-                  href={`/products/${item.id}?collection=${slugValue ?? ""}`}
-                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
-                >
-                <Box className="product-card" sx={{ position: "relative" }}>
                 <Box
+                  key={item.id}
                   sx={{
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    aspectRatio: "4 / 5",
                     position: "relative",
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    minWidth: 0,
+                    "&:hover .delete-btn": { opacity: 1 },
+                    "&:hover .product-image": {
+                      filter: "grayscale(0%)",
+                      transform: "scale(1.06)",
+                    },
                   }}
                 >
-                  {primaryImage ? (
-                    <>
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          inset: 0,
-                          backgroundImage: `url(${primaryImage})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          filter: "blur(14px)",
-                          transform: "scale(1.08)",
-                          opacity: 0.35,
-                        }}
-                      />
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          inset: 0,
-                          backgroundImage: `url(${primaryImage})`,
-                          backgroundSize: "contain",
-                          backgroundPosition: "center",
-                          backgroundRepeat: "no-repeat",
-                          transition: "transform 0.7s ease",
-                          ".product-card:hover &": { transform: "scale(1.03)" },
-                        }}
-                      />
-                    </>
-                  ) : (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        inset: 0,
-                        backgroundColor: "rgba(255,255,255,0.08)",
+                  {isAdmin && (
+                    <IconButton
+                      className="delete-btn"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        void handleDeleteProduct(item.id);
                       }}
-                    />
-                  )}
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 70%)",
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      left: 16,
-                      right: 16,
-                      bottom: 14,
-                      p: 1.4,
-                      borderRadius: 2,
-                      background: "linear-gradient(90deg, rgba(47, 45, 45, 0.37) 0%, rgba(135, 131, 135, 0.35) 60%)",
-                      border: "2px solid rgba(255,255,255,0.14)",
-                      backdropFilter: "blur(3px)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 1.5,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontWeight: 700,
-                        color: "rgba(255,255,255,0.95)",
-                        fontSize: "1.2rem",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {item.name}
-                    </Typography>
-                    <Box
-                      sx={{
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 999,
-                        backgroundColor: "rgba(242,185,13,0.18)",
-                        border: "1px solid rgba(242,185,13,0.4)",
-                      }}
-                    >
-                      <Typography sx={{ color: accent, fontWeight: 600, fontSize: "0.95rem" }}>
-                        {formatCurrency(item.price)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  {item.tags?.includes("new") && (
-                    <Box
+                      disabled={deletePending === item.id}
                       sx={{
                         position: "absolute",
                         top: 12,
-                        left: 12,
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 1,
-                        backgroundColor: accent,
-                        color: "rgba(18,21,26,0.9)",
-                        fontSize: "0.65rem",
-                        fontWeight: 800,
-                        letterSpacing: "0.18em",
-                        textTransform: "uppercase",
+                        right: 12,
+                        zIndex: 2,
+                        backgroundColor: "rgba(0,0,0,0.6)",
+                        color: "rgba(255,255,255,0.85)",
+                        opacity: 0,
+                        transition: "opacity 0.2s ease",
+                        "&:hover": { backgroundColor: "rgba(5, 5, 5, 0.75)", color: "#fca5a5" },
                       }}
                     >
-                      New
-                    </Box>
+                      {deletePending === item.id ? (
+                        <CircularProgress size={18} sx={{ color: "rgba(255,255,255,0.9)" }} />
+                      ) : (
+                        <DeleteOutlineIcon fontSize="small" />
+                      )}
+                    </IconButton>
                   )}
+                  <Link
+                    href={`/products/${item.id}?collection=${slugValue ?? ""}`}
+                    style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                  >
+                    <Box
+                      className="product-card"
+                      sx={{
+                        borderRadius: 2,
+                        backgroundColor: "rgba(38, 38, 38, 0.45)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid rgba(242,185,13,0.15)",
+                        p: 1.5,
+                        aspectRatio: "4 / 5",
+                        display: "flex",
+                        flexDirection: "column",
+                        transition: "transform 0.3s ease",
+                        position: "relative",
+                      }}
+                    >
+                      {item.tags?.includes("new") && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            px: 1,
+                            py: 0.4,
+                            borderRadius: 0.5,
+                            backgroundColor: accent,
+                            color: "rgba(18,21,26,0.9)",
+                            fontSize: "0.6rem",
+                            fontWeight: 700,
+                            letterSpacing: "0.2em",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          New
+                        </Box>
+                      )}
+                      <Box
+                        sx={{
+                          position: "relative",
+                          flexGrow: 1,
+                          borderRadius: 2,
+                          overflow: "hidden",
+                          backgroundColor: "rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        {primaryImage ? (
+                          <Box
+                            className="product-image"
+                            component="img"
+                            src={primaryImage}
+                            alt={item.name}
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center",
+                              transform: "scale(1)",
+                              filter: "grayscale(30%)",
+                              transition: "transform 0.7s ease, filter 0.7s ease",
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              position: "absolute",
+                              inset: 0,
+                              backgroundColor: "rgba(255,255,255,0.08)",
+                            }}
+                          />
+                        )}
+                      </Box>
+                      <Box
+                        sx={{
+                          pt: 2,
+                          px: 0.5,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 2,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "var(--font-playfair)",
+                            fontSize: "1.2rem",
+                            color: "rgba(255,255,255,0.95)",
+                          }}
+                        >
+                          {item.name}
+                        </Typography>
+                        <Box
+                          sx={{
+                            px: 1.2,
+                            py: 0.4,
+                            borderRadius: 1,
+                            backgroundColor: "rgba(242,185,13,0.18)",
+                            border: "1px solid rgba(242,185,13,0.35)",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "rgba(242,185,13,0.95)",
+                              fontWeight: 600,
+                              fontSize: "0.7rem",
+                              letterSpacing: "0.12em",
+                            }}
+                          >
+                            {formatCurrency(item.price)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Link>
                 </Box>
-                </Box>
-                </Link>
-              </Box>
             );
             })}
           </Box>

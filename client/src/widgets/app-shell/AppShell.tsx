@@ -7,7 +7,7 @@ import { Header } from "@/src/widgets/header";
 import { Footer } from "@/src/widgets/footer";
 
 const gradientByPath: Record<string, string> = {
-  "/": "linear-gradient(120deg, #f26a4b 0%, #f5b54c 45%, #9be15d 100%)",
+  "/": "linear-gradient(170deg,rgb(71, 105, 178) 20%,rgba(247, 150, 24, 0.85) 90%)",
   "/we": "linear-gradient(170deg,rgb(71, 105, 178) 20%,rgba(247, 150, 24, 0.85) 90%)",
   "/shop": "linear-gradient(130deg,rgb(128, 71, 203) 10%,rgb(77, 128, 114) 35%,rgb(213, 153, 24) 105%)",
   "/prestige": "linear-gradient(200deg,rgb(83, 131, 207) -10%,rgba(75, 0, 224, 0.54) 60%,rgba(237, 118, 14, 0.67) 100%)",

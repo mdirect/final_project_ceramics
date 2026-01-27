@@ -12,7 +12,7 @@ const founders = [
     role: "Master Goldsmith",
     quote:
       "\"Gold is simply sunlight captured in the earth. I just give it a voice.\"",
-    cta: "Explore Jewelry",
+    cta: "Explore more",
     image:
       "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
   },
@@ -22,7 +22,7 @@ const founders = [
     role: "Ceramic Artisan",
     quote:
       "\"The clay knows its shape before I do. My hands are just the medium.\"",
-    cta: "Explore Ceramics",
+    cta: "Explore more",
     image:
       "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1000&q=80",
   },
@@ -32,7 +32,7 @@ const founders = [
     role: "Joint Project",
     quote:
       "A limited fusion series where raw porcelain meets forged 24k gold leaf.",
-    cta: "View Series",
+    cta: "Explore more",
     image:
       "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1000&q=80",
   },
@@ -62,6 +62,7 @@ export default function ProjectsPage() {
             fontWeight: 700,
             fontSize: { xs: "2.4rem", md: "3.8rem" },
             color: "rgba(255,255,255,0.95)",
+            fontFamily: "var(--font-playfair)",
           }}
         >
           Living Concept: Our Visionaries
@@ -82,39 +83,54 @@ export default function ProjectsPage() {
       </Box>
       
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-          gap: { xs: 3, md: 4 },
-          maxWidth: 1200,
-          mx: "auto",
-          width: "100%",
-        }}
-      >
-        {founders.map((person) => (
-          <Link
-            key={person.slug}
-            href={`/projects/${person.slug}`}
-            style={{ display: "block", textDecoration: "none" }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                borderRadius: 3,
-                overflow: "hidden",
-                aspectRatio: "3 / 4",
-                backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.25) 50%, transparent 100%), url(${person.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                border: "1px solid rgba(255,255,255,0.12)",
-                transition: "transform 0.5s ease, box-shadow 0.5s ease",
-                "&:hover": {
-                  transform: "scale(1.02)",
-                  boxShadow: "0 22px 40px rgba(242,185,13,0.2)",
-                },
-              }}
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(3, 350px)" },
+            justifyContent: "center",
+            justifyItems: "stretch",
+            gap: { xs: 3, md: 4 },
+            width: "100%",
+            maxWidth: 1300,
+            marginBottom: 6,
+          }}
+        >
+          {founders.map((person) => (
+            <Link
+              key={person.slug}
+              href={`/projects/${person.slug}`}
+              style={{ display: "block", textDecoration: "none", width: "100%" }}
             >
+              <Box
+                sx={{
+                  position: "relative",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  aspectRatio: "3 / 4",
+                  width: "100%",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  transition: "box-shadow 0.5s ease",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: `linear-gradient(-5deg, rgba(0,0,0,0.8) 0%, rgba(0, 0, 0, 0.27) 60%, transparent 100%), url(${person.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    transition: "transform 0.5s ease",
+                    transform: "scale(1)",
+                    transformOrigin: "center",
+                    zIndex: 0,
+                  },
+                  "&:hover": {
+                    boxShadow: "0 12px 40px rgba(163, 162, 163, 0.46)",
+                  },
+                  "&:hover::before": {
+                    transform: "scale(1.04)",
+                  },
+                }}
+              >
               <Box
                 sx={{
                   position: "absolute",
@@ -125,13 +141,13 @@ export default function ProjectsPage() {
                   pointerEvents: "none",
                 }}
               />
-              <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 3 }}>
+              <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 3, zIndex: 1 }}>
                 <Typography
                   sx={{
                     color: accent,
                     textTransform: "uppercase",
                     letterSpacing: "0.2em",
-                    fontSize: "0.65rem",
+                    fontSize: "0.75rem",
                     fontWeight: 700,
                   }}
                 >
@@ -143,6 +159,7 @@ export default function ProjectsPage() {
                     fontSize: "1.6rem",
                     fontWeight: 700,
                     mt: 0.5,
+                    fontFamily: "var(--font-playfair)",
                   }}
                 >
                   {person.label}
@@ -169,9 +186,10 @@ export default function ProjectsPage() {
                   {person.cta} →
                 </Typography>
               </Box>
-            </Box>
-          </Link>
-        ))}
+              </Box>
+            </Link>
+          ))}
+        </Box>
       </Box>
     </Stack>
   );

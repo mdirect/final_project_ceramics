@@ -112,10 +112,8 @@ const collectionMeta: Record<
 };
 
 const collectionFilters = [
-  { label: "All Works", value: "all" },
   { label: "Jewelry", value: "jewelry" },
   { label: "Ceramics", value: "ceramics" },
-  { label: "Limited Edition", value: "limited" },
 ];
 
 const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
@@ -261,6 +259,7 @@ export default function ShopPage() {
         
         <Typography
           sx={{
+            fontFamily: "var(--font-playfair)",
             fontSize: { xs: "2.6rem", md: "4.4rem" },
             lineHeight: 1.05,
             letterSpacing: "-0.02em",
@@ -268,7 +267,13 @@ export default function ShopPage() {
             fontWeight: 300,
           }}
         >
-          The <Box component="span" sx={{ fontWeight: 700, fontStyle: "italic" }}>Collections</Box>
+          The{" "}
+          <Box
+            component="span"
+            sx={{ fontWeight: 700, fontStyle: "italic", fontFamily: "var(--font-playfair)" }}
+          >
+            Collections
+          </Box>
         </Typography>
         <Typography
           sx={{
@@ -305,16 +310,20 @@ export default function ShopPage() {
               fontWeight: 700,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              backgroundColor: activeFilter === filter.value ? accent : "rgba(255,255,255,0.08)",
-              color: activeFilter === filter.value ? "rgba(18, 21, 26, 0.9)" : "rgba(255,255,255,0.9)",
+              backgroundColor: activeFilter === filter.value ? accent : "rgba(255,255,255,0.16)",
+              color:
+                activeFilter === filter.value
+                  ? "rgba(18, 21, 26, 0.9)"
+                  : "rgba(255,255,255,0.95)",
+              border: "1px solid rgba(255,255,255,0.28)",
               "&:hover": {
                 backgroundColor:
-                  activeFilter === filter.value ? accent : "rgba(255,255,255,0.16)",
+                  activeFilter === filter.value ? accent : "rgba(255,255,255,0.24)",
               },
             }}
           />
         ))}
-        <Link href="/shop/all_jewellery" style={{ textDecoration: "none" }}>
+        <Link href="/shop/all" style={{ textDecoration: "none" }}>
           <Chip
             label="All Jewellery"
             size="medium"
@@ -324,15 +333,16 @@ export default function ShopPage() {
               fontWeight: 700,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              backgroundColor: "rgba(255,255,255,0.08)",
-              color: "rgba(255,255,255,0.9)",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+              backgroundColor: "rgba(255,255,255,0.16)",
+              color: "rgba(255,255,255,0.95)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.24)" },
             }}
           />
         </Link>
         <Link href="/shop/art_objects" style={{ textDecoration: "none" }}>
           <Chip
-            label="Art Objects"
+            label="All Art Objects"
             size="medium"
             sx={{
               borderRadius: 999,
@@ -340,9 +350,10 @@ export default function ShopPage() {
               fontWeight: 700,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              backgroundColor: "rgba(255,255,255,0.08)",
-              color: "rgba(255,255,255,0.9)",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.16)" },
+              backgroundColor: "rgba(255,255,255,0.16)",
+              color: "rgba(255,255,255,0.95)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.24)" },
             }}
           />
         </Link>
@@ -529,7 +540,7 @@ export default function ShopPage() {
                     transition: "transform 0.5s ease",
                     "&:hover": { transform: "translateY(-6px)" },
                     "&:hover .collection-image": { transform: "scale(1.08)" },
-                    "&:hover .collection-cta": { opacity: 1 },
+                    "&:hover .collection-cta": { opacity: 1, transform: "translateY(0)" },
                   }}
                 >
                   <Box
@@ -553,23 +564,22 @@ export default function ShopPage() {
                   <Box
                     sx={{
                       position: "absolute",
-                      left:16,
-                      right:16,
-                      bottom: 16,
-                      p: 2,
-                      borderRadius: 2,
-                      backgroundColor: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      backdropFilter: "blur(2px)",
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      p: 2.5,
+                      background:
+                        "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 70%)",
                     }}
                   >
                     <Typography
                       sx={{
                         color: "rgba(255,255,255,0.95)",
-                        fontSize: "1.5rem",
+                        fontSize: "1.45rem",
                         fontStyle: "italic",
                         fontWeight: 700,
                         letterSpacing: "-0.01em",
+                        fontFamily: "var(--font-playfair)",
                       }}
                     >
                       {collection.label}
@@ -577,14 +587,15 @@ export default function ShopPage() {
                     <Typography
                       className="collection-cta"
                       sx={{
-                        mt: 2,
+                        mt: 1.5,
                         color: accent,
                         fontSize: "0.7rem",
                         fontWeight: 700,
                         textTransform: "uppercase",
                         letterSpacing: "0.18em",
                         opacity: 0,
-                        transition: "opacity 0.3s ease",
+                        transform: "translateY(6px)",
+                        transition: "opacity 0.3s ease, transform 0.3s ease",
                       }}
                     >
                       Explore Collection →
