@@ -164,24 +164,31 @@ export default function ProductPage() {
 
   return (
     <Stack spacing={6}>
-      <Stack direction="row" spacing={1} sx={{ color: "rgba(255,255,255,0.5)" }}>
-        <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <Typography sx={{ fontSize: "1rem", "&:hover": { color: accent } }}>Home</Typography>
-        </Link>
-        <Typography sx={{ fontSize: "1rem" }}>/</Typography>
+      <Box>
         <Link
           href={collectionSlug ? `/collections/${collectionSlug}` : "/shop"}
-          style={{ textDecoration: "none", color: "inherit" }}
+          style={{ textDecoration: "none" }}
         >
-          <Typography sx={{ fontSize: "1rem", "&:hover": { color: accent } }}>
-            {collectionSlug ?? "Collections"}
-          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<ChevronLeftIcon sx={{ fontSize: "1.1rem" }} />}
+            sx={{
+              backgroundColor: accent,
+              color: "rgba(18,21,26,0.95)",
+              textTransform: "uppercase",
+              letterSpacing: "0.18em",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              px: 2.5,
+              borderRadius: 999,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              "&:hover": { backgroundColor: "#f6c423" },
+            }}
+          >
+            Back to collection
+          </Button>
         </Link>
-        <Typography sx={{ fontSize: "1rem" }}>/</Typography>
-        <Typography sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.9)" }}>
-          {viewName}
-        </Typography>
-      </Stack>
+      </Box>
 
       {loadError && (
         <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
@@ -228,36 +235,20 @@ export default function ProductPage() {
               </Box>
             )}
             {activeSrc ? (
-              <>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${activeSrc})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    filter: "blur(18px)",
-                    transform: "scale(1.08)",
-                    opacity: 0.35,
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${activeSrc})`,
-                    backgroundSize: "contain",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    transform: "translateZ(0)",
-                    transformOrigin: "center",
-                    willChange: "transform",
-                    backfaceVisibility: "hidden",
-                    transition: "transform 0.7s ease",
-                    "&:hover": { transform: "translateZ(0) scale(1.03)" },
-                  }}
-                />
-              </>
+              <Box
+                component="img"
+                src={activeSrc}
+                alt={viewName}
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                  objectPosition: "center",
+                  imageRendering: "auto",
+                }}
+              />
             ) : (
               <Box
                 sx={{

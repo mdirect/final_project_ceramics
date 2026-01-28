@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { Box, Stack, Typography } from "@mui/material";
-
+import Ira from "@/public/Ira.jpg";
+import Laura from "@/public/Laura.jpg";
+import Nastya from "@/public/Nastya.jpg";
 const accent = "#f2b90d";
 
 const founders = [
@@ -13,8 +15,7 @@ const founders = [
     quote:
       "\"Gold is simply sunlight captured in the earth. I just give it a voice.\"",
     cta: "Explore more",
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
+    image: Laura.src,
   },
   {
     label: "Irina Vorobjeva",
@@ -23,8 +24,7 @@ const founders = [
     quote:
       "\"The clay knows its shape before I do. My hands are just the medium.\"",
     cta: "Explore more",
-    image:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1000&q=80",
+    image: Ira.src,
   },
   {
     label: "Anastasiia Glazkova",
@@ -33,8 +33,7 @@ const founders = [
     quote:
       "A limited fusion series where raw porcelain meets forged 24k gold leaf.",
     cta: "Explore more",
-    image:
-      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1000&q=80",
+    image: Nastya.src,
   },
 ];
 

@@ -23,6 +23,7 @@ import { apiFetch } from "@/src/shared/api/http";
 import { useAuth } from "@/src/shared/providers/AuthProvider";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
@@ -167,6 +168,7 @@ export default function CollectionPage() {
   const matched = collections.find((collection) => collection.slug === slugValue);
   const configTitle = matched?.label;
   const title = collection?.title ?? configTitle ?? formatTitle(slugValue);
+  const description = collection?.description?.trim() ?? "";
 
   useEffect(() => {
     if (!slugValue) {
@@ -364,19 +366,40 @@ export default function CollectionPage() {
           alignItems: "start",
         }}
       >
-        <Box
-          component="aside"
-          sx={{
-            display: { xs: "none", md: "block" },
-            borderRadius: 1,
-            border: "1px solid rgba(242, 185, 13, 0.32)",
-            backgroundColor: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(12px)",
-            p: 2.5,
-          }}
-        >
-          <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
-            <Stack spacing={1.5}>
+        <Stack spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
+          <Link href="/shop" style={{ textDecoration: "none" }}>
+            <Button
+              variant="contained"
+              startIcon={<ChevronLeftIcon sx={{ fontSize: "1.1rem" }} />}
+              sx={{
+                width: "100%",
+                backgroundColor: accent,
+                color: "rgba(18,21,26,0.95)",
+                textTransform: "uppercase",
+                letterSpacing: "0.18em",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                px: 2.5,
+                borderRadius: 999,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                "&:hover": { backgroundColor: "#f6c423" },
+              }}
+            >
+              Back to collections
+            </Button>
+          </Link>
+          <Box
+            component="aside"
+            sx={{
+              borderRadius: 1,
+              border: "1px solid rgba(242, 185, 13, 0.32)",
+              backgroundColor: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(12px)",
+              p: 2.5,
+            }}
+          >
+            <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
+              <Stack spacing={1.5}>
               <Typography
                 sx={{
                   textTransform: "uppercase",
@@ -540,40 +563,23 @@ export default function CollectionPage() {
             </Stack>
           </Stack>
         </Box>
+        </Stack>
 
         <Stack spacing={3}>
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
-            <Box>
+          <Stack spacing={1.5}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              justifyContent={{ xs: "flex-start", sm: "flex-end" }}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              spacing={1.5}
+            >
               <Typography
                 sx={{
-                  fontSize: { xs: "2.6rem", md: "3.8rem" },
-                  fontWeight: 600,
-                  fontFamily: "var(--font-playfair)",
-                  color: "rgba(255, 255, 255, 0.98)",
-                }}
-              >
-                {title}
-              </Typography>
-              <Typography
-                sx={{
-                  color: "rgba(242,185,13,0.75)",
-                  fontSize: "0.9rem",
+                  color: "rgba(226, 232, 240, 0.9)",
+                  fontSize: "0.78rem",
                   textTransform: "uppercase",
-                  letterSpacing: "0.32em",
-                  fontWeight: 600,
-                  mt: 0.5,
-                }}
-              >
-                Collection items
-              </Typography>
-            </Box>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography
-                sx={{
-                  color: "rgba(226, 232, 240, 0.97)",
-                  fontSize: "0.82rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.2em",
+                  letterSpacing: "0.22em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 Showing {pagedItems.length} of {sortedItems.length} items
@@ -586,29 +592,70 @@ export default function CollectionPage() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <SearchIcon sx={{ fontSize: "1.3rem", color: "rgba(226,232,240,0.4)" }} />
+                      <SearchIcon sx={{ fontSize: "1.2rem", color: "rgba(226,232,240,0.45)" }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
-                  minWidth: 280,
+                  minWidth: { xs: "100%", sm: 260 },
+                  maxWidth: { xs: "100%", sm: 320 },
                   "& .MuiInputBase-input": {
-                    color: "rgba(226,232,240,0.85)",
+                    color: "rgba(226,232,240,0.9)",
                     fontSize: "0.9rem",
-                    py: 0.85,
+                    py: 0.9,
+                    px: 1.2,
                     "&::placeholder": {
-                      fontSize: "0.88rem",
+                      fontSize: "0.86rem",
                     },
                   },
                   "& .MuiOutlinedInput-root": {
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                    borderColor: "rgba(255,255,255,0.12)",
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderColor: "rgba(255,255,255,0.16)",
                     borderRadius: 999,
-                    pr: 0.5,
+                    pr: 0.6,
                   },
                 }}
               />
             </Stack>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: "2.6rem", md: "3.8rem" },
+                  fontWeight: 600,
+                  fontFamily: "var(--font-playfair)",
+                  color: "rgba(255, 255, 255, 0.98)",
+                }}
+              >
+                {title}
+              </Typography>
+              {description && (
+                <Typography
+                  sx={{
+                    color: "rgba(226, 232, 240, 0.78)",
+                    fontSize: { xs: "0.98rem", md: "1.05rem" },
+                    fontFamily: "var(--font-inter)",
+                    lineHeight: 1.8,
+                    mt: 1,
+                    maxWidth: 720,
+                  }}
+                >
+                  {description}
+                </Typography>
+              )}
+              <Typography
+                sx={{
+                  color: "rgba(242,185,13,0.75)",
+                  fontSize: "0.9rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.32em",
+                  fontWeight: 600,
+                  mt: 0.5,
+                  pt: description ? 1 : 0,
+                }}
+              >
+                Collection items
+              </Typography>
+            </Box>
           </Stack>
 
           {loadError && (
@@ -816,7 +863,6 @@ export default function CollectionPage() {
                     minWidth: 0,
                     "&:hover .delete-btn": { opacity: 1 },
                     "&:hover .product-image": {
-                      filter: "grayscale(0%)",
                       transform: "scale(1.06)",
                     },
                   }}
@@ -909,7 +955,6 @@ export default function CollectionPage() {
                               objectFit: "cover",
                               objectPosition: "center",
                               transform: "scale(1)",
-                              filter: "grayscale(30%)",
                               transition: "transform 0.7s ease, filter 0.7s ease",
                             }}
                           />

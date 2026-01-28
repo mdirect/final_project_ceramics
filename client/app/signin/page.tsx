@@ -71,7 +71,11 @@ export default function SignInPage() {
   };
 
   return (
-    <Stack spacing={5} alignItems="center" sx={{ py: { xs: 4, md: 6 } }}>
+    <Stack
+      spacing={5}
+      alignItems="center"
+      sx={{ py: { xs: 4, md: 6 }, fontFamily: "var(--font-inter)" }}
+    >
       <Stack spacing={1} textAlign="center">
         <Typography
           variant="h1"
@@ -80,7 +84,6 @@ export default function SignInPage() {
             letterSpacing: "0.01em",
             fontWeight: 500,
             fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic",
             fontSize: { xs: "2.4rem", md: "2.9rem" },
             color: "rgba(255,255,255,0.95)",
           }}
@@ -269,17 +272,6 @@ export default function SignInPage() {
           </Stack>
         </Stack>
       </Box>
-
-      <Typography
-        sx={{
-          fontSize: "0.65rem",
-          color: "rgba(255,255,255,0.4)",
-          letterSpacing: "0.28em",
-          textTransform: "uppercase",
-        }}
-      >
-        WSE Jewellery • Ceramic collections and projects
-      </Typography>
       <Snackbar
         open={Boolean(toast)}
         autoHideDuration={3500}
