@@ -2,27 +2,14 @@ import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { tag } from './seeds/tag';
+import { user } from './seeds/user';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.createMany({
-    skipDuplicates: true,
-    data: [
-      {
-        name: 'Админ',
-        email: 'admin@ya.ru',
-        password: await hash('Qwerty1!', 10),
-        role: 'ADMIN',
-      },
-      {
-        name: 'Дарья',
-        email: 'test@ya.ru',
-        password: await hash('Qwerty1!', 10),
-      },
-    ],
-  });
-  console.log('Users seeds done');
+  await user(prisma);
+  await tag(prisma);
 
   const seedDir = join(__dirname, 'seed-data');
   const collectionsPath = join(seedDir, 'collections.json');
@@ -30,8 +17,14 @@ async function main() {
 
   const collectionsSeed = JSON.parse(
     readFileSync(collectionsPath, 'utf-8'),
-  ) as Array<{ title: string; description?: string | null; image?: string | null }>;
-  const productsSeed = JSON.parse(readFileSync(productsPath, 'utf-8')) as Array<{
+  ) as Array<{
+    title: string;
+    description?: string | null;
+    image?: string | null;
+  }>;
+  const productsSeed = JSON.parse(
+    readFileSync(productsPath, 'utf-8'),
+  ) as Array<{
     name: string;
     desc?: string | null;
     image?: string | null;
@@ -97,6 +90,23 @@ async function main() {
     });
   }
   console.log('Products seeds done');
+
+  await prisma.productTagLink.createMany({
+    data: [
+      { productId: 1, tagId: 1 },
+      { productId: 1, tagId: 6 },
+      { productId: 1, tagId: 12 },
+      { productId: 1, tagId: 15 },
+      { productId: 1, tagId: 19 },
+      { productId: 2, tagId: 5 },
+      { productId: 2, tagId: 7 },
+      { productId: 2, tagId: 13 },
+      { productId: 2, tagId: 17 },
+      { productId: 2, tagId: 21 },
+      { productId: 2, tagId: 23 },
+    ],
+  });
+  console.log('Link tag and product seeds done');
 
   await prisma.event.createMany({
     data: [

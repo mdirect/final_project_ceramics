@@ -5,6 +5,9 @@ CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED');
 
 -- CreateEnum
+CREATE TYPE "Filter" AS ENUM ('Form', 'Color', 'Glaze_type', 'Composition_type', 'Production_type', 'Motif_type');
+
+-- CreateEnum
 CREATE TYPE "EventStatus" AS ENUM ('UPCOMING', 'PAST');
 
 -- CreateTable
@@ -90,6 +93,28 @@ CREATE TABLE "Product" (
 );
 
 -- CreateTable
+CREATE TABLE "Tag" (
+    "id" SERIAL NOT NULL,
+    "filter" "Filter" NOT NULL,
+    "tag" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProductTagLink" (
+    "id" SERIAL NOT NULL,
+    "productId" INTEGER NOT NULL,
+    "tagId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ProductTagLink_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Worker" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
@@ -170,6 +195,15 @@ CREATE UNIQUE INDEX "Cart_userId_productId_key" ON "Cart"("userId", "productId")
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_number_key" ON "Order"("number");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Collection_title_key" ON "Collection"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_collectionId_name_key" ON "Product"("collectionId", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProductTagLink_productId_tagId_key" ON "ProductTagLink"("productId", "tagId");
+
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -187,6 +221,12 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "Collection"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductTagLink" ADD CONSTRAINT "ProductTagLink_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductTagLink" ADD CONSTRAINT "ProductTagLink_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_workerId_fkey" FOREIGN KEY ("workerId") REFERENCES "Worker"("id") ON DELETE CASCADE ON UPDATE CASCADE;

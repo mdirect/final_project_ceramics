@@ -18,6 +18,7 @@ import { PostModule } from './post/post.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OrderItemModule } from './order-item/order-item.module';
     EventModule,
     CatalogModule,
     PostModule,
+    TagModule,
     CartModule,
     WorkerModule,
     ProjectModule,
