@@ -149,6 +149,9 @@ export default function CollectionPage() {
     price: "",
     image: "",
     desc: "",
+    finish: "",
+    material: "",
+    important: "",
   });
   const imageUrls = useMemo(() => parseImageUrls(formState.image), [formState.image]);
   const hasImageUrl = imageUrls.length > 0;
@@ -276,11 +279,22 @@ export default function CollectionPage() {
           image: images[0] ?? null,
           images: images.length > 0 ? images : null,
           desc: formState.desc.trim() || null,
+          finish: formState.finish.trim() || null,
+          material: formState.material.trim() || null,
+          important: formState.important.trim() || null,
           collectionId: collection.id,
         }),
       });
       setProducts((current) => [created, ...current]);
-      setFormState({ name: "", price: "", image: "", desc: "" });
+      setFormState({
+        name: "",
+        price: "",
+        image: "",
+        desc: "",
+        finish: "",
+        material: "",
+        important: "",
+      });
     } catch (error) {
       setActionError(
         error instanceof Error ? error.message : "Failed to add product.",
@@ -759,6 +773,8 @@ export default function CollectionPage() {
                     placeholder="https://... (multiple allowed, comma or newline)"
                     fullWidth
                     size="small"
+                    multiline
+                    minRows={4}
                     error={hasImageUrl && !isImageUrlValid}
                     helperText={
                       hasImageUrl && !isImageUrlValid
@@ -784,6 +800,8 @@ export default function CollectionPage() {
                     placeholder="Short description"
                     fullWidth
                     size="small"
+                  multiline
+                  minRows={4}
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
                       "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
@@ -794,6 +812,62 @@ export default function CollectionPage() {
                     }}
                   />
                 </Stack>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                <TextField
+                  value={formState.finish}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, finish: event.target.value }))
+                  }
+                  label="Finish"
+                  placeholder="For example polished / matte"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  value={formState.material}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, material: event.target.value }))
+                  }
+                  label="Material"
+                  placeholder="For example porcelain, 18k gold"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  value={formState.important}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, important: event.target.value }))
+                  }
+                  label="Important"
+                  placeholder="Care note or warning"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+              </Stack>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
                   <Button
                     variant="contained"
