@@ -19,27 +19,27 @@ type PersonProjects = {
 const personProjects: Record<string, PersonProjects> = {
   "laura-winter": {
     name: "Laura Winter",
-    title: "Ритуалы украшений",
+    title: "Jewelry Rituals",
     bio:
-      "Лора соединяет металл с керамикой, превращая украшения в историю прикосновения. Она работает с патиной, рваной фактурой и мягким светом серебра.",
+      "Laura connects metal with ceramics, turning jewelry into a story of touch. She works with patina, raw textures, and the soft glow of silver.",
     contact: {
-      label: "Связаться",
+      label: "Contact",
       value: "hello@winter-sparrow-eye.com",
     },
     projects: [
       {
         title: "Ritual Collar",
         description:
-          "Серия колье, вдохновленная линией речного ила и следом веревки на мокрой глине.",
-        price: "от 420 €",
+          "A necklace series inspired by river silt lines and rope traces on wet clay.",
+        price: "from €420",
         image:
           "https://images.unsplash.com/photo-1456327102063-fb5054efe647?auto=format&fit=crop&w=1200&q=80",
       },
       {
         title: "Silent Runes",
         description:
-          "Кулоны с керамическими вставками, созданные для дневниковых ритуалов и личных оберегов.",
-        price: "от 280 €",
+          "Pendants with ceramic inserts made for journal rituals and personal talismans.",
+        price: "from €280",
         image:
           "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80",
       },
@@ -47,27 +47,27 @@ const personProjects: Record<string, PersonProjects> = {
   },
   "irina-vorobjeva": {
     name: "Irina Vorobjeva",
-    title: "Тактильные пространства",
+    title: "Tactile Spaces",
     bio:
-      "Ирина выстраивает архитектуру из глины: модульные формы, грубая глазурь и драматичный свет внутри пространства.",
+      "Irina builds architecture from clay: modular forms, rough glaze, and dramatic light within space.",
     contact: {
-      label: "Связаться",
+      label: "Contact",
       value: "studio@winter-sparrow-eye.com",
     },
     projects: [
       {
         title: "Clay Terrain",
         description:
-          "Настенные панели с рельефом, повторяющим движение песка и морских волн.",
-        price: "от 680 €",
+          "Wall panels with reliefs that echo the movement of sand and sea waves.",
+        price: "from €680",
         image:
           "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
       },
       {
         title: "Slow Tables",
         description:
-          "Столы из керамических плит с микро-трещинами, стабилизированными бронзой.",
-        price: "от 1200 €",
+          "Tables made from ceramic slabs with micro-cracks stabilized by bronze.",
+        price: "from €1200",
         image:
           "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
       },
@@ -75,27 +75,27 @@ const personProjects: Record<string, PersonProjects> = {
   },
   "anastasiia-glazkova": {
     name: "Anastasiia Glazkova",
-    title: "Глазурная поэтика",
+    title: "Glaze Poetics",
     bio:
-      "Анастасия создает визуальные истории, где цвет глазури играет роль памяти. Ее проекты — это смесь живописи, керамики и света.",
+      "Anastasiia creates visual stories where glaze color becomes memory. Her projects blend painting, ceramics, and light.",
     contact: {
-      label: "Связаться",
+      label: "Contact",
       value: "projects@winter-sparrow-eye.com",
     },
     projects: [
       {
         title: "Light Vessels",
         description:
-          "Световые объекты, в которых полупрозрачная глазурь работает как фильтр.",
-        price: "от 540 €",
+          "Light objects where semi‑transparent glaze acts like a filter.",
+        price: "from €540",
         image:
           "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80",
       },
       {
         title: "Glaze Letters",
         description:
-          "Набор настенных панно, рассказывающих о личных архивах и письмах.",
-        price: "от 360 €",
+          "A series of wall panels that tell stories of personal archives and letters.",
+        price: "from €360",
         image:
           "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80",
       },
@@ -176,7 +176,7 @@ export default async function ProjectsPersonPage({
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          Эта страница не найдена. Выберите автора ниже.
+          This page was not found. Choose an author below.
         </Typography>
         <Stack spacing={1} alignItems="center">
           {Object.entries(personProjects).map(([personSlug, info]) => (

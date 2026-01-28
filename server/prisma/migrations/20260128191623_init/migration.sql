@@ -84,6 +84,8 @@ CREATE TABLE "Product" (
     "desc" TEXT,
     "image" TEXT,
     "material" TEXT,
+    "finish" TEXT,
+    "important" TEXT,
     "images" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "price" DECIMAL(10,2) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

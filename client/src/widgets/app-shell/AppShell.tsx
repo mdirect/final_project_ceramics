@@ -15,8 +15,8 @@ const gradientByPath: Record<string, string> = {
   "/events": "linear-gradient(145deg, #0f2027 0%, #2c5364 45%, #f7c873 100%)",
   "/contacts": "linear-gradient(145deg, #2b5876 0%, #4e4376 50%, #f8cdda 100%)",
   "/policy": "linear-gradient(145deg, #1a2a3a 0%, #3f5c7a 55%,rgb(66, 187, 114) 100%)",
-  "/signin": "linear-gradient(185deg, #20243a 0%, #4a4f87 60%,rgb(198, 88, 63) 90%)",
-  "/cart": "linear-gradient(150deg, #16222a 0%, #3a6073 60%, #f2c94c 90%)",
+  "/signin": "linear-gradient(185deg,rgba(55, 85, 119, 0.73) 0%, #4a4f87 60%,rgba(198, 88, 63, 0.77) 90%)",
+  "/cart": "linear-gradient(150deg,rgba(60, 137, 114, 0.86) 0%, #3a6073 60%,rgba(242, 200, 76, 0.47) 90%)",
 };
 
 function resolveGradient(pathname: string) {
@@ -89,7 +89,7 @@ export function AppShell({ children }: PropsWithChildren) {
             sx={{
               width: "100%",
               height: "100%",
-              opacity: 0.2,
+              opacity: 0.12,
             }}
           >
             <text
@@ -115,7 +115,7 @@ export function AppShell({ children }: PropsWithChildren) {
             display: "flex",
             justifyContent: "center",
             mt: "clamp(20px, 6vh, 80px)",
-            opacity: 0.22,
+            opacity: 0.12,
           }}
         >
           <Box

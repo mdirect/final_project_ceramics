@@ -92,12 +92,11 @@ export default function SignUpPage() {
             letterSpacing: "0.01em",
             fontWeight: 500,
             fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic",
             fontSize: { xs: "2.4rem", md: "2.9rem" },
             color: "rgba(255,255,255,0.95)",
           }}
         >
-          Registration
+          Sign up
         </Typography>
         <Typography
           sx={{
@@ -366,17 +365,6 @@ export default function SignUpPage() {
           </Stack>
         </Stack>
       </Box>
-
-      <Typography
-        sx={{
-          fontSize: "0.65rem",
-          color: "rgba(255,255,255,0.4)",
-          letterSpacing: "0.28em",
-          textTransform: "uppercase",
-        }}
-      >
-        WSE Jewellery • Ceramic collections and projects
-      </Typography>
       <Snackbar
         open={Boolean(toast)}
         autoHideDuration={3500}

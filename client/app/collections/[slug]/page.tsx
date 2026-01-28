@@ -23,6 +23,7 @@ import { apiFetch } from "@/src/shared/api/http";
 import { useAuth } from "@/src/shared/providers/AuthProvider";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
@@ -82,44 +83,37 @@ const filterGroups = [
   {
     id: "color",
     label: "Color",
-    options: ["Colourful", "White", "Black", "Yellow", "Green"],
+    options: ["Mixed color", "White", "Black", "Yellow", "Green"],
   },
   {
-    id: "surface",
-    label: "Surface medium",
-    options: ["Glaze", "Engobe", "Acrylic", "Epoxy resin", "Light-reflecting pigment"],
+    id: "Glaze type",
+    label: "Glaze type",
+    options: ["Ceramically glazed", "Non-ceramically glazed", "Unglazed"],
   },
   {
-    id: "hanging",
-    label: "Hanging material",
-    options: ["Chain", "Beading wire", "Memory wire", "Decorative cord"],
-  },
-  {
-    id: "composition",
+    id: "Composition type",
     label: "Composition type",
-    options: ["Multi-part jewelry", "Single-piece jewelry"],
+    options: ["Multi-part jewellery", " One-part jewellery"],
   },
   {
-    id: "production",
+    id: "Production type",
     label: "Production type",
-    options: ["Regularly", "May be repeated", "Part of collection", "Single piece"],
+    options: ["Regular", "May be repeated", "Part of collection", "Single piece"],
   },
   {
-    id: "animal",
-    label: "Animal motif",
+    id: "Motif type",
+    label: "Motif type",
     options: [
-      "Seal",
-      "Bird",
-      "Camel",
-      "Antelope",
-      "Deer",
-      "Lizard",
-      "Bear",
-      "Squirrel",
-      "Beetle",
-      "Spider",
-      "Donkey",
-      "Cat",
+      "Animalistic",
+      "People",
+      "Mythology",
+      "Esoteric",
+      "Figurative",
+      "Ornamental",
+      "Still life",
+      "Abstract",
+      "Body part",
+      "Story",
     ],
   },
 ];
@@ -155,6 +149,9 @@ export default function CollectionPage() {
     price: "",
     image: "",
     desc: "",
+    finish: "",
+    material: "",
+    important: "",
   });
   const imageUrls = useMemo(() => parseImageUrls(formState.image), [formState.image]);
   const hasImageUrl = imageUrls.length > 0;
@@ -174,6 +171,7 @@ export default function CollectionPage() {
   const matched = collections.find((collection) => collection.slug === slugValue);
   const configTitle = matched?.label;
   const title = collection?.title ?? configTitle ?? formatTitle(slugValue);
+  const description = collection?.description?.trim() ?? "";
 
   useEffect(() => {
     if (!slugValue) {
@@ -207,7 +205,7 @@ export default function CollectionPage() {
           if (!cancelled) {
             setCollection(null);
             setProducts([]);
-            setLoadError("Коллекция не найдена в базе данных.");
+            setLoadError("Collection not found in the database.");
           }
           return;
         }
@@ -227,7 +225,7 @@ export default function CollectionPage() {
           setLoadError(
             error instanceof Error
               ? error.message
-              : "Не удалось загрузить товары.",
+              : "Failed to load products.",
           );
         }
       } finally {
@@ -246,7 +244,7 @@ export default function CollectionPage() {
 
   const handleCreateProduct = async () => {
     if (!collection) {
-      setActionError("Не удалось определить коллекцию для товара.");
+      setActionError("Unable to determine collection for the product.");
       return;
     }
 
@@ -254,17 +252,17 @@ export default function CollectionPage() {
     const priceValue = Number(formState.price);
 
     if (!name) {
-      setActionError("Название товара обязательно.");
+      setActionError("Product name is required.");
       return;
     }
 
     if (!formState.price || Number.isNaN(priceValue) || priceValue <= 0) {
-      setActionError("Цена должна быть числом больше 0.");
+      setActionError("Price must be a number greater than 0.");
       return;
     }
 
     if (!isImageUrlValid) {
-      setActionError("Нужны прямые ссылки на файлы (.jpg/.png/.webp).");
+      setActionError("Direct file links are required (.jpg/.png/.webp).");
       return;
     }
 
@@ -281,14 +279,25 @@ export default function CollectionPage() {
           image: images[0] ?? null,
           images: images.length > 0 ? images : null,
           desc: formState.desc.trim() || null,
+          finish: formState.finish.trim() || null,
+          material: formState.material.trim() || null,
+          important: formState.important.trim() || null,
           collectionId: collection.id,
         }),
       });
       setProducts((current) => [created, ...current]);
-      setFormState({ name: "", price: "", image: "", desc: "" });
+      setFormState({
+        name: "",
+        price: "",
+        image: "",
+        desc: "",
+        finish: "",
+        material: "",
+        important: "",
+      });
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Не удалось добавить товар.",
+        error instanceof Error ? error.message : "Failed to add product.",
       );
     } finally {
       setIsSaving(false);
@@ -303,7 +312,7 @@ export default function CollectionPage() {
       setProducts((current) => current.filter((item) => item.id !== id));
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Не удалось удалить товар.",
+        error instanceof Error ? error.message : "Failed to remove product.",
       );
     } finally {
       setDeletePending(null);
@@ -371,19 +380,40 @@ export default function CollectionPage() {
           alignItems: "start",
         }}
       >
-        <Box
-          component="aside"
-          sx={{
-            display: { xs: "none", md: "block" },
-            borderRadius: 1,
-            border: "1px solid rgba(242, 185, 13, 0.32)",
-            backgroundColor: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(12px)",
-            p: 2.5,
-          }}
-        >
-          <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
-            <Stack spacing={1.5}>
+        <Stack spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
+          <Link href="/shop" style={{ textDecoration: "none" }}>
+            <Button
+              variant="contained"
+              startIcon={<ChevronLeftIcon sx={{ fontSize: "1.1rem" }} />}
+              sx={{
+                width: "100%",
+                backgroundColor: accent,
+                color: "rgba(18,21,26,0.95)",
+                textTransform: "uppercase",
+                letterSpacing: "0.18em",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                px: 2.5,
+                borderRadius: 999,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                "&:hover": { backgroundColor: "#f6c423" },
+              }}
+            >
+              Back to collections
+            </Button>
+          </Link>
+          <Box
+            component="aside"
+            sx={{
+              borderRadius: 1,
+              border: "1px solid rgba(242, 185, 13, 0.32)",
+              backgroundColor: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(12px)",
+              p: 2.5,
+            }}
+          >
+            <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
+              <Stack spacing={1.5}>
               <Typography
                 sx={{
                   textTransform: "uppercase",
@@ -547,40 +577,23 @@ export default function CollectionPage() {
             </Stack>
           </Stack>
         </Box>
+        </Stack>
 
         <Stack spacing={3}>
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
-            <Box>
+          <Stack spacing={1.5}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              justifyContent={{ xs: "flex-start", sm: "flex-end" }}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              spacing={1.5}
+            >
               <Typography
                 sx={{
-                  fontSize: { xs: "2.6rem", md: "3.8rem" },
-                  fontWeight: 600,
-                  fontFamily: "var(--font-playfair)",
-                  color: "rgba(255, 255, 255, 0.98)",
-                }}
-              >
-                {title}
-              </Typography>
-              <Typography
-                sx={{
-                  color: "rgba(242,185,13,0.75)",
-                  fontSize: "0.9rem",
+                  color: "rgba(226, 232, 240, 0.9)",
+                  fontSize: "0.78rem",
                   textTransform: "uppercase",
-                  letterSpacing: "0.32em",
-                  fontWeight: 600,
-                  mt: 0.5,
-                }}
-              >
-                Collection items
-              </Typography>
-            </Box>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography
-                sx={{
-                  color: "rgba(226, 232, 240, 0.97)",
-                  fontSize: "0.82rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.2em",
+                  letterSpacing: "0.22em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 Showing {pagedItems.length} of {sortedItems.length} items
@@ -593,29 +606,70 @@ export default function CollectionPage() {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <SearchIcon sx={{ fontSize: "1.3rem", color: "rgba(226,232,240,0.4)" }} />
+                      <SearchIcon sx={{ fontSize: "1.2rem", color: "rgba(226,232,240,0.45)" }} />
                     </InputAdornment>
                   ),
                 }}
                 sx={{
-                  minWidth: 280,
+                  minWidth: { xs: "100%", sm: 260 },
+                  maxWidth: { xs: "100%", sm: 320 },
                   "& .MuiInputBase-input": {
-                    color: "rgba(226,232,240,0.85)",
+                    color: "rgba(226,232,240,0.9)",
                     fontSize: "0.9rem",
-                    py: 0.85,
+                    py: 0.9,
+                    px: 1.2,
                     "&::placeholder": {
-                      fontSize: "0.88rem",
+                      fontSize: "0.86rem",
                     },
                   },
                   "& .MuiOutlinedInput-root": {
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                    borderColor: "rgba(255,255,255,0.12)",
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderColor: "rgba(255,255,255,0.16)",
                     borderRadius: 999,
-                    pr: 0.5,
+                    pr: 0.6,
                   },
                 }}
               />
             </Stack>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: "2.6rem", md: "3.8rem" },
+                  fontWeight: 600,
+                  fontFamily: "var(--font-playfair)",
+                  color: "rgba(255, 255, 255, 0.98)",
+                }}
+              >
+                {title}
+              </Typography>
+              {description && (
+                <Typography
+                  sx={{
+                    color: "rgba(226, 232, 240, 0.78)",
+                    fontSize: { xs: "0.98rem", md: "1.05rem" },
+                    fontFamily: "var(--font-inter)",
+                    lineHeight: 1.8,
+                    mt: 1,
+                    maxWidth: 720,
+                  }}
+                >
+                  {description}
+                </Typography>
+              )}
+              <Typography
+                sx={{
+                  color: "rgba(242,185,13,0.75)",
+                  fontSize: "0.9rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.32em",
+                  fontWeight: 600,
+                  mt: 0.5,
+                  pt: description ? 1 : 0,
+                }}
+              >
+                Collection items
+              </Typography>
+            </Box>
           </Stack>
 
           {loadError && (
@@ -645,7 +699,7 @@ export default function CollectionPage() {
                       fontSize: "0.62rem",
                     }}
                   >
-                    Админ-панель
+                    Admin panel
                   </Typography>
                 </Stack>
                 <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -654,8 +708,8 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, name: event.target.value }))
                     }
-                    label="Название"
-                    placeholder="Название товара"
+                    label="Name"
+                    placeholder="Product name"
                     fullWidth
                     size="small"
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -672,8 +726,8 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, price: event.target.value }))
                     }
-                    label="Цена"
-                    placeholder="Например 120"
+                    label="Price"
+                    placeholder="For example 120"
                     fullWidth
                     size="small"
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -715,14 +769,16 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, image: event.target.value }))
                     }
-                    label="URL изображения"
-                    placeholder="https://... (можно несколько через запятую или новую строку)"
+                    label="Image URL"
+                    placeholder="https://... (multiple allowed, comma or newline)"
                     fullWidth
                     size="small"
+                    multiline
+                    minRows={4}
                     error={hasImageUrl && !isImageUrlValid}
                     helperText={
                       hasImageUrl && !isImageUrlValid
-                        ? "Нужны прямые ссылки на файлы (.jpg/.png/.webp)"
+                        ? "Direct file links required (.jpg/.png/.webp)"
                         : " "
                     }
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
@@ -740,10 +796,12 @@ export default function CollectionPage() {
                     onChange={(event) =>
                       setFormState((current) => ({ ...current, desc: event.target.value }))
                     }
-                    label="Описание"
-                    placeholder="Короткое описание"
+                    label="Description"
+                    placeholder="Short description"
                     fullWidth
                     size="small"
+                  multiline
+                  minRows={4}
                     InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
                     sx={{
                       "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
@@ -754,6 +812,62 @@ export default function CollectionPage() {
                     }}
                   />
                 </Stack>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+                <TextField
+                  value={formState.finish}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, finish: event.target.value }))
+                  }
+                  label="Finish"
+                  placeholder="For example polished / matte"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  value={formState.material}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, material: event.target.value }))
+                  }
+                  label="Material"
+                  placeholder="For example porcelain, 18k gold"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+                <TextField
+                  value={formState.important}
+                  onChange={(event) =>
+                    setFormState((current) => ({ ...current, important: event.target.value }))
+                  }
+                  label="Important"
+                  placeholder="Care note or warning"
+                  fullWidth
+                  size="small"
+                  InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                  sx={{
+                    "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "rgba(0,0,0,0.35)",
+                      borderRadius: 1,
+                    },
+                  }}
+                />
+              </Stack>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
                   <Button
                     variant="contained"
@@ -769,7 +883,7 @@ export default function CollectionPage() {
                       "&:hover": { backgroundColor: "#f7cd4c" },
                     }}
                   >
-                    {isSaving ? "Сохранение..." : "Добавить товар"}
+                    {isSaving ? "Saving..." : "Add product"}
                   </Button>
                   {actionError && (
                     <Alert severity="error" sx={{ flex: 1 }}>
@@ -809,7 +923,7 @@ export default function CollectionPage() {
             {!isLoading && sortedItems.length === 0 && (
               <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
                 <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
-                  Пока нет товаров в этой коллекции.
+                  No products in this collection yet.
                 </Typography>
               </Box>
             )}
@@ -823,7 +937,6 @@ export default function CollectionPage() {
                     minWidth: 0,
                     "&:hover .delete-btn": { opacity: 1 },
                     "&:hover .product-image": {
-                      filter: "grayscale(0%)",
                       transform: "scale(1.06)",
                     },
                   }}
@@ -916,7 +1029,6 @@ export default function CollectionPage() {
                               objectFit: "cover",
                               objectPosition: "center",
                               transform: "scale(1)",
-                              filter: "grayscale(30%)",
                               transition: "transform 0.7s ease, filter 0.7s ease",
                             }}
                           />

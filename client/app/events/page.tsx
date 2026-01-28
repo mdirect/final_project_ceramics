@@ -53,7 +53,10 @@ const primaryColor = "rgba(242,185,13,0.95)";
 
 export default function EventsPage() {
   return (
-    <Stack spacing={8} sx={{ py: { xs: 4, md: 8 }, position: "relative" }}>
+    <Stack
+      spacing={5}
+      sx={{ py: { xs: 4, md: 8 }, position: "relative", fontFamily: "var(--font-inter)" }}
+    >
       <Box
         sx={{
           position: "absolute",
@@ -102,6 +105,7 @@ export default function EventsPage() {
             letterSpacing: "-0.02em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.96)",
+            fontFamily: "var(--font-playfair)",
           }}
         >
           Events

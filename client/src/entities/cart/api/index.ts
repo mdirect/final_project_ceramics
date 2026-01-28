@@ -1,5 +1,8 @@
 export const cartApi = {
-  get: "/api/cart",
-  update: "/api/cart",
+  get: "/cart",
+  add: "/cart",
+  update: (productId: number) => `/cart/${productId}`,
+  remove: (productId: number) => `/cart/${productId}`,
+  clear: "/cart",
 };
 

@@ -202,7 +202,7 @@ export default function ShopPage() {
       } catch (error) {
         if (!cancelled) {
           setCollectionsError(
-            error instanceof Error ? error.message : "Не удалось загрузить коллекции.",
+            error instanceof Error ? error.message : "Failed to load collections.",
           );
         }
       } finally {
@@ -220,12 +220,12 @@ export default function ShopPage() {
   const handleCreateCollection = async () => {
     const title = collectionForm.title.trim();
     if (!title) {
-      setCollectionError("Название коллекции обязательно.");
+      setCollectionError("Collection name is required.");
       return;
     }
 
     if (hasCollectionImage && !isCollectionImageValid) {
-      setCollectionError("Нужна прямая ссылка на файл (.jpg/.png/.webp).");
+      setCollectionError("Direct file link required (.jpg/.png/.webp).");
       return;
     }
 
@@ -242,11 +242,11 @@ export default function ShopPage() {
           image: trimmedCollectionImage || null,
         }),
       });
-      setCollectionMessage("Коллекция добавлена.");
+      setCollectionMessage("Collection added.");
       setCollectionForm({ title: "", description: "", image: "" });
     } catch (error) {
       setCollectionError(
-        error instanceof Error ? error.message : "Не удалось добавить коллекцию.",
+        error instanceof Error ? error.message : "Failed to add collection.",
       );
     } finally {
       setIsCollectionSaving(false);
@@ -371,7 +371,7 @@ export default function ShopPage() {
       >
         <Stack spacing={2}>
           <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-            Админ-панель: добавить коллекцию
+            Admin panel: add collection
           </Typography>
           <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
             <TextField
@@ -382,8 +382,8 @@ export default function ShopPage() {
                   title: event.target.value,
                 }))
               }
-              label="Название"
-              placeholder="Название коллекции"
+              label="Name"
+              placeholder="Collection name"
               fullWidth
               size="small"
               InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
@@ -402,14 +402,14 @@ export default function ShopPage() {
                   image: event.target.value,
                 }))
               }
-              label="URL изображения"
+              label="Image URL"
               placeholder="https://..."
               fullWidth
               size="small"
               error={hasCollectionImage && !isCollectionImageValid}
               helperText={
                 hasCollectionImage && !isCollectionImageValid
-                  ? "Нужна прямая ссылка на файл (.jpg/.png/.webp)"
+                  ? "Direct file link required (.jpg/.png/.webp)"
                   : " "
               }
               InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
@@ -430,8 +430,8 @@ export default function ShopPage() {
                 description: event.target.value,
               }))
             }
-            label="Описание"
-            placeholder="Короткое описание"
+            label="Description"
+            placeholder="Short description"
             fullWidth
             size="small"
             multiline
@@ -457,7 +457,7 @@ export default function ShopPage() {
                 "&:hover": { backgroundColor: "#f7cd4c" },
               }}
             >
-              {isCollectionSaving ? "Сохранение..." : "Добавить коллекцию"}
+              {isCollectionSaving ? "Saving..." : "Add collection"}
             </Button>
             {collectionError && (
               <Alert severity="error" sx={{ flex: 1 }}>
@@ -500,14 +500,14 @@ export default function ShopPage() {
             }}
           >
             <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
-              Загрузка коллекций...
+              Loading collections...
             </Typography>
           </Box>
         )}
         {!collectionsLoading && pageCollections.length === 0 && (
           <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
             <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
-              Коллекций пока нет.
+              No collections yet.
             </Typography>
           </Box>
         )}

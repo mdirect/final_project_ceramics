@@ -106,15 +106,18 @@ model Product {
   desc         String?
   image        String?
   material     String?
+  finish       String?
+  important    String?
   images       String[] @default([])
   price        Decimal  @db.Decimal(10, 2)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  collection      Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  carts           Cart[]
-  orderItems      OrderItem[]
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  carts        Cart[]
+  orderItems   OrderItem[]
   productTagLink  ProductTagLink[]
+
   @@unique([collectionId, name])
 }
 

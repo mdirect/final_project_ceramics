@@ -137,7 +137,7 @@ export default function ShopAllPage() {
       } catch (error) {
         if (!cancelled) {
           setLoadError(
-            error instanceof Error ? error.message : "Не удалось загрузить товары.",
+            error instanceof Error ? error.message : "Failed to load products.",
           );
         }
       } finally {
@@ -161,7 +161,7 @@ export default function ShopAllPage() {
       setProducts((current) => current.filter((item) => item.id !== id));
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Не удалось удалить товар.",
+        error instanceof Error ? error.message : "Failed to remove product.",
       );
     } finally {
       setDeletePending(null);
@@ -520,7 +520,7 @@ export default function ShopAllPage() {
             {!isLoading && sortedItems.length === 0 && (
               <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 4 }}>
                 <Typography sx={{ color: "rgba(255,255,255,0.6)" }}>
-                  Пока нет товаров.
+                  No products yet.
                 </Typography>
               </Box>
             )}
