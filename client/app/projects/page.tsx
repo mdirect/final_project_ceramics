@@ -18,15 +18,6 @@ const founders = [
     image: Laura.src,
   },
   {
-    label: "Irina Vorobjeva",
-    slug: "irina-vorobjeva",
-    role: "Ceramic Artisan",
-    quote:
-      "\"The clay knows its shape before I do. My hands are just the medium.\"",
-    cta: "Explore more",
-    image: Ira.src,
-  },
-  {
     label: "Anastasiia Glazkova",
     slug: "anastasiia-glazkova",
     role: "Joint Project",
@@ -35,24 +26,22 @@ const founders = [
     cta: "Explore more",
     image: Nastya.src,
   },
+  {
+    label: "Irina Vorobeva",
+    slug: "irina-vorobjeva",
+    role: "Ceramic Artisan",
+    quote:
+      "\"The clay knows its shape before I do. My hands are just the medium.\"",
+    cta: "Explore more",
+    image: Ira.src,
+  },
 ];
 
 export default function ProjectsPage() {
   return (
     <Stack spacing={6}>
       <Box sx={{ textAlign: "center", pt: { xs: 2, md: 4 } }}>
-        <Typography
-          sx={{
-            textTransform: "uppercase",
-            letterSpacing: "0.3em",
-            fontSize: "0.7rem",
-            fontWeight: 700,
-            color: accent,
-            mb: 2,
-          }}
-        >
-          Creative Direction
-        </Typography>
+        
         <Typography
           variant="h1"
           sx={{
@@ -64,21 +53,9 @@ export default function ProjectsPage() {
             fontFamily: "var(--font-playfair)",
           }}
         >
-          Living Concept: Our Visionaries
+          Projects
         </Typography>
-        <Typography
-          sx={{
-            mt: 2,
-            color: "rgba(255,255,255,0.65)",
-            maxWidth: 760,
-            mx: "auto",
-            fontSize: { xs: "1rem", md: "1.1rem" },
-            lineHeight: 1.9,
-          }}
-        >
-          A dialogue between earth and metal. Discover the two minds bridging the
-          gap between ancient craft and modern silhouette.
-        </Typography>
+        
       </Box>
       
 
@@ -86,13 +63,14 @@ export default function ProjectsPage() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(3, 350px)" },
+            gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(3, 430px)" },
             justifyContent: "center",
             justifyItems: "stretch",
             gap: { xs: 3, md: 4 },
             width: "100%",
-            maxWidth: 1300,
+            maxWidth: 1450,
             marginBottom: 6,
+            marginTop: 6,
           }}
         >
           {founders.map((person) => (
@@ -141,17 +119,7 @@ export default function ProjectsPage() {
                 }}
               />
               <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 3, zIndex: 1 }}>
-                <Typography
-                  sx={{
-                    color: accent,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.2em",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                  }}
-                >
-                  {person.role}
-                </Typography>
+                
                 <Typography
                   sx={{
                     color: "rgba(255,255,255,0.95)",
@@ -163,27 +131,7 @@ export default function ProjectsPage() {
                 >
                   {person.label}
                 </Typography>
-                <Typography
-                  sx={{
-                    color: "rgba(255,255,255,0.7)",
-                    fontSize: "0.85rem",
-                    mt: 1,
-                    mb: 2,
-                  }}
-                >
-                  {person.quote}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: accent,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.18em",
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                  }}
-                >
-                  {person.cta} →
-                </Typography>
+                
               </Box>
               </Box>
             </Link>

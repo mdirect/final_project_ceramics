@@ -251,7 +251,7 @@ export default function ContactsPage() {
                 <Box>
                   <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>Phone</Typography>
                   <Typography sx={{ fontSize: "1.05rem" }}>
-                    +7 (000) 000-00-00
+                  06817274330
                   </Typography>
                 </Box>
               </Stack>

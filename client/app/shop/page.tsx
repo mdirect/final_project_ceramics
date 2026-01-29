@@ -16,6 +16,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/src/shared/api/http";
+import { useAuth } from "@/src/shared/providers/AuthProvider";
 
 const collectionMeta: Record<
   string,
@@ -111,10 +112,7 @@ const collectionMeta: Record<
   },
 };
 
-const collectionFilters = [
-  { label: "Jewelry", value: "jewelry" },
-  { label: "Ceramics", value: "ceramics" },
-];
+
 
 const imageExtensionRegex = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
 
@@ -136,6 +134,9 @@ const toSlug = (value: string) =>
 
 export default function ShopPage() {
   const pageSize = 8;
+  const { user } = useAuth();
+  const isAdmin =
+    (user?.role?.toLowerCase() ?? "") === "admin" && (user?.isActive ?? true);
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("all");
   const [collectionsData, setCollectionsData] = useState<Collection[]>([]);
@@ -275,17 +276,7 @@ export default function ShopPage() {
             Collections
           </Box>
         </Typography>
-        <Typography
-          sx={{
-            mt: 2,
-            fontSize: { xs: "1rem", md: "1.1rem" },
-            color: "rgba(255, 255, 255, 0.89)",
-            lineHeight: 1.5,
-          }}
-        >
-          Artisanal jewelry and ceramics crafted for the modern soul. Each piece tells a
-          story of the solstice, the moon, and the raw earth.
-        </Typography>
+        
       </Stack>
 
       <Stack
@@ -298,31 +289,7 @@ export default function ShopPage() {
           "& .MuiChip-root": { mb: 1 },
         }}
       >
-        {collectionFilters.map((filter) => (
-          <Chip
-            key={filter.value}
-            label={filter.label}
-            size="medium"
-            onClick={() => setActiveFilter(filter.value)}
-            sx={{
-              borderRadius: 999,
-              px: 2,
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              backgroundColor: activeFilter === filter.value ? accent : "rgba(255,255,255,0.16)",
-              color:
-                activeFilter === filter.value
-                  ? "rgba(18, 21, 26, 0.9)"
-                  : "rgba(255,255,255,0.95)",
-              border: "1px solid rgba(255,255,255,0.28)",
-              "&:hover": {
-                backgroundColor:
-                  activeFilter === filter.value ? accent : "rgba(255,255,255,0.24)",
-              },
-            }}
-          />
-        ))}
+        
         <Link href="/shop/all" style={{ textDecoration: "none" }}>
           <Chip
             label="All Jewellery"
@@ -359,33 +326,84 @@ export default function ShopPage() {
         </Link>
       </Stack>
 
-      <Box
-        sx={{
-          borderRadius: 3,
-          border: "2px solid rgba(255, 255, 255, 0.84)",
-          backgroundColor: "rgba(8,12,18,0.5)",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
-          backdropFilter: "blur(14px)",
-          p: { xs: 3, md: 4 },
-        }}
-      >
-        <Stack spacing={2}>
-          <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
-            Admin panel: add collection
-          </Typography>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+      {isAdmin && (
+        <Box
+          sx={{
+            borderRadius: 3,
+            border: "2px solid rgba(255, 255, 255, 0.84)",
+            backgroundColor: "rgba(8,12,18,0.5)",
+            boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+            backdropFilter: "blur(14px)",
+            p: { xs: 3, md: 4 },
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography sx={{ fontWeight: 700, color: "rgba(255,255,255,0.95)" }}>
+              Admin panel: add collection
+            </Typography>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+              <TextField
+                value={collectionForm.title}
+                onChange={(event) =>
+                  setCollectionForm((current) => ({
+                    ...current,
+                    title: event.target.value,
+                  }))
+                }
+                label="Name"
+                placeholder="Collection name"
+                fullWidth
+                size="small"
+                InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                  },
+                }}
+              />
+              <TextField
+                value={collectionForm.image}
+                onChange={(event) =>
+                  setCollectionForm((current) => ({
+                    ...current,
+                    image: event.target.value,
+                  }))
+                }
+                label="Image URL"
+                placeholder="https://..."
+                fullWidth
+                size="small"
+                error={hasCollectionImage && !isCollectionImageValid}
+                helperText={
+                  hasCollectionImage && !isCollectionImageValid
+                    ? "Direct file link required (.jpg/.png/.webp)"
+                    : " "
+                }
+                InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
+                FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                  },
+                }}
+              />
+            </Stack>
             <TextField
-              value={collectionForm.title}
+              value={collectionForm.description}
               onChange={(event) =>
                 setCollectionForm((current) => ({
                   ...current,
-                  title: event.target.value,
+                  description: event.target.value,
                 }))
               }
-              label="Name"
-              placeholder="Collection name"
+              label="Description"
+              placeholder="Short description"
               fullWidth
               size="small"
+              multiline
+              minRows={2}
               InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
               sx={{
                 "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
@@ -394,84 +412,35 @@ export default function ShopPage() {
                 },
               }}
             />
-            <TextField
-              value={collectionForm.image}
-              onChange={(event) =>
-                setCollectionForm((current) => ({
-                  ...current,
-                  image: event.target.value,
-                }))
-              }
-              label="Image URL"
-              placeholder="https://..."
-              fullWidth
-              size="small"
-              error={hasCollectionImage && !isCollectionImageValid}
-              helperText={
-                hasCollectionImage && !isCollectionImageValid
-                  ? "Direct file link required (.jpg/.png/.webp)"
-                  : " "
-              }
-              InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
-              FormHelperTextProps={{ sx: { color: "rgba(255,255,255,0.5)" } }}
-              sx={{
-                "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "rgba(255,255,255,0.05)",
-                },
-              }}
-            />
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+              <Button
+                variant="contained"
+                onClick={handleCreateCollection}
+                disabled={isCollectionSaving || (hasCollectionImage && !isCollectionImageValid)}
+                sx={{
+                  textTransform: "none",
+                  fontWeight: 700,
+                  backgroundColor: accent,
+                  color: "rgba(18,21,26,0.9)",
+                  "&:hover": { backgroundColor: "#f7cd4c" },
+                }}
+              >
+                {isCollectionSaving ? "Saving..." : "Add collection"}
+              </Button>
+              {collectionError && (
+                <Alert severity="error" sx={{ flex: 1 }}>
+                  {collectionError}
+                </Alert>
+              )}
+              {collectionMessage && (
+                <Alert severity="success" sx={{ flex: 1 }}>
+                  {collectionMessage}
+                </Alert>
+              )}
+            </Stack>
           </Stack>
-          <TextField
-            value={collectionForm.description}
-            onChange={(event) =>
-              setCollectionForm((current) => ({
-                ...current,
-                description: event.target.value,
-              }))
-            }
-            label="Description"
-            placeholder="Short description"
-            fullWidth
-            size="small"
-            multiline
-            minRows={2}
-            InputLabelProps={{ sx: { color: "rgba(255,255,255,0.6)" } }}
-            sx={{
-              "& .MuiInputBase-input": { color: "rgba(255,255,255,0.85)" },
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: "rgba(255,255,255,0.05)",
-              },
-            }}
-          />
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-            <Button
-              variant="contained"
-              onClick={handleCreateCollection}
-              disabled={isCollectionSaving || (hasCollectionImage && !isCollectionImageValid)}
-              sx={{
-                textTransform: "none",
-                fontWeight: 700,
-                backgroundColor: accent,
-                color: "rgba(18,21,26,0.9)",
-                "&:hover": { backgroundColor: "#f7cd4c" },
-              }}
-            >
-              {isCollectionSaving ? "Saving..." : "Add collection"}
-            </Button>
-            {collectionError && (
-              <Alert severity="error" sx={{ flex: 1 }}>
-                {collectionError}
-              </Alert>
-            )}
-            {collectionMessage && (
-              <Alert severity="success" sx={{ flex: 1 }}>
-                {collectionMessage}
-              </Alert>
-            )}
-          </Stack>
-        </Stack>
-      </Box>
+        </Box>
+      )}
 
       {collectionsError && (
         <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
@@ -676,6 +645,7 @@ export default function ShopPage() {
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
+          fontFamily: "var(--font-playfair)",
         }}
       >
         <Box
@@ -700,6 +670,7 @@ export default function ShopPage() {
               fontSize: { xs: "2rem", md: "2.6rem" },
               fontWeight: 800,
               color: "rgba(255,255,255,0.95)",
+              fontFamily: "inherit",
             }}
           >
             Stay in the loop
@@ -710,6 +681,7 @@ export default function ShopPage() {
               maxWidth: 620,
               mx: "auto",
               textAlign: "center",
+              fontFamily: "inherit",
             }}
           >
             Join our inner circle for early access to limited artisanal drops and the stories
@@ -733,6 +705,7 @@ export default function ShopPage() {
                 backgroundColor: "rgba(255,255,255,0.08)",
                 color: "rgba(255,255,255,0.9)",
                 outline: "none",
+                fontFamily: "inherit",
               }}
             />
             <Button
@@ -743,6 +716,7 @@ export default function ShopPage() {
                 backgroundColor: accent,
                 color: "rgba(18,21,26,0.9)",
                 fontWeight: 800,
+                fontFamily: "inherit",
                 "&:hover": { backgroundColor: "#f6c423" },
               }}
             >

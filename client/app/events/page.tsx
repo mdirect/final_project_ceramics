@@ -2,50 +2,49 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 
 const events = [
   {
-    label: "March 12 — 15, 2024",
+    label: "March 12 — 15, 2026",
     title: "Vernissage of the Void",
     description:
       'An exclusive showcase of our "Winter Silence" ceramic collection. Exploring the tactile nature of emptiness and shadow in our London atelier.',
     location: "Tate Modern Annex, London",
     action: "Details",
-    icon: "calendar_today",
+    featured:true,
   },
   {
-    label: "Featured Event",
+    label: "April 07, 2026",
     title: "Paris Design Week",
     description:
       "Winter Sparrow Eye joins the 'Matière Première' exhibition. A dialogue between raw minerals and refined jewelry craftsmanship.",
     location: "Le Marais, Rue de Turenne, Paris",
-    action: "Register Attendance",
-    icon: "stars",
-    featured: true,
+    action: "Details",
+    featured:true,
   },
   {
-    label: "April 20, 2024",
+    label: "April 20, 2026",
     title: "The Artisans Market",
     description:
       "A curated gathering of independent creators. We will be offering a limited run of studio seconds and experimental prototypes.",
     location: "The Old Truman Brewery, London",
     action: "Details",
-    icon: "local_mall",
+    featured:true,
   },
   {
-    label: "May 05, 2024",
+    label: "May 05, 2026",
     title: "Workshop: The Sparrow's Eye",
     description:
       'An intimate workshop on the philosophy of "Quiet Craft". Learn our unique methods of ceramic texturing and gold leaf application.',
     location: "Winter Sparrow Eye Studio, Kent",
-    action: "Join Waitlist",
-    icon: "palette",
+    action: "Details",
+    featured:true,
   },
   {
-    label: "June 18, 2024",
+    label: "June 18, 2026",
     title: "Kyoto Craft Biennale",
     description:
       "Representing modern British craftsmanship in the heart of Japan's ancient ceramic capital. A celebration of cross-cultural artistry.",
     location: "Kyoto International Exhibition Hall",
-    action: "Learn More",
-    icon: "public",
+    action: "Details",
+    featured:true,
   },
 ];
 
@@ -54,8 +53,8 @@ const primaryColor = "rgba(242,185,13,0.95)";
 export default function EventsPage() {
   return (
     <Stack
-      spacing={5}
-      sx={{ py: { xs: 4, md: 8 }, position: "relative", fontFamily: "var(--font-inter)" }}
+      spacing={6}
+      sx={{ py: { xs: 4, md: 1 }, position: "relative", fontFamily: "var(--font-inter)" }}
     >
       <Box
         sx={{
@@ -96,7 +95,7 @@ export default function EventsPage() {
         }}
       />
 
-      <Stack spacing={1} sx={{ maxWidth: 840 }}>
+      <Stack spacing={2} sx={{ maxWidth: 840 }}>
         <Typography
           variant="h1"
           sx={{
@@ -158,22 +157,12 @@ export default function EventsPage() {
           >
             <Stack spacing={2}>
               <Stack direction="row" spacing={1.2} alignItems="center">
-                <Box
-                  component="span"
-                  sx={{
-                    color: primaryColor,
-                    fontSize: "1rem",
-                    fontFamily: "'Material Symbols Outlined'",
-                  }}
-                >
-                  {event.icon}
-                </Box>
                 <Typography
                   sx={{
                     color: primaryColor,
                     textTransform: "uppercase",
                     letterSpacing: "0.2em",
-                    fontSize: "0.65rem",
+                    fontSize: "0.75rem",
                     fontWeight: 700,
                   }}
                 >

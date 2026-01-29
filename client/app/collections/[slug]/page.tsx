@@ -21,10 +21,13 @@ import { useParams } from "next/navigation";
 import { collections } from "@/src/shared/config/collections";
 import { apiFetch } from "@/src/shared/api/http";
 import { useAuth } from "@/src/shared/providers/AuthProvider";
+import { useFavorites } from "@/src/shared/providers/FavoritesProvider";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
@@ -131,7 +134,9 @@ export default function CollectionPage() {
   const params = useParams<{ slug?: string | string[] }>();
   const slugValue = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug;
   const { user } = useAuth();
-  const isAdmin = true;
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const isAdmin =
+    (user?.role?.toLowerCase() ?? "") === "admin" && (user?.isActive ?? true);
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sort, setSort] = useState("newest");
@@ -929,6 +934,7 @@ export default function CollectionPage() {
             )}
             {pagedItems.map((item) => {
               const primaryImage = item.images?.[0] ?? item.image;
+              const favorited = isFavorite(item.id);
               return (
                 <Box
                   key={item.id}
@@ -941,6 +947,34 @@ export default function CollectionPage() {
                     },
                   }}
                 >
+                  <IconButton
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      toggleFavorite({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        image: item.image ?? null,
+                        collectionId: item.collectionId ?? null,
+                      });
+                    }}
+                    sx={{
+                      position: "absolute",
+                      top: 18,
+                      right: isAdmin ? 52 : 18,
+                      zIndex: 2,
+                      backgroundColor: "rgba(0,0,0,0.6)",
+                      color: favorited ? accent : "rgba(255,255,255,0.85)",
+                      "&:hover": { backgroundColor: "rgba(5, 5, 5, 0.75)" },
+                    }}
+                  >
+                    {favorited ? (
+                      <FavoriteIcon fontSize="small" />
+                    ) : (
+                      <FavoriteBorderIcon fontSize="small" />
+                    )}
+                  </IconButton>
                   {isAdmin && (
                     <IconButton
                       className="delete-btn"

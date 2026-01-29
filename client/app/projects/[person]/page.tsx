@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 
-type Project = {
+type ProjectSection = {
   title: string;
   description: string;
-  price: string;
-  image: string;
+  images: string[];
+  metaLeft?: string;
+  metaRight?: string;
 };
 
 type PersonProjects = {
@@ -13,7 +14,8 @@ type PersonProjects = {
   title: string;
   bio: string;
   contact: { label: string; value: string };
-  projects: Project[];
+  projects: ProjectSection[];
+  showSupportNote?: boolean;
 };
 
 const personProjects: Record<string, PersonProjects> = {
@@ -28,49 +30,50 @@ const personProjects: Record<string, PersonProjects> = {
     },
     projects: [
       {
-        title: "Ritual Collar",
+        title: "The Castle",
         description:
-          "A necklace series inspired by river silt lines and rope traces on wet clay.",
-        price: "from €420",
-        image:
-          "https://images.unsplash.com/photo-1456327102063-fb5054efe647?auto=format&fit=crop&w=1200&q=80",
+          "The painting you see was born from a small unfinished play. A knight is imprisoned by an enemy in a castle dungeon, there are no people there, only endless walls, windows and towers. And all the knight can do is to look at the castle landscapes day after day and see images from his past life. Fields, forests, villages. This is the main idea, but I cannot say that I depicted it literally. Instead I am more like the hero of my play, simply saw different images in the white walls of my apartment and followed them which led to the appearance of this work. Perhaps we can say that its main motive is the opposition between freedom and unfreedom. However, I do not believe that painting should be a repository of this or any other philosophical concept. No matter what idea led us to the creation of this or other painting, in the end it is the painting and not the text with its description that sands in front of the viewer. It will not hold him if it is only a statement of a ready-made postulate. It must be independent. So my painting is first of all about itself, about the images that came to my mind, continuing each other and not demanding anything more. I would also like to say a few words about ambition. I believe that an artist should be ambitious. And I'm not talking about a career, I'm talking about the fact that the works he creates should be more than just something interesting and nice that he will forget the next day. Art is not a hobby and art is not always a pleasant process. To do something good, you often have to suffer. I suffered for this work, I wanted to quit it countless times and yet here I am, writing this text. I hope that my work will inspire you, and I also hope it will inspire my fellow artists to sometimes try to jump higher than they ever could and then there will be more amazing works in the world. For collaboration and partnership inquiries, please write to my email: lauravinter5@gmail.com.",
+        images: [
+          "/project%20Laura/laura1.jpg",
+          "/project%20Laura/laura2.jpg",
+          "/project%20Laura/laura3.jpg",
+          "/project%20Laura/laura4.jpg",
+          "/project%20Laura/laura5.jpg",
+          "/project%20Laura/laura6.jpg",
+          "/project%20Laura/laura7.jpg",
+          "/project%20Laura/laura8.jpg",
+        ],
       },
-      {
-        title: "Silent Runes",
-        description:
-          "Pendants with ceramic inserts made for journal rituals and personal talismans.",
-        price: "from €280",
-        image:
-          "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80",
-      },
+      
     ],
   },
   "irina-vorobjeva": {
-    name: "Irina Vorobjeva",
+    name: "Irina Vorobeva",
     title: "Tactile Spaces",
     bio:
       "Irina builds architecture from clay: modular forms, rough glaze, and dramatic light within space.",
+    showSupportNote: true,
     contact: {
       label: "Contact",
       value: "studio@winter-sparrow-eye.com",
     },
     projects: [
       {
-        title: "Clay Terrain",
+        title: "Project 1",
         description:
-          "Wall panels with reliefs that echo the movement of sand and sea waves.",
-        price: "from €680",
-        image:
-          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+          "If I were to imagine my artistic presence in the world, it would take the form of a solitary lighthouse, filled from its base to its very top with memories. Mine, others’, and those that never truly existed. They arrive with the waves, pressing themselves against the stone walls, and I gather them one by one, like grains of gold in the sand. Unanswered love letters, handwritten diaries, crumpled grocery lists, faded receipts. Here, memories of something exalted matter just as much as the sound of church bells drifting through a half-open window, while the air is heavy with the scent of oranges. A sudden dark gaze from an ancient fresco yields to the warm flank of a dog watching the salt foam approach the shore. At times, someone comes to the lighthouse and accidentally finds what they were looking for — even if they didn’t know it yet: the spout of an old porcelain teapot, the long-forgotten laughter of a stranger from the streets of Montmartre, a cinema ticket left behind as a bookmark, caught between pages marked with notes in the margins. And sometimes, there, I find what I myself have been searching for. For now, I share photographs on my profile and would be grateful for your support.",
+        images: [
+          "/project%20Ira/Ira1.jpg",
+          "/project%20Ira/Ira2.jpg",
+          "/project%20Ira/Ira3.jpg",
+          "/project%20Ira/Ira4.jpg",
+          "/project%20Ira/Ira5.jpg",
+          "/project%20Ira/Ira6.jpg",
+          "/project%20Ira/Ira7.jpg",
+          "/project%20Ira/Ira8.jpg",
+        ],
       },
-      {
-        title: "Slow Tables",
-        description:
-          "Tables made from ceramic slabs with micro-cracks stabilized by bronze.",
-        price: "from €1200",
-        image:
-          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-      },
+      
     ],
   },
   "anastasiia-glazkova": {
@@ -78,27 +81,28 @@ const personProjects: Record<string, PersonProjects> = {
     title: "Glaze Poetics",
     bio:
       "Anastasiia creates visual stories where glaze color becomes memory. Her projects blend painting, ceramics, and light.",
+    showSupportNote: true,
     contact: {
       label: "Contact",
       value: "projects@winter-sparrow-eye.com",
     },
     projects: [
       {
-        title: "Light Vessels",
+        title: "Project 1",
         description:
-          "Light objects where semi‑transparent glaze acts like a filter.",
-        price: "from €540",
-        image:
-          "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80",
+        "I love art more than i love making art. I am drawn to looking, to thinking, to observing what people create. But I have never been able to stay on the sidel. I always end up wanting to make something myself. My artistic way runs through a kind of roughness. Things often come out unpolished, but emotionally charged. I do not always like that, but it allows me to work directly, to focus only on what I want to put down. I am drawn to the meeting point between figuration and abstraction, because it brings in a kind of quiet, non-narrative mysticism. Art-house, if you want to call it that, but always with a character the viewer and I can both recognize. My characters are often childlike. It is easy for me to return to the past this way, and in a sense I think of children as my own nation. In acrylic and oil I often work in a simplified, almost naive way. Like roughness, it comes naturally to me because of its directness. But my real, gentle pleasure is watercolor. With it, I do not feel the need to construct something heavy. A single element or a small sketch can be enough. Here you can see some of my works. If you are interested in an art collaboration, have any questions, or simply want to talk about my or your art, please write to me at anaglazkova324@gmail.com.",
+        images: [
+          "/project%20Nastya/Nastya1.jpg",
+          "/project%20Nastya/Nastya2.jpg",
+          "/project%20Nastya/Nastya3.jpg",
+          "/project%20Nastya/Nastya4.jpg",
+          "/project%20Nastya/Nastya5.jpg",
+          "/project%20Nastya/Nastya6.jpg",
+          "/project%20Nastya/Nastya7.jpg",
+          "/project%20Nastya/Nastya8.jpg",
+        ],
       },
-      {
-        title: "Glaze Letters",
-        description:
-          "A series of wall panels that tell stories of personal archives and letters.",
-        price: "from €360",
-        image:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80",
-      },
+      
     ],
   },
 };
@@ -147,7 +151,6 @@ export default async function ProjectsPersonPage({
       (entry) => nameToSlug(entry.name) === normalizedSlug,
     );
   const displayName = person?.name ?? (normalizedSlug ? normalizedSlug.replace(/-/g, " ") : "Projects");
-  const projects: Project[] = person?.projects ?? [];
   const entries = Object.entries(personProjects);
   const currentEntry = entries.find(([, entry]) => entry === person);
   const nextEntry =
@@ -199,7 +202,7 @@ export default async function ProjectsPersonPage({
   }
 
   return (
-    <Stack spacing={{ xs: 6, md: 10 }}>
+    <Stack spacing={{ xs: 6, md: 5 }}>
       <Stack spacing={2}>
         <Box
           sx={{
@@ -217,7 +220,7 @@ export default async function ProjectsPersonPage({
                 alignItems: "center",
                 gap: 1,
                 color: "rgba(255,255,255,0.55)",
-                fontSize: "0.7rem",
+                fontSize: "0.75rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.24em",
                 fontWeight: 700,
@@ -231,10 +234,10 @@ export default async function ProjectsPersonPage({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Typography
                 sx={{
-                  fontSize: "0.65rem",
+                  fontSize: "0.75rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.24em",
-                  color: "rgba(255,255,255,0.35)",
+                  color: "rgba(255, 255, 255, 0.53)",
                 }}
               >
                 Next Founder
@@ -243,7 +246,7 @@ export default async function ProjectsPersonPage({
                 <Typography
                   sx={{
                     fontWeight: 700,
-                    fontSize: "0.85rem",
+                    fontSize: "1rem",
                     color: "rgba(255,255,255,0.8)",
                     "&:hover": { color: accent },
                   }}
@@ -256,6 +259,28 @@ export default async function ProjectsPersonPage({
         </Box>
       </Stack>
 
+      {person?.showSupportNote && (
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1.5,
+            px: 2.5,
+            py: 1.2,
+            borderRadius: 999,
+            border: "1px solid rgba(242,185,13,0.35)",
+            backgroundColor: "rgba(242,185,13,0.12)",
+            color: "rgba(255,255,255,0.9)",
+            textTransform: "uppercase",
+            letterSpacing: "0.24em",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+          }}
+        >
+          Winter Sparrow Eye supports Art and shares projects by our friends with you:
+        </Box>
+      )}
+
       <Box
         sx={{
           display: "flex",
@@ -263,27 +288,16 @@ export default async function ProjectsPersonPage({
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", md: "flex-start" },
           gap: { xs: 6, md: 10 },
+          mt: person?.showSupportNote ? { xs: 2.5, md: 3 } : 0,
           mb: { xs: 4, md: 8 },
         }}
       >
         <Box sx={{ maxWidth: 520 }}>
           <Typography
-            sx={{
-              textTransform: "uppercase",
-              letterSpacing: "0.3em",
-              fontSize: "0.65rem",
-              fontWeight: 700,
-              color: accent,
-              mb: 2,
-            }}
-          >
-            {(person?.title ?? "Master Artist").toUpperCase()}
-          </Typography>
-          <Typography
             variant="h2"
             sx={{
               fontFamily: "var(--font-playfair)",
-              fontSize: { xs: "2.4rem", md: "3.8rem" },
+              fontSize: "4rem",
               color: "rgba(255,255,255,0.95)",
               mb: 3,
             }}
@@ -304,244 +318,159 @@ export default async function ProjectsPersonPage({
               "A studio portrait of form, tactility, and the quiet ritual of craft."}
           </Typography>
           <Box sx={{ display: "flex", gap: 6 }}>
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: "0.66rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.28em",
-                  color: accent,
-                  mb: 0.5,
-                }}
-              >
-                Studio Focus
-              </Typography>
-              <Typography sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>
-                {person?.title ?? "Personal projects"}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: "0.66rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.28em",
-                  color: accent,
-                  mb: 0.5,
-                }}
-              >
-                Collections
-              </Typography>
-              <Typography sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.6)" }}>
-                {projects.length} series
-              </Typography>
-            </Box>
+            
+            
           </Box>
         </Box>
 
-        <Box sx={{ mt: { xs: 2, md: 0 }, position: "relative" }}>
-          <Box
-            sx={{
-              position: "absolute",
-              inset: -16,
-              borderRadius: "999px",
-              backgroundColor: "rgba(242,185,13,0.2)",
-              filter: "blur(40px)",
-              opacity: 0,
-              transition: "opacity 0.5s ease",
-              ".portrait-group:hover &": { opacity: 1 },
-            }}
-          />
-          <Box
-            className="portrait-group"
-            component="img"
-            src={
-              projects[0]?.image ??
-              "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=80"
-            }
-            alt={`${displayName} portrait`}
-            sx={{
-              position: "relative",
-              width: { xs: 260, md: 288 },
-              height: { xs: 360, md: 420 },
-              objectFit: "cover",
-              borderRadius: 3,
-              boxShadow: "0 28px 60px rgba(0, 0, 0, 0.5)",
-              filter: "grayscale(1)",
-              transition: "filter 0.7s ease",
-              "&:hover": { filter: "grayscale(0)" },
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 16,
-              left: 16,
-              right: 16,
-              p: 2,
-              borderRadius: 2,
-              backgroundColor: "rgba(44, 44, 44, 0.36)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "0.75rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.2em",
-                color: accent,
-                fontWeight: 700,
-                mb: 0.4,
-              }}
-            >
-              Studio Highlight
-            </Typography>
-            <Typography sx={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.9)" }}>
-              {projects[0]?.title ?? "Signature collection"}
-            </Typography>
-          </Box>
-        </Box>
+        
       </Box>
 
       <Box
         sx={{
           width: "100%",
           p: { xs: 3, md: 5 },
-          borderRadius: 3,
+          borderRadius: 4,
           border: "1px solid rgba(255,255,255,0.08)",
           backgroundColor: "rgba(0,0,0,0.1)",
           backdropFilter: "blur(12px)",
         }}
       >
-        {[
-          {
-            title: "Ritual Elements",
-            images: [
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuCsXylEdheeMm45_ipVXgr2D9t4lbDCLqJ8nozfDcZF5sraT0wuB-OUTVxzgCi6Vc-74DPQ6auvuNYUb1iAJke4uyqCKN4tZZqxp0ivmrYPZNpnZF3fswKAsGK89nv3uNDDi9C-LKmy2tj_5OaHwWeAQ1wwF5XilgmvTzWIlXQ8J0OWwoCam_cTwX4PjBNOyVVAef9VseLfCZcgKiUHy7jJo8jpvb-K1zAqxLqiha4tbArnnGVjWmLpCIrhmfV21LV9m6L4ZUQe2YqU",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuC3Cb_oi3yIl59mKQAouPsMhOpfBA1p1I_pPbT4Cz9agWyoqtDSIDugFJLRzE0VqOotfK7OP40-KYxr0d9ps3G8kyp-qETtp7qH4jI_8kQflcCbWREPjyTnaE8WWw3lVAJnxsDTPKPvJXOAUkk4DOZYPXPdzQ9idO6Ons4N-Z-Dh2kYG_iHXE_5xiepole7Xils_K1IqstaqAyx7n-2LFZpvWAhw72ZViUw_48Ki8W8FfJDaxlYaa-PQapLg_0xPlH2zH43gXd400-B",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuCKbdzwWPB0DSd2XiIoFmcjH_JcWFbKHGLSNlYDO306rNbU81CS0MaL-wDGf49kT9VWyiS6hUY9QzW3HCTxsCamAp6cXcM33b5EXhZxhuBtvyO0YR7J_GOt18EyMbGG3xPltHVerDJJJDuXCGIG3EdOZWxz5GoBW9fSAO2xm-XDEZmxO4f_3Vi5-SJ2Ja4arIW4sB990cj-dBGGIkziclwrSXi0cGz8A3DF7_NJrxuRj2wu0u6r7lWUDBvGIXBk4jSQcB4As3rqQE46",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuAYXqD8r8sutvGzRNYuqLoAJLlK1VQGqbs1X0w9WfNIPtujazNKJGhEb2e13nwp9kN8oqg3dMhcvgDoykNxpYQEdofw9LHc1c3f-bQPR64W4rV1LDXVua1luh6XD1dTzc0eR8ijAW3XMSHT8T5pVAiJD7jeUv1i8WVCkLFLriGipoC3vLjQDvkQ4qNp3ReV275tijQzVVIvXURzAfP8r-72VGE3vVaLDwpSKjYIF9-Wv7YTEkOYbHjlONgAD-iuJfHJq2NRNtFd8_bX",
-            ],
-            quote:
-              "The Ritual Elements collection explores the intersection of raw metal and ancient forms. Each piece is hand-forged to capture a moment of transition from the molten state to a permanent, sculptural artifact. Laura Winter blends silver with oxidized textures to create a dialogue between the wearer and the elemental past.",
-            metaLeft: "Materials: Silver, Patina",
-            metaRight: "Series: Limited Edition",
-          },
-          {
-            title: "Urban Relics",
-            images: [
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuAadOutol9beFe8b46wxIkODQpHrdgnG5lOuTcJDOO9gNWXOXq5987UbUAxOA34hQjpHdTTKRQW3mWRlTFV92pgfYy7h-RgzDB6bimb6aaEJZwRinsf9M_Je-wMzUvbuxPI66pCTzSrqF-iHaHCc5iq1Tt6fL4nrSO1PsO1t9-F0yep4p8v51SAYPtRSNR5zITZ7PF4fDae4NUQLWnZ2a_fIq7YSPR6kVyCX_8CRciWY7xy6vkn7g_41Vn3DaKSs4IkRzl4eSVwPJID",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuBnerBFbRydF_xWVHLknOMvmQ9RZ4BEf-moHpykn0KZ-tbZDkeCZ_zodkuu9gMFOK_5C36KBRZl3hzjzpqL-CyeEyQgTgNSpq7jLtLrRSRDpJ67kLIMOOlICti754NlRYCPLPDzsGoTNd6yAi7hUF5uNTSY8Ayt3z5qf9OR-V27uJ_N-7xsK4ZGdNTYOYgZBLFjJ3psf4zU4aWJR-n9zFtk9hTJQKXTukFYtuHcnMV78MAqjIT91gkXekUhq9MK1v_UsTwsHW02ibRJ",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuBYHJdFjUa_GcmlBoLmrFDXo9V0QL3kKAezSz1toeuN2PeOXGqe71_TtRIZ6DglCN5Vz1y7-q4D6IS357rvTL0CZeC8U5JmQoL1FQKlU4fllx77bdiOwd4bOqP2nAVKV4FsV2HDdq0IhmPE-tbbHcCyMKUdZ6wtaWbYxSwqPbP57P98ilR_7DcTxnqNMnhaY9Bfmld553bJh7zLXU0G3gbcBnMzV06TXOTSg0AQofd--CZMLNG9jqoTStsWpxYCqGX5qeF2WV6Vgx49",
-              "https://lh3.googleusercontent.com/aida-public/AB6AXuAwDTR5o7aXA0B0ScvfH9C6pRiA8qhMygcxFQWktzfOaHV4mI1IPqJBs0RKSPyWrxGB7hZkm-n_dY4oBWUEuOpzsAtwKk1u5Gi0QCc-p2_VaONNRSvDRZudjHq4bXzjtfPA1AJvTBBMWrQrcJxx9xhhQYmcWoJl7C3K0yhNUOqdS2e3Yy0M5_fIqSTqaCDqiqbs4iVP0KJTJuk5ewyZMzKa4_GuStXkjBapETpMEE5G2U-9nNSHI0FbV7NaJagSOwO4ASzyZFi8bqSu",
-            ],
-            quote:
-              "Inspired by the brutalist architecture of her home city, Urban Relics finds beauty in the structural and the geometric. This series uses high-polished surfaces contrasted with deep, industrial engravings. It represents a modern armor for the contemporary soul, balancing strength with minimalist elegance.",
-            metaLeft: "Materials: White Gold, Steel",
-            metaRight: "Series: Core Collection",
-          },
-        ].map((section) => (
-          <Box key={section.title} sx={{ mb: { xs: 8, md: 10 } }}>
-            <Box
-              sx={{
-                display: "inline-flex",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                mb: 4,
-              }}
-            >
-              <Typography
+        {(person?.projects ?? []).map((section) => {
+          const firstImages = section.images.slice(0, 4);
+          const secondImages = section.images.slice(4, 8);
+          const filledSecondImages =
+            secondImages.length >= 4
+              ? secondImages
+              : [...secondImages, ...firstImages].slice(0, 4);
+
+          return (
+            <Box key={section.title} sx={{ mb: { xs: 8, md: 10 } }}>
+              <Box
                 sx={{
-                  fontFamily: "var(--font-playfair)",
-                  fontSize: "0.95rem",
-                  letterSpacing: "0.28em",
-                  textTransform: "uppercase",
-                  color: accent,
+                  display: "inline-flex",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  mb: 4,
                 }}
               >
-                {section.title}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" },
-                gap: 2,
-                mb: 4,
-              }}
-            >
-              {section.images.map((image, index) => (
-                <Box
-                  key={`${section.title}-${index}`}
+                <Typography
+                  sx={{
+                    fontFamily: "var(--font-playfair)",
+                    fontSize: "1rem",
+                    letterSpacing: "0.28em",
+                    textTransform: "uppercase",
+                    fontWeight: 700,
+                    color: accent,
+                  }}
+                >
+                  {section.title}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" },
+                  gap: 2,
+                  mb: 4,
+                }}
+              >
+                {firstImages.map((image, index) => (
+                  <Box
+                    key={`${section.title}-first-${index}`}
                   sx={{
                     aspectRatio: "4 / 5",
                     borderRadius: 2,
                     overflow: "hidden",
                     border: "1px solid rgba(255,255,255,0.08)",
+                    backgroundColor: "rgba(0,0,0,0.25)",
                     "&:hover img": {
                       filter: "grayscale(0)",
-                      transform: "scale(1)",
                     },
                   }}
-                >
-                  <Box
-                    component="img"
-                    src={image}
-                    alt={`${section.title} detail ${index + 1}`}
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      filter: "grayscale(1)",
-                      transform: "scale(1.05)",
-                      transition: "all 0.7s ease",
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
-            <Box
-              sx={{
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 2,
-                p: { xs: 3, md: 4 },
-                backgroundColor: "rgba(255,255,255,0.05)",
-              }}
-            >
-              <Typography
-                sx={{
-                  maxWidth: 760,
-                  fontFamily: "var(--font-playfair)",
-                  fontStyle: "italic",
-                  fontSize: { xs: "0.95rem", md: "1.1rem" },
-                  lineHeight: 1.8,
-                  color: "rgba(255,255,255,0.8)",
-                }}
-              >
-                "{section.quote}"
-              </Typography>
+                  >
+                    <Box
+                      component="img"
+                      src={image}
+                      alt={`${section.title} detail ${index + 1}`}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                      objectFit: "contain",
+                        filter: "grayscale(1)",
+                        transition: "all 0.7s ease",
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Box>
+
               <Box
                 sx={{
-                  mt: 3,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 2,
-                  fontSize: "0.62rem",
-                  letterSpacing: "0.28em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.5)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 2,
+                  p: { xs: 3, md: 4 },
+                  backgroundColor: "rgba(255,255,255,0.05)",
+                  mb: 4,
                 }}
               >
-                <Typography sx={{ fontSize: "inherit" }}>{section.metaLeft}</Typography>
-                <Typography sx={{ fontSize: "inherit" }}>•</Typography>
-                <Typography sx={{ fontSize: "inherit" }}>{section.metaRight}</Typography>
+                <Typography
+                  sx={{
+                    maxWidth: 1060,
+                    fontFamily: "var(--font-playfair)",
+                    fontStyle: "italic",
+                    fontSize: { xs: "0.95rem", md: "1.1rem" },
+                    lineHeight: 1.8,
+                    color: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                "{section.description}"
+                </Typography>
+                
+              </Box>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "repeat(2, 1fr)", md: "repeat(4, 1fr)" },
+                  gap: 2,
+                }}
+              >
+                {filledSecondImages.map((image, index) => (
+                  <Box
+                    key={`${section.title}-second-${index}`}
+                  sx={{
+                    aspectRatio: "4 / 5",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backgroundColor: "rgba(0,0,0,0.25)",
+                    "&:hover img": {
+                      filter: "grayscale(0)",
+                    },
+                  }}
+                  >
+                    <Box
+                      component="img"
+                      src={image}
+                      alt={`${section.title} detail ${index + 5}`}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                      objectFit: "contain",
+                        filter: "grayscale(1)",
+                        transition: "all 0.7s ease",
+                      }}
+                    />
+                  </Box>
+                ))}
               </Box>
             </Box>
-          </Box>
-        ))}
+          );
+        })}
       </Box>
     </Stack>
   );

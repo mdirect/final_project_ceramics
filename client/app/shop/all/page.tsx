@@ -19,11 +19,15 @@ import {
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/src/shared/api/http";
+import { useFavorites } from "@/src/shared/providers/FavoritesProvider";
 
 type Product = {
   id: number;
@@ -109,7 +113,7 @@ const sortOptions = [
 const accent = "#f2b90d";
 
 export default function ShopAllPage() {
-  const isAdmin = true;
+  const isAdmin = false;
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [sort, setSort] = useState("newest");
@@ -120,6 +124,7 @@ export default function ShopAllPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletePending, setDeletePending] = useState<number | null>(null);
+  const { toggleFavorite, isFavorite } = useFavorites();
   const pageSize = 12;
 
   useEffect(() => {
@@ -207,6 +212,36 @@ export default function ShopAllPage() {
 
   const pageCount = Math.max(1, Math.ceil(sortedItems.length / pageSize));
   const clampedPage = Math.min(page, pageCount);
+  const paginationItems = useMemo(() => {
+    if (pageCount <= 5) {
+      return Array.from({ length: pageCount }, (_, index) => index + 1);
+    }
+
+    const pages = new Set<number>([1, pageCount, clampedPage, clampedPage - 1, clampedPage + 1]);
+    if (clampedPage <= 3) {
+      pages.add(2);
+      pages.add(3);
+      pages.add(4);
+    } else if (clampedPage >= pageCount - 2) {
+      pages.add(pageCount - 1);
+      pages.add(pageCount - 2);
+      pages.add(pageCount - 3);
+    }
+
+    const sortedPages = Array.from(pages)
+      .filter((value) => value >= 1 && value <= pageCount)
+      .sort((a, b) => a - b);
+
+    const items: Array<number | string> = [];
+    sortedPages.forEach((value, index) => {
+      if (index > 0 && value - sortedPages[index - 1] > 1) {
+        items.push("…");
+      }
+      items.push(value);
+    });
+
+    return items;
+  }, [pageCount, clampedPage]);
   const pagedItems = useMemo(() => {
     const start = (clampedPage - 1) * pageSize;
     return sortedItems.slice(start, start + pageSize);
@@ -234,18 +269,39 @@ export default function ShopAllPage() {
           alignItems: "start",
         }}
       >
-        <Box
-          component="aside"
-          sx={{
-            display: { xs: "none", md: "block" },
-            borderRadius: 1,
-            border: "1px solid rgba(242, 185, 13, 0.32)",
-            backgroundColor: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(12px)",
-            p: 2.5,
-          }}
-        >
-          <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
+        <Stack spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
+          <Link href="/shop" style={{ textDecoration: "none" }}>
+            <Button
+              variant="contained"
+              startIcon={<ChevronLeftIcon sx={{ fontSize: "1.1rem" }} />}
+              sx={{
+                width: "100%",
+                backgroundColor: accent,
+                color: "rgba(18,21,26,0.95)",
+                textTransform: "uppercase",
+                letterSpacing: "0.18em",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                px: 2.5,
+                borderRadius: 999,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                "&:hover": { backgroundColor: "#f6c423" },
+              }}
+            >
+              Back to collections
+            </Button>
+          </Link>
+          <Box
+            component="aside"
+            sx={{
+              borderRadius: 1,
+              border: "1px solid rgba(242, 185, 13, 0.32)",
+              backgroundColor: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(12px)",
+              p: 2.5,
+            }}
+          >
+            <Stack spacing={4} sx={{ position: "sticky", top: 96 }}>
             <Stack spacing={1.5}>
               <Typography
                 sx={{
@@ -408,8 +464,9 @@ export default function ShopAllPage() {
                 Reset Filters
               </Button>
             </Stack>
-          </Stack>
-        </Box>
+            </Stack>
+          </Box>
+        </Stack>
 
         <Stack spacing={3}>
           <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
@@ -526,6 +583,7 @@ export default function ShopAllPage() {
             )}
             {pagedItems.map((item) => {
               const primaryImage = item.images?.[0] ?? item.image;
+              const favorited = isFavorite(item.id);
               return (
                 <Box
                   key={item.id}
@@ -539,6 +597,34 @@ export default function ShopAllPage() {
                     },
                   }}
                 >
+                  <IconButton
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      toggleFavorite({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        image: item.image ?? null,
+                        collectionId: null,
+                      });
+                    }}
+                    sx={{
+                      position: "absolute",
+                      top: 18,
+                      right: isAdmin ? 52 : 18,
+                      zIndex: 2,
+                      backgroundColor: "rgba(0,0,0,0.6)",
+                      color: favorited ? accent : "rgba(255,255,255,0.85)",
+                      "&:hover": { backgroundColor: "rgba(5, 5, 5, 0.75)" },
+                    }}
+                  >
+                    {favorited ? (
+                      <FavoriteIcon fontSize="small" />
+                    ) : (
+                      <FavoriteBorderIcon fontSize="small" />
+                    )}
+                  </IconButton>
                   {isAdmin && (
                     <IconButton
                       className="delete-btn"
@@ -707,67 +793,39 @@ export default function ShopAllPage() {
             >
               <ArrowBackIosNewIcon fontSize="small" />
             </IconButton>
-            {pageCount <= 5
-              ? Array.from({ length: pageCount }, (_, index) => index + 1).map((index) => (
-                  <Box
-                    key={index}
-                    onClick={() => setPage(index)}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      backgroundColor:
-                        index === clampedPage ? accent : "rgba(255,255,255,0.06)",
-                      color:
-                        index === clampedPage
-                          ? "rgba(18,21,26,0.9)"
-                          : "rgba(255,255,255,0.8)",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {index}
-                  </Box>
-                ))
-              : [
-                  1,
-                  Math.max(2, clampedPage - 1),
-                  clampedPage,
-                  Math.min(pageCount - 1, clampedPage + 1),
-                  pageCount,
-                ].map((index, idx, array) => (
-                  <Box
-                    key={`${index}-${idx}`}
-                    onClick={() => setPage(index)}
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      backgroundColor:
-                        index === clampedPage ? accent : "rgba(255,255,255,0.06)",
-                      color:
-                        index === clampedPage
-                          ? "rgba(18,21,26,0.9)"
-                          : "rgba(255,255,255,0.8)",
-                      fontWeight: 700,
-                      opacity:
-                        idx === 1 && array[idx - 1] !== index - 1
-                          ? 0.45
-                          : idx === 3 && array[idx + 1] !== index + 1
-                            ? 0.45
-                            : 1,
-                    }}
-                  >
-                    {index}
-                  </Box>
-                ))}
+            {paginationItems.map((item, index) => {
+              const isNumber = typeof item === "number";
+              const isActive = item === clampedPage;
+              return (
+                <Box
+                  key={`${item}-${index}`}
+                  onClick={isNumber ? () => setPage(item) : undefined}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: isNumber ? "pointer" : "default",
+                    backgroundColor: isNumber
+                      ? isActive
+                        ? accent
+                        : "rgba(255,255,255,0.06)"
+                      : "transparent",
+                    color: isNumber
+                      ? isActive
+                        ? "rgba(18,21,26,0.9)"
+                        : "rgba(255,255,255,0.8)"
+                      : "rgba(255,255,255,0.5)",
+                    fontWeight: 700,
+                    pointerEvents: isNumber ? "auto" : "none",
+                  }}
+                >
+                  {item}
+                </Box>
+              );
+            })}
             <IconButton
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
               disabled={clampedPage === pageCount}

@@ -17,10 +17,13 @@ export default function PrestigePage() {
       >
         Prestige
       </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Premium selection with limited pieces.
+      
+      <Typography
+      sx={{
+        fontSize:"2rem",
+      }}>
+        Coming soon...
       </Typography>
-      <ProductGrid title="Prestige items" />
     </Stack>
   );
 }

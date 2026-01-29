@@ -10,10 +10,12 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/src/shared/providers/CartProvider";
+import { useFavorites } from "@/src/shared/providers/FavoritesProvider";
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 type Product = {
@@ -59,11 +61,13 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const relatedRef = useRef<HTMLDivElement | null>(null);
   const { addItem, isLoading: isCartUpdating, error: cartError } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastSeverity, setToastSeverity] = useState<"success" | "error">("success");
   const fallbackImage =
     "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1600&q=80";
+  const isFavorited = product ? isFavorite(product.id) : false;
 
   useEffect(() => {
     if (!idValue) {
@@ -483,14 +487,37 @@ export default function ProductPage() {
               </Stack>
               <Button
                 variant="outlined"
-                startIcon={<FavoriteBorderIcon sx={{ color: accent }} />}
+                startIcon={
+                  isFavorited ? (
+                    <FavoriteIcon sx={{ color: accent }} />
+                  ) : (
+                    <FavoriteBorderIcon sx={{ color: accent }} />
+                  )
+                }
                 sx={{
                   borderColor: "rgba(255,255,255,0.12)",
                   color: "rgba(255,255,255,0.8)",
                   "&:hover": { borderColor: "rgba(255,255,255,0.3)" },
                 }}
+                onClick={() => {
+                  if (!product) {
+                    return;
+                  }
+                  const wasAdded = toggleFavorite({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image ?? null,
+                    collectionId: product.collectionId ?? null,
+                  });
+                  setToastMessage(
+                    wasAdded ? "Added to favorites." : "Removed from favorites."
+                  );
+                  setToastSeverity("success");
+                  setToastOpen(true);
+                }}
               >
-                Add to Wishlist
+                {isFavorited ? "Remove from Favorites" : "Add to Favorites"}
               </Button>
             </Stack>
 
