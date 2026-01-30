@@ -130,7 +130,8 @@ export default function CartPage() {
                   borderRadius: 3,
                   p: { xs: 2.5, md: 3 },
                   border: "1px solid rgba(255,255,255,0.12)",
-                  boxShadow: "0 12px 28px rgba(0,0,0,0.25)",
+                  boxShadow: "0 12px 28px rgba(0,0,0,0.25)",  
+                backdropFilter: "blur(9px)",
                   transition: "background-color 0.2s ease",
                   "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
                 }}
@@ -278,6 +279,7 @@ export default function CartPage() {
           <Box
             sx={{
               backgroundColor: "rgba(68, 67, 67, 0.6)",
+              backdropFilter: "blur(9px)",
               borderRadius: 5,
               p: { xs: 3, md: 4 },
               border: "1px solid rgba(255,255,255,0.12)",
@@ -355,6 +357,8 @@ export default function CartPage() {
             </Stack>
             <Button
               variant="contained"
+              component={Link}
+              href="/checkout"
               sx={{
                 mt: 4.5,
                 textTransform: "uppercase",

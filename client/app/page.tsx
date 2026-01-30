@@ -9,19 +9,19 @@ const contentFont = "var(--font-playfair)";
 
 const storyTiles = [
   {
-    title: "Laura Winter",
+    title: "Anastasiia Glazkova",
     caption: "Ceramic textures meeting raw 18k gold.",
     image: LauraWE.src,
     alt: "Exotic floral arrangement with vibrant proteas and anemones",
   },
   {
-    title: "Anastasiia Glazkova",
+    title: "Irina Vorobeva",
     caption: "Light dancing on the wheel.",
     image: AnastasiaWe.src,
     alt: "Artistic craft supplies and washi tape in a studio setting",
   },
   {
-    title: "Irina Vorobeva",
+    title: "Laura Winter",
     caption: "A whisper of elegance.",
     image: IrinaWE.src,
     alt: "Close up portrait of a pensive craftsman with a beard",
@@ -30,7 +30,7 @@ const storyTiles = [
 
 const team = [
   {
-    name: "Laura Winter",
+    name: "Anastasiia Glazkova",
     role: "Lead Designer",
     bio:
       "A metalsmith with a background in architectural history, Elena translates the structure of historical ruins into wearable art.",
@@ -38,7 +38,7 @@ const team = [
     position: "center 35%",
   },
   {
-    name: "Anastasiia Glazkova",
+    name: "Irina Vorobeva",
     role: "Master Ceramist",
     bio:
       "Julian finds beauty in imperfection. His broken-edge ceramic series anchors our tactile display philosophy.",
@@ -46,7 +46,7 @@ const team = [
     position: "center 45%",
   },
   {
-    name: "Irina Vorobeva",
+    name: "Laura Winter",
     role: "Creative Director",
     bio:
       "Curating the visual narrative, Sarah ensures that every sparrow-eye detail aligns with our earth-toned aesthetic.",
@@ -71,7 +71,7 @@ export default function Home() {
             color: accent,
           }}
         >
-          WE
+          ABOUT US
         </Typography>
         <Box
           sx={{
