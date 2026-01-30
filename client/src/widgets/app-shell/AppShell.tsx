@@ -1,7 +1,7 @@
 "use client";
 
 import type { PropsWithChildren } from "react";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Container, Stack } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { Header } from "@/src/widgets/header";
 import { Footer } from "@/src/widgets/footer";
@@ -17,6 +17,8 @@ const gradientByPath: Record<string, string> = {
   "/policy": "linear-gradient(145deg, #1a2a3a 0%, #3f5c7a 55%,rgb(66, 187, 114) 100%)",
   "/signin": "linear-gradient(185deg,rgba(55, 85, 119, 0.73) 0%, #4a4f87 60%,rgba(198, 88, 63, 0.77) 90%)",
   "/cart": "linear-gradient(150deg,rgba(60, 137, 114, 0.86) 0%, #3a6073 60%,rgba(242, 200, 76, 0.47) 90%)",
+  "/checkout": "linear-gradient(190deg,rgba(47, 112, 93, 0.86) 0%,rgb(40, 71, 85) 60%,rgba(49, 119, 70, 0.69) 100%)",
+  "/profile": "linear-gradient(145deg,rgba(48, 120, 202, 0.73) 0%,rgb(63, 69, 136) 50%,rgba(136, 74, 60, 0.77) 90%)",
 };
 
 function resolveGradient(pathname: string) {

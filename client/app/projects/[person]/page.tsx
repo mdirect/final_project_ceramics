@@ -1,5 +1,21 @@
+"use client";
+
 import Link from "next/link";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "@/src/shared/api/http";
+import { useAuth } from "@/src/shared/providers/AuthProvider";
 
 type ProjectSection = {
   title: string;
@@ -16,6 +32,19 @@ type PersonProjects = {
   contact: { label: string; value: string };
   projects: ProjectSection[];
   showSupportNote?: boolean;
+};
+
+type ApiProjectPic = {
+  id: number;
+  image?: string | null;
+};
+
+type ApiProject = {
+  id: number;
+  workerId: number;
+  title: string;
+  desc?: string | null;
+  projectPics?: ApiProjectPic[] | null;
 };
 
 const personProjects: Record<string, PersonProjects> = {
@@ -108,39 +137,63 @@ const personProjects: Record<string, PersonProjects> = {
 };
 
 const accent = "#f2b90d";
-
-type ProjectsPersonPageProps = {
-  params: Promise<{
-    person: string;
-  }>;
+const workerIdBySlug: Record<string, number> = {
+  "laura-winter": 1,
+  "irina-vorobjeva": 2,
+  "anastasiia-glazkova": 3,
 };
 
-export default async function ProjectsPersonPage({
-  params,
-}: ProjectsPersonPageProps) {
-  const resolvedParams = await params;
-  const rawSlug = decodeURIComponent(resolvedParams?.person ?? "").trim();
-  let slugSource = rawSlug;
+const parseImageUrls = (value: string) =>
+  value
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
 
-  if (rawSlug.includes("http")) {
-    try {
-      const parsed = new URL(rawSlug);
-      slugSource = parsed.pathname || rawSlug;
-    } catch {
-      slugSource = rawSlug;
+const mapApiProjectToSection = (project: ApiProject): ProjectSection => {
+  const pics = [...(project.projectPics ?? [])]
+    .sort((a, b) => a.id - b.id)
+    .map((pic) => pic.image)
+    .filter(Boolean) as string[];
+  return {
+    title: project.title,
+    description: project.desc ?? "",
+    images: pics,
+  };
+};
+
+export default function ProjectsPersonPage() {
+  const params = useParams<{ person?: string }>();
+  const { user } = useAuth();
+  const isAdmin =
+    (user?.role?.toLowerCase() ?? "") === "admin" && (user?.isActive ?? true);
+  const rawSlug = useMemo(() => {
+    const value = Array.isArray(params?.person) ? params?.person[0] : params?.person ?? "";
+    return decodeURIComponent(value).trim();
+  }, [params]);
+
+  const normalizedSlug = useMemo(() => {
+    let slugSource = rawSlug;
+    if (rawSlug.includes("http")) {
+      try {
+        const parsed = new URL(rawSlug);
+        slugSource = parsed.pathname || rawSlug;
+      } catch {
+        slugSource = rawSlug;
+      }
     }
-  }
 
-  if (slugSource.includes("/projects/")) {
-    slugSource = slugSource.split("/projects/").pop() ?? slugSource;
-  }
+    if (slugSource.includes("/projects/")) {
+      slugSource = slugSource.split("/projects/").pop() ?? slugSource;
+    }
 
-  slugSource = slugSource.split(/[?#]/)[0]?.trim() ?? slugSource;
+    slugSource = slugSource.split(/[?#]/)[0]?.trim() ?? slugSource;
 
-  const normalizedSlug = slugSource
-    .toLowerCase()
-    .replace(/[_\s]+/g, "-")
-    .replace(/-+/g, "-");
+    return slugSource
+      .toLowerCase()
+      .replace(/[_\s]+/g, "-")
+      .replace(/-+/g, "-");
+  }, [rawSlug]);
+
   const nameToSlug = (name: string) =>
     name.toLowerCase().replace(/[_\s]+/g, "-").replace(/-+/g, "-");
 
@@ -150,13 +203,138 @@ export default async function ProjectsPersonPage({
     Object.values(personProjects).find(
       (entry) => nameToSlug(entry.name) === normalizedSlug,
     );
-  const displayName = person?.name ?? (normalizedSlug ? normalizedSlug.replace(/-/g, " ") : "Projects");
   const entries = Object.entries(personProjects);
   const currentEntry = entries.find(([, entry]) => entry === person);
   const nextEntry =
     currentEntry && entries.length > 1
       ? entries[(entries.indexOf(currentEntry) + 1) % entries.length]
       : undefined;
+  const displayName =
+    person?.name ?? (normalizedSlug ? normalizedSlug.replace(/-/g, " ") : "Projects");
+  const personSlug = useMemo(() => {
+    if (rawSlug && personProjects[rawSlug]) {
+      return rawSlug;
+    }
+    if (personProjects[normalizedSlug]) {
+      return normalizedSlug;
+    }
+    return Object.entries(personProjects).find(([, entry]) => entry === person)?.[0];
+  }, [rawSlug, normalizedSlug, person]);
+  const workerId = personSlug ? workerIdBySlug[personSlug] : undefined;
+
+  const [dbProjects, setDbProjects] = useState<ProjectSection[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [formState, setFormState] = useState({
+    title: "",
+    description: "",
+    firstImages: "",
+    secondImages: "",
+  });
+  const firstImages = useMemo(
+    () => parseImageUrls(formState.firstImages),
+    [formState.firstImages],
+  );
+  const secondImages = useMemo(
+    () => parseImageUrls(formState.secondImages),
+    [formState.secondImages],
+  );
+  const isFirstImagesInvalid =
+    formState.firstImages.trim().length > 0 && firstImages.length !== 4;
+  const isSecondImagesInvalid =
+    formState.secondImages.trim().length > 0 && secondImages.length !== 4;
+
+  useEffect(() => {
+    if (!workerId) {
+      setDbProjects([]);
+      return;
+    }
+    let cancelled = false;
+    const loadProjects = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      try {
+        const data = await apiFetch<ApiProject[]>(`/project/worker/${workerId}`);
+        if (!cancelled) {
+          setDbProjects(data.map(mapApiProjectToSection));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error ? error.message : "Failed to load projects.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+    void loadProjects();
+    return () => {
+      cancelled = true;
+    };
+  }, [workerId]);
+
+  const handleCreateProject = async () => {
+    if (!workerId) {
+      setActionError("Worker mapping is missing for this founder.");
+      return;
+    }
+    const title = formState.title.trim();
+    const description = formState.description.trim();
+    if (!title) {
+      setActionError("Project title is required.");
+      return;
+    }
+    if (!description) {
+      setActionError("Project description is required.");
+      return;
+    }
+    if (firstImages.length !== 4 || secondImages.length !== 4) {
+      setActionError("Please provide exactly 4 images in each block.");
+      return;
+    }
+
+    setIsSaving(true);
+    setActionError(null);
+    setActionMessage(null);
+    try {
+      const created = await apiFetch<ApiProject>("/project", {
+        method: "POST",
+        body: JSON.stringify({ workerId, title, desc: description }),
+      });
+      const images = [...firstImages, ...secondImages];
+      for (const image of images) {
+        await apiFetch("/project-pic", {
+          method: "POST",
+          body: JSON.stringify({ projectId: created.id, image }),
+        });
+      }
+      setDbProjects((current) => [
+        { title, description, images },
+        ...current,
+      ]);
+      setFormState({ title: "", description: "", firstImages: "", secondImages: "" });
+      setActionMessage("Project added.");
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to add project.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const combinedProjects = useMemo(() => {
+    const staticProjects = person?.projects ?? [];
+    if (dbProjects.length === 0) {
+      return staticProjects;
+    }
+    return [...staticProjects, ...dbProjects];
+  }, [person, dbProjects]);
 
   if (!person) {
     return (
@@ -326,6 +504,157 @@ export default async function ProjectsPersonPage({
         
       </Box>
 
+      {isAdmin && (
+        <Box
+          sx={{
+            borderRadius: 2,
+            border: "1px solid rgba(242,185,13,0.2)",
+            backgroundColor: "rgba(0,0,0,0.45)",
+            backdropFilter: "blur(12px)",
+            p: { xs: 2.5, md: 3 },
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                color: "rgba(242,185,13,0.9)",
+                textTransform: "uppercase",
+                letterSpacing: "0.28em",
+                fontSize: "0.62rem",
+              }}
+            >
+              Admin panel: add project
+            </Typography>
+            <Stack spacing={2}>
+              <TextField
+                value={formState.title}
+                onChange={(event) =>
+                  setFormState((current) => ({ ...current, title: event.target.value }))
+                }
+                label="Project title"
+                placeholder="Project name"
+                fullWidth
+                size="small"
+                InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+              <TextField
+                value={formState.description}
+                onChange={(event) =>
+                  setFormState((current) => ({ ...current, description: event.target.value }))
+                }
+                label="Description"
+                placeholder="Project description"
+                fullWidth
+                size="small"
+                multiline
+                minRows={4}
+                InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+              <TextField
+                value={formState.firstImages}
+                onChange={(event) =>
+                  setFormState((current) => ({ ...current, firstImages: event.target.value }))
+                }
+                label="First 4 images"
+                placeholder="Enter 4 image URLs (comma or new line)"
+                fullWidth
+                size="small"
+                multiline
+                minRows={3}
+                error={isFirstImagesInvalid}
+                helperText={isFirstImagesInvalid ? "Exactly 4 images required." : " "}
+                InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                FormHelperTextProps={{ sx: { color: "rgba(226,232,240,0.45)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+              <TextField
+                value={formState.secondImages}
+                onChange={(event) =>
+                  setFormState((current) => ({ ...current, secondImages: event.target.value }))
+                }
+                label="Second 4 images"
+                placeholder="Enter 4 image URLs (comma or new line)"
+                fullWidth
+                size="small"
+                multiline
+                minRows={3}
+                error={isSecondImagesInvalid}
+                helperText={isSecondImagesInvalid ? "Exactly 4 images required." : " "}
+                InputLabelProps={{ sx: { color: "rgba(226,232,240,0.5)" } }}
+                FormHelperTextProps={{ sx: { color: "rgba(226,232,240,0.45)" } }}
+                sx={{
+                  "& .MuiInputBase-input": { color: "rgba(226,232,240,0.9)" },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "rgba(0,0,0,0.35)",
+                    borderRadius: 1,
+                  },
+                }}
+              />
+            </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+              <Button
+                variant="contained"
+                onClick={handleCreateProject}
+                disabled={
+                  isSaving ||
+                  !workerId ||
+                  isFirstImagesInvalid ||
+                  isSecondImagesInvalid
+                }
+                sx={{
+                  textTransform: "uppercase",
+                  fontWeight: 600,
+                  letterSpacing: "0.22em",
+                  fontSize: "0.65rem",
+                  backgroundColor: accent,
+                  color: "rgba(18,21,26,0.9)",
+                  "&:hover": { backgroundColor: "#f7cd4c" },
+                }}
+              >
+                {isSaving ? "Saving..." : "Add project"}
+              </Button>
+              {actionError && (
+                <Alert severity="error" sx={{ flex: 1 }}>
+                  {actionError}
+                </Alert>
+              )}
+              {actionMessage && (
+                <Alert severity="success" sx={{ flex: 1 }}>
+                  {actionMessage}
+                </Alert>
+              )}
+            </Stack>
+          </Stack>
+        </Box>
+      )}
+
+      {loadError && (
+        <Alert severity="error" sx={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+          {loadError}
+        </Alert>
+      )}
+
       <Box
         sx={{
           width: "100%",
@@ -336,7 +665,12 @@ export default async function ProjectsPersonPage({
           backdropFilter: "blur(12px)",
         }}
       >
-        {(person?.projects ?? []).map((section) => {
+        {isLoading && (
+          <Typography sx={{ color: "rgba(255,255,255,0.6)", mb: 2 }}>
+            Loading more projects...
+          </Typography>
+        )}
+        {combinedProjects.map((section) => {
           const firstImages = section.images.slice(0, 4);
           const secondImages = section.images.slice(4, 8);
           const filledSecondImages =
@@ -387,10 +721,12 @@ export default async function ProjectsPersonPage({
                     overflow: "hidden",
                     border: "1px solid rgba(255,255,255,0.08)",
                     backgroundColor: "rgba(0,0,0,0.25)",
+                      cursor: "zoom-in",
                     "&:hover img": {
                       filter: "grayscale(0)",
                     },
                   }}
+                    onClick={() => setPreviewImage(image)}
                   >
                     <Box
                       component="img"
@@ -448,10 +784,12 @@ export default async function ProjectsPersonPage({
                     overflow: "hidden",
                     border: "1px solid rgba(255,255,255,0.08)",
                     backgroundColor: "rgba(0,0,0,0.25)",
+                      cursor: "zoom-in",
                     "&:hover img": {
                       filter: "grayscale(0)",
                     },
                   }}
+                    onClick={() => setPreviewImage(image)}
                   >
                     <Box
                       component="img"
@@ -472,6 +810,58 @@ export default async function ProjectsPersonPage({
           );
         })}
       </Box>
+      <Dialog
+        open={Boolean(previewImage)}
+        onClose={() => setPreviewImage(null)}
+        maxWidth={false}
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: "rgba(6, 8, 12, 0.92)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 2,
+            p: 0,
+            width: "96vw",
+            height: "90vh",
+            maxWidth: "63vw",
+            maxHeight: "90vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        }}
+      >
+        <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+          <IconButton
+            onClick={() => setPreviewImage(null)}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              color: "rgba(255,255,255,0.8)",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          {previewImage && (
+            <Box
+              component="img"
+              src={previewImage}
+              alt="Project preview"
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                borderRadius: 1.5,
+                display: "block",
+              }}
+            />
+          )}
+        </Box>
+      </Dialog>
     </Stack>
   );
 }

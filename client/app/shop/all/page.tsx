@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   IconButton,
   InputAdornment,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -28,6 +29,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/src/shared/api/http";
 import { useFavorites } from "@/src/shared/providers/FavoritesProvider";
+import { useCart } from "@/src/shared/providers/CartProvider";
 
 type Product = {
   id: number;
@@ -37,6 +39,7 @@ type Product = {
   images?: string[] | null;
   price: number | string;
   tags?: string[];
+  collectionId?: number | null;
 };
 
 const formatCurrency = (value: number | string) => {
@@ -124,7 +127,11 @@ export default function ShopAllPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletePending, setDeletePending] = useState<number | null>(null);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">("success");
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { addItem, isLoading: isCartUpdating, error: cartError } = useCart();
   const pageSize = 12;
 
   useEffect(() => {
@@ -601,13 +608,18 @@ export default function ShopAllPage() {
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
-                      toggleFavorite({
+                      const wasAdded = toggleFavorite({
                         id: item.id,
                         name: item.name,
                         price: item.price,
                         image: item.image ?? null,
                         collectionId: null,
                       });
+                      setToastMessage(
+                        wasAdded ? "Added to favorites." : "Removed from favorites.",
+                      );
+                      setToastSeverity("success");
+                      setToastOpen(true);
                     }}
                     sx={{
                       position: "absolute",
@@ -665,7 +677,7 @@ export default function ShopAllPage() {
                         backdropFilter: "blur(12px)",
                         border: "1px solid rgba(242,185,13,0.15)",
                         p: 1.5,
-                        aspectRatio: "4 / 5",
+                        height: 570,
                         display: "flex",
                         flexDirection: "column",
                         transition: "transform 0.3s ease",
@@ -738,29 +750,60 @@ export default function ShopAllPage() {
                         }}
                       >
                         <Typography
+                          noWrap
                           sx={{
                             fontFamily: "var(--font-playfair)",
                             fontSize: "1.2rem",
                             color: "rgba(255,255,255,0.95)",
+                            minWidth: 0,
+                            flex: 1,
                           }}
                         >
                           {item.name}
                         </Typography>
                         <Box
+                          onClick={async (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const success = await addItem(
+                              {
+                                id: item.id,
+                                name: item.name,
+                                price: item.price,
+                                image: item.image ?? null,
+                                collectionId: item.collectionId ?? null,
+                              },
+                              1,
+                            );
+                            setToastMessage(
+                              success
+                                ? "Item added to cart."
+                                : "Unable to add item to cart.",
+                            );
+                            setToastSeverity(success ? "success" : "error");
+                            setToastOpen(true);
+                          }}
                           sx={{
-                            px: 1.2,
-                            py: 0.4,
-                            borderRadius: 1,
-                            backgroundColor: "rgba(242,185,13,0.18)",
-                            border: "1px solid rgba(242,185,13,0.35)",
+                            px: 1.6,
+                            py: 0.6,
+                            borderRadius: 1.2,
+                            backgroundColor: "rgba(242,185,13,0.22)",
+                            border: "1px solid rgba(242,185,13,0.4)",
+                            cursor: "pointer",
+                            transition: "transform 0.2s ease, background-color 0.2s ease",
+                            "&:hover": {
+                              backgroundColor: "rgba(242,185,13,0.3)",
+                              transform: "translateY(-1px)",
+                            },
+                            "&:active": { transform: "translateY(0)" },
                           }}
                         >
                           <Typography
                             sx={{
                               color: "rgba(242,185,13,0.95)",
                               fontWeight: 600,
-                              fontSize: "0.7rem",
-                              letterSpacing: "0.12em",
+                              fontSize: "0.76rem",
+                              letterSpacing: "0.14em",
                             }}
                           >
                             {formatCurrency(item.price)}
@@ -844,6 +887,22 @@ export default function ShopAllPage() {
           </Stack>
         </Stack>
       </Box>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={2500}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: 10 }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity={toastSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {toastMessage || cartError}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
